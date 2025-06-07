@@ -14,7 +14,7 @@ Supports:
 
 ## 🔗 Live Demo
 
-🌐 [World Radio App](https://WRA.netlify.app)
+🌐 [World Radio App](https://.netlify.app)
 
 ---
 
@@ -90,7 +90,7 @@ Use DevTools → Application tab → Check Manifest and Service Worker
 ## 📤 Google Play Publishing (TWA)
 
 1. Go to [https://www.pwabuilder.com](https://www.pwabuilder.com)
-2. Enter `https://WRA.netlify.app` as the app URL
+2. Enter `https://.netlify.app` as the app URL
 3. Choose **Android (TWA)** and download the ZIP
 4. Open in Android Studio, customize, and test
 5. Upload `.aab` to Google Play Console and publish
