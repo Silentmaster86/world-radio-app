@@ -15,11 +15,11 @@ const Wrapper = styled.div`
   justify-content: center;
   min-height: 100vh;
   text-align: center;
-  padding: 1rem;
-  background: linear-gradient(90deg, #9333ea, #ec4899, #ef4444);
+  padding: ${({ theme }) => theme.spacing.sm};
+  background: linear-gradient(90deg, ${({ theme }) => theme.colors.primary}, ${({ theme }) => theme.colors.accent}, ${({ theme }) => theme.colors.danger});
   background-size: 200% 200%;
   animation: gradientX 10s ease infinite;
-  color: white;
+  color: ${({ theme }) => theme.colors.text};
 
   @keyframes gradientX {
     0%, 100% {
@@ -34,27 +34,27 @@ const Wrapper = styled.div`
 const StationLogo = styled.img`
   width: 12rem;
   height: 12rem;
-  border-radius: 1rem;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
-  margin-bottom: 1.5rem;
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  box-shadow: ${({ theme }) => theme.shadows.medium};
+  margin-bottom: ${({ theme }) => theme.spacing.md};
 `;
 
 const StationName = styled.h1`
-  font-size: 2rem;
+  font-size: ${({ theme }) => theme.fontSizes.xl};
   font-weight: bold;
-  margin-bottom: 0.5rem;
+  margin-bottom: ${({ theme }) => theme.spacing.xs};
 `;
 
 const Subtitle = styled.p`
-  font-size: 0.875rem;
-  color: #cbd5e1;
-  margin-bottom: 2rem;
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  color: ${({ theme }) => theme.colors.muted};
+  margin-bottom: ${({ theme }) => theme.spacing.lg};
 `;
 
 const ControlGroup = styled.div`
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: ${({ theme }) => theme.spacing.md};
   font-size: 2rem;
 `;
 

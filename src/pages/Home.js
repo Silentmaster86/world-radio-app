@@ -6,39 +6,40 @@ import { useAudio } from "../context/AudioContext";
 import { useFavorites } from "../context/FavoritesContext";
 
 const PageWrapper = styled.div`
-  padding: 1rem;
+  padding: ${({ theme }) => theme.spacing.sm};
   min-height: 100vh;
   background: linear-gradient(to bottom, #1a1a1a, #000);
-  color: white;
+  color: ${({ theme }) => theme.colors.text};
 `;
 
 const ControlsWrapper = styled.div`
-  margin-bottom: 1.5rem;
+  margin-bottom: ${({ theme }) => theme.spacing.md};
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: ${({ theme }) => theme.spacing.sm};
   align-items: center;
   justify-content: space-between;
 `;
 
 const CategoryButton = styled.button`
-  padding: 0.4rem 1rem;
-  border-radius: 9999px;
-  border: 1px solid transparent;
-  font-weight: ${({ $active }) => ($active ? "bold" : "normal")};
-  background: ${({ $active }) => ($active ? "white" : "#2d2d2d")};
-  color: ${({ $active }) => ($active ? "black" : "white")};
-  box-shadow: ${({ active }) => (active ? "0 2px 4px rgba(0,0,0,0.3)" : "none")};
+  padding: 0.5rem 1rem;
+  border-radius: ${({ theme }) => theme.borderRadius.full};
+  background: ${({ $active }) => ($active ? "#fff" : "rgba(255, 255, 255, 0.1)")};
+  color: ${({ $active }) => ($active ? "#000" : "#fff")};
+  border: none;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   transition: all 0.2s ease-in-out;
+  backdrop-filter: blur(10px);
 
   &:hover {
-    background: #444;
+    background: rgba(255, 255, 255, 0.2);
   }
 `;
 
 const SearchInput = styled.input`
   padding: 0.5rem 1rem;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.borderRadius.md};
   background: #2d2d2d;
   color: white;
   border: none;
@@ -48,31 +49,38 @@ const SearchInput = styled.input`
 
 const StationGrid = styled.div`
   display: grid;
-  gap: 1.5rem;
+  gap: ${({ theme }) => theme.spacing.md};
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 `;
 
 const StationCard = styled.div`
-  background: #1a1a1a;
-  padding: 1.25rem;
-  border-radius: 1rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(145deg, #1a1a1a, #121212);
+  border-radius: ${({ theme }) => theme.borderRadius.lg};
+  padding: ${({ theme }) => theme.spacing.sm};
+  box-shadow: ${({ theme }) => theme.shadows.medium};
   text-align: center;
   position: relative;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.3s ease;
   cursor: pointer;
+  transform: translateY(0);
 
   &:hover {
-    transform: scale(1.02);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.7);
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(255, 255, 255, 0.1);
   }
 `;
 
 const StationLogo = styled.img`
   width: 80px;
   height: 80px;
-  border-radius: 0.5rem;
-  margin: 0 auto 1rem;
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  margin: 0 auto ${({ theme }) => theme.spacing.sm};
+`;
+
+const StationName = styled.div`
+  font-size: ${({ theme }) => theme.fontSizes.lg};
+  font-weight: 600;
+  margin-bottom: ${({ theme }) => theme.spacing.xs};
 `;
 
 const FavoriteButton = styled.button`
@@ -132,7 +140,7 @@ export default function Home() {
         {searchedStations.map((station, i) => (
           <StationCard key={i} onClick={() => setStation(station)}>
             <StationLogo src={station.logo} alt={station.name} />
-            <div className="text-xl font-semibold mb-2">{station.name}</div>
+            <StationName>{station.name}</StationName>
             <FavoriteButton
               onClick={(e) => {
                 e.stopPropagation();

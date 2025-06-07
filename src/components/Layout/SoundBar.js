@@ -16,21 +16,21 @@ const Bar = styled.div`
   position: fixed;
   bottom: 0;
   width: 100%;
-  background: #111;
-  color: white;
+  background: ${({ theme }) => theme.colors.surface};
+  color: ${({ theme }) => theme.colors.text};
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem;
+  padding: ${({ theme }) => theme.spacing.sm};
   z-index: 50;
-  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.4);
+  box-shadow: ${({ theme }) => theme.shadows.medium};
 `;
 
 const Info = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: ${({ theme }) => theme.spacing.xs};
   margin-bottom: 0.5rem;
 
   @media(min-width: 640px) {
@@ -41,13 +41,13 @@ const Info = styled.div`
 const Logo = styled.img`
   width: 40px;
   height: 40px;
-  border-radius: 0.5rem;
+  border-radius: ${({ theme }) => theme.borderRadius.md};
 `;
 
 const Controls = styled.div`
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: ${({ theme }) => theme.spacing.sm};
   flex-wrap: wrap;
   justify-content: center;
 `;
@@ -57,10 +57,10 @@ const VolumeSlider = styled.input`
 `;
 
 const StationSelect = styled.select`
-  background: #2d2d2d;
-  color: white;
+  background: ${({ theme }) => theme.colors.surface};
+  color: ${({ theme }) => theme.colors.text};
   padding: 0.4rem 0.6rem;
-  border-radius: 6px;
+  border-radius: ${({ theme }) => theme.borderRadius.sm};
   border: none;
 `;
 
