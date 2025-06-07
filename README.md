@@ -49,6 +49,10 @@ cd world-radio-app
 
 # Install dependencies
 npm install
+npm install react-scripts --save-dev
+npm install react-icons
+npm install styled-components
+npm i --save-dev @types/react
 
 # Run the development server
 npm start

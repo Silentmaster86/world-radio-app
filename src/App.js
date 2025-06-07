@@ -1,43 +1,33 @@
 // src/App.js
-import React, { useEffect } from "react";
-import { BrowserRouter as Router } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { ThemeProvider as StyledThemeProvider } from "styled-components";
-import { ThemeProvider, useTheme } from "./context/ThemeContext.js";
-import { SoundBarProvider } from "./context/SoundBarContext.js";
-import { fetchPosts } from "./features/posts/postsSlice.js";
-import AuthObserver from "./features/auth/Authobserver.js";
-import AppRoutes from "./routes/AppRoutes.js";
-import SoundBar from "./components/Layout/SoundBar.js";
-import Layout from "./components/Layout/Layout.js"; // ✅ use this
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import styled from "styled-components";
+import { AudioProvider } from "./context/AudioContext";
+import SoundBar from "./components/Layout/SoundBar";
+import Home from "./pages/Home";
+import NowPlaying from "./pages/NowPlaying";
 
-import "./styles/App.css";
+const AppWrapper = styled.div`
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #0a0a0a, #000);
+  color: white;
+  padding: 0 1rem 7rem;
+`;
 
-const AppContent = () => {
-  const dispatch = useDispatch();
-  const { theme } = useTheme();
-
-  useEffect(() => {
-    dispatch(fetchPosts());
-  }, [dispatch]);
-
+function App() {
   return (
-    <StyledThemeProvider theme={theme}>
+    <AudioProvider>
       <Router>
-        <AuthObserver />
-        <SoundBar />
-          <AppRoutes />
+        <AppWrapper>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/now-playing" element={<NowPlaying />} />
+            {/* Add more pages here if needed in the future */}
+          </Routes>
+          <SoundBar />
+        </AppWrapper>
       </Router>
-    </StyledThemeProvider>
-  );
-};
-
-export default function App() {
-  return (
-    <ThemeProvider>
-      <SoundBarProvider>
-        <AppContent />
-      </SoundBarProvider>
-    </ThemeProvider>
+    </AudioProvider>
   );
 }
+
+export default App;

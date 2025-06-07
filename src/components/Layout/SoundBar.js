@@ -1,221 +1,133 @@
 // src/components/Layout/SoundBar.js
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import styled, { keyframes } from "styled-components";
-import { useAudio } from "../../context/AudioContext.js";
-import { useSoundBarToggle } from "../../context/SounBarContext.js";
+import React from "react";
+import styled from "styled-components";
+import { useAudio } from "../../context/AudioContext";
+import { stations } from "../../data/stations";
+import {
+  FaPlay,
+  FaPause,
+  FaVolumeMute,
+  FaVolumeUp,
+  FaStepForward,
+  FaStepBackward
+} from "react-icons/fa";
 
-
-const Wrapper = styled.div`
-  position: relative;
-`;
-
-const ToggleButton = styled.button`
-  display: none;
+const Bar = styled.div`
   position: fixed;
-  bottom: 1rem;
-  right: 1rem;
-  background: #ff4500;
+  bottom: 0;
+  width: 100%;
+  background: #111;
   color: white;
-  border: none;
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  font-size: 1.5rem;
-  z-index: 1000;
-  cursor: pointer;
-`;
-
-const Box = styled(motion.div)`
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  background: #1a1a1b;
-  border-radius: 8px;
-  color: white;
   justify-content: space-between;
-  margin-top: 1rem;
+  padding: 1rem;
+  z-index: 50;
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.4);
 `;
 
-const Line = styled(motion.span)`
-  background: white;
-  height: 1rem;
-  width: 3px;
-  margin: 0 0.15rem;
-  border-radius: 10px;
-`;
+const Info = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
 
-const Select = styled.select`
-  background: #1a1a1b;
-  color: white;
-  border: 1px solid white;
-  padding: 0.3rem;
-  flex: 1;
-
-  @media (max-width: 768px) {
-    width: 100%;
-  }
-`;
-
-const Volume = styled.input`
-  width: 100px;
-  @media (max-width: 768px) {
-    width: 100%;
-  }
-`;
-
-const marquee = keyframes`
-  0% { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
-`;
-
-const NowPlaying = styled.div`
-  overflow: hidden;
-  white-space: nowrap;
-  width: 220px;
-  font-size: 0.9rem;
-  position: relative;
-  flex: 1;
-
-  @media (max-width: 480px) {
-    display: none;
-  }
-
-  & span {
-    display: inline-block;
-    padding-left: 100%;
-    animation: ${marquee} 15s linear infinite;
+  @media(min-width: 640px) {
+    margin-bottom: 0;
   }
 `;
 
 const Logo = styled.img`
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: 0.5rem;
 `;
 
-const Button = styled.button`
-  background-color: #272729;
-  color: #fff;
-  border: 1px solid #555;
-  border-radius: 5px;
-  padding: 6px 12px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background-color: #3c3c3e;
-    border-color: #888;
-  }
-
-  &:active {
-    transform: scale(0.98);
-  }
-
-  @media (max-width: 768px) {
-    width: 100%;
-  }
+const Controls = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
 `;
 
-const SoundBar = () => {
+const VolumeSlider = styled.input`
+  width: 100px;
+`;
+
+const StationSelect = styled.select`
+  background: #2d2d2d;
+  color: white;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  border: none;
+`;
+
+export default function SoundBar() {
   const {
-    stations,
     currentStation,
+    togglePlay,
+    nextStation,
+    prevStation,
     isPlaying,
     volume,
-    isMuted,
-    togglePlay,
-    changeStation,
-    setVolume,
-    toggleMute
+    changeVolume,
+    muted,
+    toggleMute,
+    setStation,
   } = useAudio();
 
-  const [isOpen, setIsOpen] = useState(true);
-  const { visible } = useSoundBarToggle();
-
-  if (!visible) return null;
-  if (!currentStation) return null; // guard against null station
-
   return (
-    <Wrapper>
-      <ToggleButton onClick={() => setIsOpen((prev) => !prev)}>🎵</ToggleButton>
+    <Bar>
+      <Info>
+        <Logo src={currentStation.logo} alt={currentStation.name} />
+        <div>
+          <div style={{ fontWeight: "bold" }}>{currentStation.name}</div>
+          <div style={{ fontSize: "0.8rem", color: "#ccc" }}>Live Radio</div>
+        </div>
+      </Info>
 
-      <AnimatePresence>
-        {isOpen && (
-          <Box
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            transition={{ duration: 0.4 }}
-          >
-            <Logo src={currentStation.logo} alt={currentStation.name} />
+      <Controls>
+        <button onClick={prevStation} title="Previous">
+          <FaStepBackward />
+        </button>
 
-            <div style={{ display: "flex" }}>
-              {[0.1, 0.2, 0.3, 0.4, 0.5].map((delay, i) => (
-                <Line
-                  key={i}
-                  variants={{
-                    playing: {
-                      scaleY: [1, 2, 1.3, 2.5, 1],
-                      transition: { duration: 1, repeat: Infinity }
-                    },
-                    paused: { scaleY: 1 }
-                  }}
-                  animate={isPlaying ? "playing" : "paused"}
-                  transition={{ delay }}
-                />
-              ))}
-            </div>
+        <button onClick={togglePlay} title={isPlaying ? "Pause" : "Play"}>
+          {isPlaying ? <FaPause /> : <FaPlay />}
+        </button>
 
-            <Button onClick={togglePlay}>
-              {isPlaying ? "⏸️ Pause" : "▶️ Play"}
-            </Button>
+        <button onClick={nextStation} title="Next">
+          <FaStepForward />
+        </button>
 
-            <Select
-              onChange={(e) => {
-                const selected = stations.find(
-                  (s) => s.url === e.target.value
-                );
-                changeStation(selected);
-              }}
-              value={currentStation?.url}
-            >
-              {stations.map((station, index) => (
-                <option key={index} value={station.url}>
-                  {station.name}
-                </option>
-              ))}
-            </Select>
+        <button onClick={toggleMute} title={muted ? "Unmute" : "Mute"}>
+          {muted ? <FaVolumeMute /> : <FaVolumeUp />}
+        </button>
 
-            <Volume
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              value={volume}
-              onChange={(e) => setVolume(parseFloat(e.target.value))}
-            />
+        <VolumeSlider
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value={volume}
+          onChange={(e) => changeVolume(parseFloat(e.target.value))}
+        />
 
-            <Button onClick={toggleMute}>
-              {isMuted ? "🔇 Unmute" : "🔊 Mute"}
-            </Button>
-
-            <NowPlaying>
-              <span>
-                {isPlaying
-                  ? `🎧 Now Playing: ${currentStation.name}`
-                  : "⏸️ Paused"}
-              </span>
-            </NowPlaying>
-          </Box>
-        )}
-      </AnimatePresence>
-    </Wrapper>
+        <StationSelect
+          value={currentStation.name}
+          onChange={(e) => {
+            const selected = stations.find((s) => s.name === e.target.value);
+            setStation(selected);
+          }}
+        >
+          {stations.map((station, i) => (
+            <option key={i} value={station.name}>
+              {station.name}
+            </option>
+          ))}
+        </StationSelect>
+      </Controls>
+    </Bar>
   );
-};
-
-
-export default SoundBar;
+}
