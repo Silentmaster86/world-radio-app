@@ -115,5 +115,5 @@ This project is licensed under the MIT License.
 
 ## 🙌 Credits
 
-Built by [Your Name](https://github.com/Silentmaster86)  
+Built by Przemyslaw Pietkun (https://github.com/Silentmaster86)  
 Inspired by the simplicity of music and power of the web 🌐
