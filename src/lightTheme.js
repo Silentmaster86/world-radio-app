@@ -1,16 +1,15 @@
-// src/theme.js
-
-export const theme = {
+export const lightTheme = {
     colors: {
-      background: "#0e0e0e",
-      surface: "#1a1a1a",
-      accent: "#ec4899",
-      text: "#ffffff",
-      muted: "#cccccc",
-      primary: "#9333ea",
-      secondary: "#3b82f6",
-      danger: "#ef4444",
-    },
+        mode: "light",
+        background: "#f7f7f7",
+        surface: "#ffffff",
+        text: "#111111", // ✅ dark text
+        accent: "#ec4899",
+        muted: "#666666",
+        primary: "#7c3aed",
+        secondary: "#2563eb",
+        danger: "#dc2626",
+      },
     fontSizes: {
       sm: "0.875rem",
       base: "1rem",

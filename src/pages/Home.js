@@ -4,6 +4,7 @@ import styled from "styled-components";
 import { stations } from "../data/stations";
 import { useAudio } from "../context/AudioContext";
 import { useFavorites } from "../context/FavoritesContext";
+import { motion } from "framer-motion";
 
 const PageWrapper = styled.div`
   padding: ${({ theme }) => theme.spacing.sm};
@@ -54,15 +55,25 @@ const StationGrid = styled.div`
 `;
 
 const StationCard = styled.div`
-  background: linear-gradient(145deg, #1a1a1a, #121212);
+  background: ${({ theme }) =>
+    theme.colors.mode === "dark"
+      ? "linear-gradient(135deg, rgba(93,12,255,0.15), rgba(155,0,250,0.1))"
+      : theme.colors.surface};
   border-radius: ${({ theme }) => theme.borderRadius.lg};
   padding: ${({ theme }) => theme.spacing.sm};
-  box-shadow: ${({ theme }) => theme.shadows.medium};
+  box-shadow: ${({ theme }) =>
+    theme.colors.mode === "dark"
+      ? "0 0 12px rgba(0,255,255,0.05), 0 0 18px rgba(255,0,255,0.05)"
+      : theme.shadows.medium};
   text-align: center;
   position: relative;
   transition: all 0.3s ease;
   cursor: pointer;
   transform: translateY(0);
+  backdrop-filter: ${({ theme }) =>
+    theme.colors.mode === "dark" ? "blur(12px)" : "none"};
+  border: ${({ theme }) =>
+    theme.colors.mode === "dark" ? "1px solid rgba(255,255,255,0.08)" : "none"};
 
   &:hover {
     transform: translateY(-5px);
@@ -80,6 +91,7 @@ const StationLogo = styled.img`
 const StationName = styled.div`
   font-size: ${({ theme }) => theme.fontSizes.lg};
   font-weight: 600;
+  color: ${({ theme }) => theme.colors.text};
   margin-bottom: ${({ theme }) => theme.spacing.xs};
 `;
 
@@ -99,7 +111,7 @@ const FavoriteButton = styled.button`
 `;
 
 export default function Home() {
-  const { setStation } = useAudio();
+  const { setStation, currentStation } = useAudio();
   const { favorites, toggleFavorite } = useFavorites();
   const [filter, setFilter] = useState("All");
   const [query, setQuery] = useState("");
@@ -122,6 +134,7 @@ export default function Home() {
               key={i}
               $active={filter === cat}
               onClick={() => setFilter(cat)}
+              aria-label={`Filter by ${cat}`}
             >
               {cat}
             </CategoryButton>
@@ -133,23 +146,41 @@ export default function Home() {
           placeholder="🔍 Search stations..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          aria-label="Search stations"
         />
       </ControlsWrapper>
 
       <StationGrid>
         {searchedStations.map((station, i) => (
-          <StationCard key={i} onClick={() => setStation(station)}>
-            <StationLogo src={station.logo} alt={station.name} />
-            <StationName>{station.name}</StationName>
-            <FavoriteButton
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleFavorite(station);
+          <motion.div
+            key={i}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <StationCard
+              onClick={() => setStation(station)}
+              style={{
+                border:
+                  station.name === currentStation.name ? "2px solid #ec4899" : "none",
               }}
+              aria-label={`Play ${station.name}`}
             >
-              {favorites.find((f) => f.name === station.name) ? "♥" : "♡"}
-            </FavoriteButton>
-          </StationCard>
+              <StationLogo src={station.logo} alt={station.name} />
+              <StationName>{station.name}</StationName>
+              <FavoriteButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleFavorite(station);
+                }}
+                aria-label={`Toggle favorite for ${station.name}`}
+              >
+                {favorites.find((f) => f.name === station.name) ? "♥" : "♡"}
+              </FavoriteButton>
+            </StationCard>
+          </motion.div>
         ))}
       </StationGrid>
     </PageWrapper>

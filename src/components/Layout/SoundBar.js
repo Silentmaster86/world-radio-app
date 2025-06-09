@@ -15,7 +15,7 @@ import {
 const Bar = styled.div`
   position: fixed;
   bottom: 0;
-  width: 100%;
+  width: 98%;
   background: ${({ theme }) => theme.colors.surface};
   color: ${({ theme }) => theme.colors.text};
   display: flex;
@@ -54,6 +54,27 @@ const Controls = styled.div`
 
 const VolumeSlider = styled.input`
   width: 100px;
+  height: 4px;
+  appearance: none;
+  background: #444;
+  border-radius: 9999px;
+  outline: none;
+  margin: 0 0.5rem;
+  transition: background 0.3s ease;
+
+  &::-webkit-slider-thumb {
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    background: ${({ theme }) => theme.colors.accent};
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+
+  &::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+  }
 `;
 
 const StationSelect = styled.select`
@@ -89,19 +110,19 @@ export default function SoundBar() {
       </Info>
 
       <Controls>
-        <button onClick={prevStation} title="Previous">
+        <button onClick={prevStation} title="Previous" aria-label="Previous Station">
           <FaStepBackward />
         </button>
 
-        <button onClick={togglePlay} title={isPlaying ? "Pause" : "Play"}>
+        <button onClick={togglePlay} title={isPlaying ? "Pause" : "Play"} aria-label="Toggle Play">
           {isPlaying ? <FaPause /> : <FaPlay />}
         </button>
 
-        <button onClick={nextStation} title="Next">
+        <button onClick={nextStation} title="Next" aria-label="Next Station">
           <FaStepForward />
         </button>
 
-        <button onClick={toggleMute} title={muted ? "Unmute" : "Mute"}>
+        <button onClick={toggleMute} title={muted ? "Unmute" : "Mute"} aria-label="Toggle Mute">
           {muted ? <FaVolumeMute /> : <FaVolumeUp />}
         </button>
 
@@ -112,6 +133,7 @@ export default function SoundBar() {
           step="0.01"
           value={volume}
           onChange={(e) => changeVolume(parseFloat(e.target.value))}
+          aria-label="Volume Control"
         />
 
         <StationSelect
@@ -120,6 +142,7 @@ export default function SoundBar() {
             const selected = stations.find((s) => s.name === e.target.value);
             setStation(selected);
           }}
+          aria-label="Select Station"
         >
           {stations.map((station, i) => (
             <option key={i} value={station.name}>
