@@ -17,12 +17,12 @@ const AppWrapper = styled.div`
 const ToggleButton = styled.button`
   position: absolute;
   top: 1rem;
-  left: 9rem;
+  left: 13rem;
   padding: 0.6rem 1rem;
   background: ${({ theme }) => theme.colors.surface};
   color: ${({ theme }) => theme.colors.text};
-  border-radius: ${({ theme }) => theme.borderRadius.sm};
-  box-shadow: ${({ theme }) => theme.shadows.soft};
+  border-radius: ${({ theme }) => theme.borderRadius.full};
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   border: none;
 `;
 

@@ -22,30 +22,41 @@ const ControlsWrapper = styled.div`
   justify-content: space-between;
 `;
 
-const CategoryButton = styled.button`
-  padding: 0.5rem 1rem;
+const FavoritesFilterButton = styled.button`
+  padding: 0.5rem 0.8rem;
   border-radius: ${({ theme }) => theme.borderRadius.full};
   background: ${({ $active }) => ($active ? "#fff" : "rgba(255, 255, 255, 0.1)")};
   color: ${({ $active }) => ($active ? "#000" : "#fff")};
   border: none;
   font-weight: 600;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  transition: all 0.2s ease-in-out;
+  box-shadow: ${({ theme }) =>
+    theme.colors.mode === "dark"
+      ? "0 0 12px rgba(0,255,255,0.05), 0 0 18px rgba(255,0,255,0.05)"
+      : theme.shadows.medium};
+  transition: all 0.4s ease-in-out;
   backdrop-filter: blur(10px);
 
   &:hover {
-    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(255, 255, 255, 0.1);
   }
 `;
 
 const SearchInput = styled.input`
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0.8rem;
   border-radius: ${({ theme }) => theme.borderRadius.md};
   background: #2d2d2d;
   color: white;
   border: none;
   outline: none;
   width: 250px;
+
+  &:hover {
+    background: #f3f3f3;
+    color: #000000;
+    box-shadow: 0 12px 24px rgba(255, 255, 255, 0.1);
+  }
+
 `;
 
 const StationGrid = styled.div`
@@ -99,11 +110,11 @@ const FavoriteButton = styled.button`
   position: absolute;
   top: 0.75rem;
   right: 1rem;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   transition: transform 0.2s;
   background: none;
   border: none;
-  color: white;
+  color: ${({ theme }) => theme.colors.text};
 
   &:hover {
     transform: scale(1.1);
@@ -116,10 +127,13 @@ export default function Home() {
   const [filter, setFilter] = useState("All");
   const [query, setQuery] = useState("");
 
-  const categories = ["All", ...new Set(stations.map((s) => s.category))];
+  const filters = ["All", "Favorites"];
 
   const filteredStations =
-    filter === "All" ? stations : stations.filter((s) => s.category === filter);
+  filter === "Favorites"
+    ? stations.filter((s) => favorites.find((f) => f.name === s.name))
+    : stations;
+
 
   const searchedStations = filteredStations.filter((s) =>
     s.name.toLowerCase().includes(query.toLowerCase())
@@ -128,16 +142,16 @@ export default function Home() {
   return (
     <PageWrapper>
       <ControlsWrapper>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-          {categories.map((cat, i) => (
-            <CategoryButton
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
+          {filters.map((f, i) => (
+            <FavoritesFilterButton
               key={i}
-              $active={filter === cat}
-              onClick={() => setFilter(cat)}
-              aria-label={`Filter by ${cat}`}
+              $active={filter === f}
+              onClick={() => setFilter(f)}
+              aria-label={`Filter by ${f}`}
             >
-              {cat}
-            </CategoryButton>
+              {f}
+            </FavoritesFilterButton>
           ))}
         </div>
 

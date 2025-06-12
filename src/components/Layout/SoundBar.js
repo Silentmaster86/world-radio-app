@@ -136,20 +136,6 @@ export default function SoundBar() {
           aria-label="Volume Control"
         />
 
-        <StationSelect
-          value={currentStation.name}
-          onChange={(e) => {
-            const selected = stations.find((s) => s.name === e.target.value);
-            setStation(selected);
-          }}
-          aria-label="Select Station"
-        >
-          {stations.map((station, i) => (
-            <option key={i} value={station.name}>
-              {station.name}
-            </option>
-          ))}
-        </StationSelect>
       </Controls>
     </Bar>
   );
