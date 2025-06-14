@@ -14,8 +14,11 @@ import {
 
 const Bar = styled.div`
   position: fixed;
-  bottom: 0;
+  left: 0.8rem;
+  right: 0.8rem;
+  bottom: 1rem;
   width: 98%;
+  margin-right: 1rem;
   background: ${({ theme }) => theme.colors.surface};
   color: ${({ theme }) => theme.colors.text};
   display: flex;
@@ -23,9 +26,31 @@ const Bar = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: ${({ theme }) => theme.spacing.sm};
-  z-index: 50;
-  box-shadow: ${({ theme }) => theme.shadows.medium};
-`;
+  z-index: 10;
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  box-shadow: 0 6px 15px rgb(88, 70, 70);
+  
+  @media(max-width: 1024px) {
+    width: 97.2%;
+  }
+  
+  @media(max-width: 768px) {
+    width: 96.2%;
+  }
+
+  @media(max-width: 425px) {
+    width: 93.2%;
+  }
+
+  @media(max-width: 375px) {
+    width: 92.5%;
+  }
+
+  @media(max-width: 320px) {
+    width: 91%;
+  }
+
+  `;
 
 const Info = styled.div`
   display: flex;

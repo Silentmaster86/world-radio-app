@@ -1,41 +1,41 @@
 // src/App.js
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import styled, { ThemeProvider } from "styled-components";
+import styled from "styled-components";
 import { AudioProvider } from "./context/AudioContext";
 import SoundBar from "./components/Layout/SoundBar";
 import Home from "./pages/Home";
 import NowPlaying from "./pages/NowPlaying";
-import { useTheme } from "./context/ThemeContext";
 
 const AppWrapper = styled.div`
-  min-height: 100vh;
+  min-height: 80vh;
   background: ${({ theme }) => theme.colors.background};
   color: ${({ theme }) => theme.colors.text};
-  padding: 0 ${({ theme }) => theme.spacing.sm} 7rem;
-`;
+  padding: 0 ${({ theme }) => theme.spacing.sm} 8rem;
 
-const ToggleButton = styled.button`
-  position: absolute;
-  top: 1rem;
-  left: 13rem;
-  padding: 0.6rem 1rem;
-  background: ${({ theme }) => theme.colors.surface};
-  color: ${({ theme }) => theme.colors.text};
-  border-radius: ${({ theme }) => theme.borderRadius.full};
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  border: none;
+  @media(max-width: 1440px) {
+    padding-top: 1rem;
+  }
+
+  @media(max-width: 1024px) {
+    padding-bottom: 6rem;
+  }
+
+  @media(max-width: 1440px) {
+    padding-bottom: 8rem;
+  }
+
+  @media(max-width: 1440px) {
+    padding-bottom: 9rem;
+  }
+  
 `;
 
 function App() {
-  const { isDarkMode, toggleTheme } = useTheme();
 
   return (
     <AudioProvider>
       <Router>
         <AppWrapper>
-          <ToggleButton onClick={toggleTheme}>
-            Switch to {isDarkMode ? "Light" : "Dark"} Mode
-          </ToggleButton>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/now-playing" element={<NowPlaying />} />

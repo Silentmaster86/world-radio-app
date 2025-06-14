@@ -21,7 +21,7 @@ export const darkTheme = {
     sm: "1rem",
     md: "1.5rem",
     lg: "2rem",
-    xl: "3rem",
+    xl: "1rem",
   },
   borderRadius: {
     sm: "6px",

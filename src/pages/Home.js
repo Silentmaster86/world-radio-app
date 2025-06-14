@@ -4,11 +4,13 @@ import styled from "styled-components";
 import { stations } from "../data/stations";
 import { useAudio } from "../context/AudioContext";
 import { useFavorites } from "../context/FavoritesContext";
+import { useTheme } from "../context/ThemeContext";
 import { motion } from "framer-motion";
+import { FaSun, FaMoon } from "react-icons/fa";
 
 const PageWrapper = styled.div`
   padding: ${({ theme }) => theme.spacing.sm};
-  min-height: 100vh;
+  min-height: 80vh;
   background: linear-gradient(to bottom, #1a1a1a, #000);
   color: ${({ theme }) => theme.colors.text};
 `;
@@ -16,10 +18,15 @@ const PageWrapper = styled.div`
 const ControlsWrapper = styled.div`
   margin-bottom: ${({ theme }) => theme.spacing.md};
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: ${({ theme }) => theme.spacing.sm};
-  align-items: center;
-  justify-content: space-between;
+  position: relative;
+
+  @media (min-width: 660px) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
 `;
 
 const FavoritesFilterButton = styled.button`
@@ -37,13 +44,71 @@ const FavoritesFilterButton = styled.button`
   backdrop-filter: blur(10px);
 
   &:hover {
-    transform: translateY(-5px);
     box-shadow: 0 12px 24px rgba(255, 255, 255, 0.1);
   }
 `;
 
+const ToggleButton = styled.button`
+  padding: 0.5rem 1rem;
+  background: ${({ $active }) => ($active ? "#fff" : "rgba(255, 255, 255, 0.1)")};
+  color: ${({ $active }) => ($active ? "#000" : "#fff")};
+  border-radius: ${({ theme }) => theme.borderRadius.full};
+  box-shadow: ${({ theme }) =>
+    theme.colors.mode === "dark"
+      ? "0 0 12px rgba(0,255,255,0.05), 0 0 18px rgba(255,0,255,0.05)"
+      : theme.shadows.medium};
+  transition: all 0.4s ease-in-out;
+  border: none;
+  max-width: 4rem;
+
+  &:hover {
+    box-shadow: 0 12px 24px rgba(255, 255, 255, 0.1);
+  }
+`;
+
+const ToggleThumb = styled.div`
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: ${({ theme }) => theme.colors.accent};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  transition: transform 0.4s ease;
+`;
+
+const LeftControls = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  @media (min-width: 660px) {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+`;
+
+const FilterRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+`;
+
+const SearchRow = styled.div`
+  display: flex;
+  justify-content: center;
+  
+
+  @media (min-width: 660px) {
+    justify-content: center;
+  }
+`;
+
 const SearchInput = styled.input`
-  padding: 0.5rem 0.8rem;
+padding: 0.5rem 0.8rem;
   border-radius: ${({ theme }) => theme.borderRadius.md};
   background: #2d2d2d;
   color: white;
@@ -56,7 +121,6 @@ const SearchInput = styled.input`
     color: #000000;
     box-shadow: 0 12px 24px rgba(255, 255, 255, 0.1);
   }
-
 `;
 
 const StationGrid = styled.div`
@@ -124,16 +188,16 @@ const FavoriteButton = styled.button`
 export default function Home() {
   const { setStation, currentStation } = useAudio();
   const { favorites, toggleFavorite } = useFavorites();
+  const { isDarkMode, toggleTheme } = useTheme();
   const [filter, setFilter] = useState("All");
   const [query, setQuery] = useState("");
 
   const filters = ["All", "Favorites"];
 
   const filteredStations =
-  filter === "Favorites"
-    ? stations.filter((s) => favorites.find((f) => f.name === s.name))
-    : stations;
-
+    filter === "Favorites"
+      ? stations.filter((s) => favorites.find((f) => f.name === s.name))
+      : stations;
 
   const searchedStations = filteredStations.filter((s) =>
     s.name.toLowerCase().includes(query.toLowerCase())
@@ -142,26 +206,34 @@ export default function Home() {
   return (
     <PageWrapper>
       <ControlsWrapper>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
-          {filters.map((f, i) => (
-            <FavoritesFilterButton
-              key={i}
-              $active={filter === f}
-              onClick={() => setFilter(f)}
-              aria-label={`Filter by ${f}`}
-            >
-              {f}
-            </FavoritesFilterButton>
-          ))}
-        </div>
-
-        <SearchInput
-          type="text"
-          placeholder="🔍 Search stations..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          aria-label="Search stations"
-        />
+      <LeftControls>
+          <FilterRow>
+            {filters.map((f, i) => (
+              <FavoritesFilterButton
+                key={i}
+                $active={filter === f}
+                onClick={() => setFilter(f)}
+                aria-label={`Filter by ${f}`}
+              >
+                {f}
+              </FavoritesFilterButton>
+            ))}
+          <ToggleButton onClick={toggleTheme} $dark={isDarkMode} aria-label="Toggle theme">
+          <ToggleThumb>
+            {isDarkMode ? <FaMoon size={12} /> : <FaSun size={12} />}
+          </ToggleThumb>
+          </ToggleButton>
+          </FilterRow>
+          <SearchRow>
+            <SearchInput
+              type="text"
+              placeholder="🔍 Search stations..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              aria-label="Search stations"
+            />
+          </SearchRow>
+        </LeftControls>
       </ControlsWrapper>
 
       <StationGrid>
