@@ -67,8 +67,22 @@ export const AudioProvider = ({ children }) => {
         artwork: [{ src: station.logo, sizes: "512x512", type: "image/png" }],
       });
 
-      navigator.mediaSession.setActionHandler("play", togglePlay);
-      navigator.mediaSession.setActionHandler("pause", togglePlay);
+      navigator.mediaSession.setActionHandler("play", () => {
+        try {
+          audioRef.current.play();
+          setIsPlaying(true);
+        } catch (err) {
+          console.error("Play error:", err);
+        }
+      });
+      navigator.mediaSession.setActionHandler("pause", () => {
+        try {
+          audioRef.current.pause();
+          setIsPlaying(false);
+        } catch (err) {
+          console.error("Play error:", err);
+        }
+      });
       navigator.mediaSession.setActionHandler("nexttrack", nextStation);
       navigator.mediaSession.setActionHandler("previoustrack", prevStation);
     }
@@ -76,6 +90,7 @@ export const AudioProvider = ({ children }) => {
 
   // Auto-update audio on station or volume change
   useEffect(() => {
+    audioRef.current.preload = "none";
     audioRef.current.volume = volume;
     audioRef.current.muted = muted;
   }, [volume, muted]);
