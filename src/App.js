@@ -1,10 +1,10 @@
-// src/App.js
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import styled from "styled-components";
-import { AudioProvider } from "./context/AudioContext";
+import { AnimatePresence } from "framer-motion";
 import SoundBar from "./components/Layout/SoundBar";
 import Home from "./pages/Home";
 import NowPlaying from "./pages/NowPlaying";
+import PageTransition from "./components/Layout/PageTransition";
 
 const AppWrapper = styled.div`
   min-height: 80vh;
@@ -12,38 +12,43 @@ const AppWrapper = styled.div`
   color: ${({ theme }) => theme.colors.text};
   padding: 0 ${({ theme }) => theme.spacing.sm} 8rem;
 
-  @media(max-width: 1440px) {
+  @media (max-width: 1440px) {
     padding-top: 1rem;
   }
 
-  @media(max-width: 1024px) {
-    padding-bottom: 6rem;
+  @media (max-width: 1024px) {
+    padding-bottom: 1rem;
   }
-
-  @media(max-width: 1440px) {
-    padding-bottom: 8rem;
-  }
-
-  @media(max-width: 1440px) {
-    padding-bottom: 9rem;
-  }
-  
 `;
 
-function App() {
+// 👇 Move AnimatePresence and useLocation into a proper route-aware component
+function AnimatedRoutes() {
+  const location = useLocation();
 
   return (
-    <AudioProvider>
-      <Router>
-        <AppWrapper>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/now-playing" element={<NowPlaying />} />
-          </Routes>
-          <SoundBar />
-        </AppWrapper>
-      </Router>
-    </AudioProvider>
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route
+          path="/"
+          element={<PageTransition><Home /></PageTransition>}
+        />
+        <Route
+          path="/now-playing"
+          element={<PageTransition><NowPlaying /></PageTransition>}
+        />
+      </Routes>
+    </AnimatePresence>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppWrapper>
+        <AnimatedRoutes />
+        <SoundBar />
+      </AppWrapper>
+    </Router>
   );
 }
 

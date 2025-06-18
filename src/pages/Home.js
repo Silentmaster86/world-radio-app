@@ -1,12 +1,13 @@
 // src/pages/Home.js
-import React, { useState } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { FaSun, FaMoon } from "react-icons/fa";
 import styled from "styled-components";
+import { motion } from "framer-motion";
 import { stations } from "../data/stations";
 import { useAudio } from "../context/AudioContext";
 import { useFavorites } from "../context/FavoritesContext";
 import { useTheme } from "../context/ThemeContext";
-import { motion } from "framer-motion";
-import { FaSun, FaMoon } from "react-icons/fa";
 
 const PageWrapper = styled.div`
   padding: ${({ theme }) => theme.spacing.sm};
@@ -186,12 +187,12 @@ const FavoriteButton = styled.button`
 `;
 
 export default function Home() {
+  const navigate = useNavigate();
   const { setStation, currentStation } = useAudio();
   const { favorites, toggleFavorite } = useFavorites();
   const { isDarkMode, toggleTheme } = useTheme();
   const [filter, setFilter] = useState("All");
   const [query, setQuery] = useState("");
-
   const filters = ["All", "Favorites"];
 
   const filteredStations =
@@ -206,7 +207,7 @@ export default function Home() {
   return (
     <PageWrapper>
       <ControlsWrapper>
-      <LeftControls>
+        <LeftControls>
           <FilterRow>
             {filters.map((f, i) => (
               <FavoritesFilterButton
@@ -218,11 +219,11 @@ export default function Home() {
                 {f}
               </FavoritesFilterButton>
             ))}
-          <ToggleButton onClick={toggleTheme} $dark={isDarkMode} aria-label="Toggle theme">
-          <ToggleThumb>
-            {isDarkMode ? <FaMoon size={12} /> : <FaSun size={12} />}
-          </ToggleThumb>
-          </ToggleButton>
+            <ToggleButton onClick={toggleTheme} $dark={isDarkMode} aria-label="Toggle theme">
+              <ToggleThumb>
+                {isDarkMode ? <FaMoon size={12} /> : <FaSun size={12} />}
+              </ToggleThumb>
+            </ToggleButton>
           </FilterRow>
           <SearchRow>
             <SearchInput
@@ -237,38 +238,45 @@ export default function Home() {
       </ControlsWrapper>
 
       <StationGrid>
-        {searchedStations.map((station, i) => (
-          <motion.div
-            key={i}
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <StationCard
-              onClick={() => setStation(station)}
-              style={{
-                border:
-                  station.name === currentStation.name ? "2px solid #ec4899" : "none",
+        {searchedStations.map((station, i) => {
+          if (!station) return null;
+          
+          return (
+            <motion.div
+              key={i}
+              onClick={() => {
+                console.log("[Motion] Clicked:", station.name);
+                setStation(station);
+                navigate("/now-playing");
               }}
-              aria-label={`Play ${station.name}`}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
             >
-              <StationLogo src={station.logo} alt={station.name} />
-              <StationName>{station.name}</StationName>
-              <FavoriteButton
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleFavorite(station);
+              <StationCard
+                style={{
+                  border: station.name === currentStation.name ? "2px solid #ec4899" : "none",
                 }}
-                aria-label={`Toggle favorite for ${station.name}`}
+                aria-label={`Play ${station.name}`}
               >
-                {favorites.find((f) => f.name === station.name) ? "♥" : "♡"}
-              </FavoriteButton>
-            </StationCard>
-          </motion.div>
-        ))}
+                <StationLogo src={station.logo} alt={station.name} />
+                <StationName>{station.name}</StationName>
+                <FavoriteButton
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleFavorite(station);
+                  }}
+                >
+                  {favorites.find((f) => f.name === station.name) ? "♥" : "♡"}
+                </FavoriteButton>
+              </StationCard>
+            </motion.div>
+          );
+        })}
       </StationGrid>
+
     </PageWrapper>
   );
 }

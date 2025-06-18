@@ -1,8 +1,6 @@
 // src/components/Layout/SoundBar.js
-import React from "react";
 import styled from "styled-components";
 import { useAudio } from "../../context/AudioContext";
-import { stations } from "../../data/stations";
 import {
   FaPlay,
   FaPause,

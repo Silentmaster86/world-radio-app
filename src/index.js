@@ -8,8 +8,6 @@ import { ThemeProviderToggle, useTheme } from "./context/ThemeContext";
 import { register } from "./serviceWorkerRegistration";
 
 register();
-
-const root = ReactDOM.createRoot(document.getElementById("root"));
 const AppWithTheme = () => {
   const { theme } = useTheme();
   return (
@@ -20,6 +18,7 @@ const AppWithTheme = () => {
   );
 };
 
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <FavoritesProvider>
     <AudioProvider>
@@ -29,3 +28,4 @@ root.render(
     </AudioProvider>
   </FavoritesProvider>
 );
+

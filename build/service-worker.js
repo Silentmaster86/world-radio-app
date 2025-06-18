@@ -18,11 +18,10 @@ self.addEventListener("install", (event) => {
       caches.match(event.request).then((cachedResponse) => {
         return (
           cachedResponse ||
-          fetch(event.request).then((response) => {
-            return caches.open("radio-cache-v1").then((cache) => {
-              cache.put(event.request, response.clone());
-              return response;
-            });
+          fetch(event.request).then(async (response) => {
+            const cache = await caches.open("radio-cache-v1");
+            cache.put(event.request, response.clone());
+            return response;
           })
         );
       })

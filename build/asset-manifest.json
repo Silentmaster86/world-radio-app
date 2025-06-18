@@ -1,10 +1,20 @@
 {
   "files": {
-    "main.js": "/Silentmaster86/world-radio-app/static/js/main.bd8c2326.js",
-    "index.html": "/Silentmaster86/world-radio-app/index.html",
-    "main.bd8c2326.js.map": "/Silentmaster86/world-radio-app/static/js/main.bd8c2326.js.map"
+    "main.js": "./static/js/main.66b099b0.js",
+    "static/media/heart_uk.png": "./static/media/heart_uk.6b4e0a78c37c1f9a1c74.png",
+    "static/media/radio_eska.png": "./static/media/radio_eska.afa6624a1c5e6a6395c6.png",
+    "static/media/radio_X.png": "./static/media/radio_X.7adbc7c17b7e1e0bdd72.png",
+    "static/media/pr_chicago.png": "./static/media/pr_chicago.48705dec2a16081ea8f2.png",
+    "static/media/radio_bielsko.png": "./static/media/radio_bielsko.4cbbad14743af6822f71.png",
+    "static/media/kiss_fm.png": "./static/media/kiss_fm.2d55df6d94f821fc4279.png",
+    "static/media/capital.png": "./static/media/capital.cad4be218f2a92134908.png",
+    "static/media/capital_dance.png": "./static/media/capital_dance.53ab5f52e983764792a6.png",
+    "static/media/rmf_maxx.png": "./static/media/rmf_maxx.2c415289a75df95ec0ee.png",
+    "static/media/polish_radio_london.png": "./static/media/polish_radio_london.080e7c1a847febf1c62f.png",
+    "index.html": "./index.html",
+    "main.66b099b0.js.map": "./static/js/main.66b099b0.js.map"
   },
   "entrypoints": [
-    "static/js/main.bd8c2326.js"
+    "static/js/main.66b099b0.js"
   ]
 }
