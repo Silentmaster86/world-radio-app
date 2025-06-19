@@ -8,6 +8,7 @@ import { stations } from "../data/stations";
 import { useAudio } from "../context/AudioContext";
 import { useFavorites } from "../context/FavoritesContext";
 import { useTheme } from "../context/ThemeContext";
+import SoundBar from "../components/Layout/SoundBar";
 
 const PageWrapper = styled.div`
   padding: ${({ theme }) => theme.spacing.sm};
@@ -276,7 +277,6 @@ export default function Home() {
           );
         })}
       </StationGrid>
-
     </PageWrapper>
   );
 }

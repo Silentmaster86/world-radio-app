@@ -14,7 +14,7 @@ const Bar = styled.div`
   position: fixed;
   left: 0.8rem;
   right: 0.8rem;
-  bottom: 1rem;
+  bottom: 5rem;
   width: 98%;
   margin-right: 1rem;
   background: ${({ theme }) => theme.colors.surface};
@@ -28,24 +28,32 @@ const Bar = styled.div`
   border-radius: ${({ theme }) => theme.borderRadius.md};
   box-shadow: 0 6px 15px rgb(88, 70, 70);
   
+  @media(max-width: 1440px) {
+    bottom: 2.3rem;
+  }
+
   @media(max-width: 1024px) {
     width: 97.2%;
   }
   
   @media(max-width: 768px) {
     width: 96.2%;
+    bottom: 2.3rem;
   }
 
   @media(max-width: 425px) {
     width: 93.2%;
+    bottom: 1rem;
   }
 
   @media(max-width: 375px) {
     width: 92.5%;
+    bottom: 1rem;
   }
 
   @media(max-width: 320px) {
     width: 91%;
+    bottom: 0.5rem;
   }
 
   `;
@@ -100,14 +108,6 @@ const VolumeSlider = styled.input`
   }
 `;
 
-const StationSelect = styled.select`
-  background: ${({ theme }) => theme.colors.surface};
-  color: ${({ theme }) => theme.colors.text};
-  padding: 0.4rem 0.6rem;
-  border-radius: ${({ theme }) => theme.borderRadius.sm};
-  border: none;
-`;
-
 export default function SoundBar() {
   const {
     currentStation,
@@ -119,7 +119,6 @@ export default function SoundBar() {
     changeVolume,
     muted,
     toggleMute,
-    setStation,
   } = useAudio();
 
   return (

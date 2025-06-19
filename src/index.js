@@ -6,12 +6,12 @@ import { ThemeProvider } from "styled-components";
 import { GlobalStyle } from "./Globalstyle.js";
 import { ThemeProviderToggle, useTheme } from "./context/ThemeContext";
 import { register } from "./serviceWorkerRegistration";
-
-register();
-const AppWithTheme = () => {
-  const { theme } = useTheme();
-  return (
-    <ThemeProvider theme={theme}>
+  
+  register();
+  const AppWithTheme = () => {
+    const { theme } = useTheme();
+    return (
+<ThemeProvider theme={theme}>
       <GlobalStyle />
       <App />
     </ThemeProvider>
@@ -25,7 +25,6 @@ root.render(
       <ThemeProviderToggle>
         <AppWithTheme />
       </ThemeProviderToggle>
-    </AudioProvider>
-  </FavoritesProvider>
-);
-
+      </AudioProvider>
+    </FavoritesProvider>
+  );

@@ -1,20 +1,20 @@
 {
   "files": {
-    "main.js": "./static/js/main.66b099b0.js",
-    "static/media/heart_uk.png": "./static/media/heart_uk.6b4e0a78c37c1f9a1c74.png",
-    "static/media/radio_eska.png": "./static/media/radio_eska.afa6624a1c5e6a6395c6.png",
-    "static/media/radio_X.png": "./static/media/radio_X.7adbc7c17b7e1e0bdd72.png",
-    "static/media/pr_chicago.png": "./static/media/pr_chicago.48705dec2a16081ea8f2.png",
-    "static/media/radio_bielsko.png": "./static/media/radio_bielsko.4cbbad14743af6822f71.png",
-    "static/media/kiss_fm.png": "./static/media/kiss_fm.2d55df6d94f821fc4279.png",
-    "static/media/capital.png": "./static/media/capital.cad4be218f2a92134908.png",
-    "static/media/capital_dance.png": "./static/media/capital_dance.53ab5f52e983764792a6.png",
-    "static/media/rmf_maxx.png": "./static/media/rmf_maxx.2c415289a75df95ec0ee.png",
-    "static/media/polish_radio_london.png": "./static/media/polish_radio_london.080e7c1a847febf1c62f.png",
+    "main.js": "./static/js/main.6eb6b246.js",
+    "static/media/radio_eska.png": "./static/media/radio_eska.8c3e3a8856b3e380beca.png",
+    "static/media/heart_uk.png": "./static/media/heart_uk.981e5cac6f23ceb2d499.png",
+    "static/media/radio_X.png": "./static/media/radio_X.a60c79cba03e5cbf4a94.png",
+    "static/media/kiss_fm.png": "./static/media/kiss_fm.173a807585d53395ed26.png",
+    "static/media/radio_bielsko.png": "./static/media/radio_bielsko.ffdad8efddfa14003271.png",
+    "static/media/pr_chicago.png": "./static/media/pr_chicago.a8cb9f20a8eae4b9f2c8.png",
+    "static/media/capital.png": "./static/media/capital.ae48c0dba77a1af5760e.png",
+    "static/media/capital_dance.png": "./static/media/capital_dance.2dceca9caecb7adc8637.png",
+    "static/media/rmf_maxx.png": "./static/media/rmf_maxx.bc3940b29eba97049e0e.png",
+    "static/media/polish_radio_london.png": "./static/media/polish_radio_london.425fe7bbe35bf844e7b9.png",
     "index.html": "./index.html",
-    "main.66b099b0.js.map": "./static/js/main.66b099b0.js.map"
+    "main.6eb6b246.js.map": "./static/js/main.6eb6b246.js.map"
   },
   "entrypoints": [
-    "static/js/main.66b099b0.js"
+    "static/js/main.6eb6b246.js"
   ]
 }

@@ -8,7 +8,7 @@ const Wrapper = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 70vh;
+  min-height: 80vh;
   padding: ${({ theme }) => theme.spacing.sm};
   text-align: center;
   background: linear-gradient(
@@ -18,7 +18,7 @@ const Wrapper = styled.div`
     ${({ theme }) => theme.colors.danger}
   );
   background-size: 200% 200%;
-  animation: gradientX 10s ease infinite;
+  animation: gradientX 5s ease infinite;
   color: ${({ theme }) => theme.colors.text};
 
   @keyframes gradientX {
@@ -32,8 +32,8 @@ const Wrapper = styled.div`
 `;
 
 const StationLogo = styled.img`
-  width: 12rem;
-  height: 12rem;
+  width: 10rem;
+  height: 10rem;
   border-radius: ${({ theme }) => theme.borderRadius.md};
   box-shadow: ${({ theme }) => theme.shadows.medium};
   margin-bottom: ${({ theme }) => theme.spacing.md};
@@ -51,12 +51,6 @@ const Subtitle = styled.p`
   margin-bottom: ${({ theme }) => theme.spacing.lg};
 `;
 
-const ControlGroup = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${({ theme }) => theme.spacing.md};
-  font-size: 2rem;
-`;
 
 const FloatingHomeButton = styled.button`
   position: fixed;
@@ -72,7 +66,7 @@ const FloatingHomeButton = styled.button`
   cursor: pointer;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
   animation: bounce 2.5s infinite ease-in-out;
-  transition: background 0.3s ease;
+  transition: background 0.5s ease;
 
   &:hover {
     background: rgba(255, 255, 255, 0.25);
@@ -112,18 +106,6 @@ export default function NowPlaying() {
       <StationLogo src={currentStation.logo} alt={currentStation.name} />
       <StationName>{currentStation.name}</StationName>
       <Subtitle>Streaming Live</Subtitle>
-
-      <ControlGroup>
-        <button onClick={prevStation} title="Previous">
-          <FaStepBackward />
-        </button>
-        <button onClick={togglePlay} title={isPlaying ? "Pause" : "Play"}>
-          {isPlaying ? <FaPause /> : <FaPlay />}
-        </button>
-        <button onClick={nextStation} title="Next">
-          <FaStepForward />
-        </button>
-      </ControlGroup>
 
       <FloatingHomeButton onClick={() => navigate("/")}>
         <FaHome size={20} />
