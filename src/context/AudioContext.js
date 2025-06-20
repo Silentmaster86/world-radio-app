@@ -12,17 +12,21 @@ export const AudioProvider = ({ children }) => {
   const [volume, setVolume] = useState(1);
   const [muted, setMuted] = useState(false);
 
-  const playStation = (station, index) => {
-    audioRef.current.src = station.url;
-    audioRef.current.play().then(() => {
-      setCurrentStationIndex(index);
+  const playStation = async (station, index) => {
+    if (!station || !station.url) return;
+  
+    try {
+      audioRef.current.src = station.url;
+      await audioRef.current.play();
       setIsPlaying(true);
+      setCurrentStationIndex(index);
       updateMediaSession(station);
-    }).catch((err) => {
-      console.warn("[playStation] Playback error:", err.message);
+    } catch (err) {
+      console.warn("[playStation] error:", err.message);
       setIsPlaying(false);
-    });
+    }
   };
+  
 
   const togglePlay = () => {
     if (isPlaying) {
@@ -57,12 +61,14 @@ export const AudioProvider = ({ children }) => {
 
   const nextStation = () => {
     const nextIndex = (currentStationIndex + 1) % stations.length;
-    playStation(stations[nextIndex], nextIndex);
+    const next = stations[nextIndex];
+    playStation(next, nextIndex);
   };
 
   const prevStation = () => {
     const prevIndex = (currentStationIndex - 1 + stations.length) % stations.length;
-    playStation(stations[prevIndex], prevIndex);
+    const prev = stations[prevIndex];
+    playStation(prev, prevIndex);
   };
 
   const updateMediaSession = (station) => {
@@ -78,18 +84,25 @@ export const AudioProvider = ({ children }) => {
 
   useEffect(() => {
     if (!("mediaSession" in navigator)) return;
-
+  
     navigator.mediaSession.setActionHandler("play", () => {
-      audioRef.current.play().then(() => setIsPlaying(true));
+      audioRef.current.play().catch(() => {});
+      setIsPlaying(true);
     });
-
+  
     navigator.mediaSession.setActionHandler("pause", () => {
       audioRef.current.pause();
       setIsPlaying(false);
     });
-
-    navigator.mediaSession.setActionHandler("nexttrack", nextStation);
-    navigator.mediaSession.setActionHandler("previoustrack", prevStation);
+  
+    navigator.mediaSession.setActionHandler("nexttrack", () => {
+      console.log("Next track triggered");
+      nextStation();
+    });
+    navigator.mediaSession.setActionHandler("previoustrack", () => {
+      console.log("Previous track triggered");
+      prevStation();
+    });
   }, []);
 
   useEffect(() => {
