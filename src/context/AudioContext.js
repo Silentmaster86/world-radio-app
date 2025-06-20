@@ -3,7 +3,6 @@ import { createContext, useContext, useRef, useState, useEffect } from "react";
 import { stations } from "../data/stations";
 
 const AudioContext = createContext();
-
 export const useAudio = () => useContext(AudioContext);
 
 export const AudioProvider = ({ children }) => {
@@ -13,19 +12,31 @@ export const AudioProvider = ({ children }) => {
   const [volume, setVolume] = useState(1);
   const [muted, setMuted] = useState(false);
 
-  // ▶️ Play / Pause
+  const playStation = (station, index) => {
+    audioRef.current.src = station.url;
+    audioRef.current.play().then(() => {
+      setCurrentStationIndex(index);
+      setIsPlaying(true);
+      updateMediaSession(station);
+    }).catch((err) => {
+      console.warn("[playStation] Playback error:", err.message);
+      setIsPlaying(false);
+    });
+  };
+
   const togglePlay = () => {
     if (isPlaying) {
       audioRef.current.pause();
+      setIsPlaying(false);
     } else {
-      audioRef.current.play().catch((err) => {
-        console.warn("[togglePlay] Autoplay failed:", err.message);
+      audioRef.current.play().then(() => {
+        setIsPlaying(true);
+      }).catch((err) => {
+        console.warn("[togglePlay] Autoplay error:", err.message);
       });
     }
-    setIsPlaying(!isPlaying);
   };
 
-  // 🔊 Volume
   const changeVolume = (vol) => {
     setVolume(vol);
     audioRef.current.volume = vol;
@@ -37,57 +48,39 @@ export const AudioProvider = ({ children }) => {
     audioRef.current.muted = newMuted;
   };
 
-  // 📻 Station switching
-  const setStation = async (station) => {
-    const index = stations.findIndex(
-      (s) => s.name.toLowerCase() === station.name.toLowerCase()
-    );
-    if (index === -1 || index === currentStationIndex) return;
-
-    setCurrentStationIndex(index);
-    audioRef.current.src = station.url;
-
-    try {
-      await audioRef.current.play();
-      setIsPlaying(true);
-    } catch (err) {
-      console.warn("[setStation] Autoplay blocked:", err.message);
-      setIsPlaying(false);
+  const setStation = (station) => {
+    const index = stations.findIndex(s => s.name === station.name);
+    if (index !== -1) {
+      playStation(station, index);
     }
   };
 
   const nextStation = () => {
     const nextIndex = (currentStationIndex + 1) % stations.length;
-    setStation(stations[nextIndex]);
+    playStation(stations[nextIndex], nextIndex);
   };
 
   const prevStation = () => {
     const prevIndex = (currentStationIndex - 1 + stations.length) % stations.length;
-    setStation(stations[prevIndex]);
+    playStation(stations[prevIndex], prevIndex);
   };
 
-  // ✅ Update metadata when station changes
-  useEffect(() => {
+  const updateMediaSession = (station) => {
     if (!("mediaSession" in navigator)) return;
 
-    const station = stations[currentStationIndex];
     navigator.mediaSession.metadata = new window.MediaMetadata({
       title: station.name,
       artist: "Online Radio",
       album: "Live Stream",
-      artwork: [
-        { src: station.logo, sizes: "512x512", type: "image/png" },
-      ],
+      artwork: [{ src: station.logo, sizes: "512x512", type: "image/png" }],
     });
-  }, [currentStationIndex]);
+  };
 
-  // ✅ Set handlers once
   useEffect(() => {
     if (!("mediaSession" in navigator)) return;
 
     navigator.mediaSession.setActionHandler("play", () => {
-      audioRef.current.play().catch(() => {});
-      setIsPlaying(true);
+      audioRef.current.play().then(() => setIsPlaying(true));
     });
 
     navigator.mediaSession.setActionHandler("pause", () => {
@@ -97,9 +90,8 @@ export const AudioProvider = ({ children }) => {
 
     navigator.mediaSession.setActionHandler("nexttrack", nextStation);
     navigator.mediaSession.setActionHandler("previoustrack", prevStation);
-  }, []); // only once on mount
+  }, []);
 
-  // Volume + preload
   useEffect(() => {
     audioRef.current.preload = "none";
     audioRef.current.volume = volume;
@@ -126,3 +118,4 @@ export const AudioProvider = ({ children }) => {
     </AudioContext.Provider>
   );
 };
+k
