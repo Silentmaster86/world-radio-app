@@ -21,21 +21,49 @@ Supports:
 ## 📦 Folder Structure
 
 ```
-/public
-  ├── favicon.ico
-  ├── icon-192.png
-  ├── icon-512.png
-  ├── manifest.json
-  └── service-worker.js
+world-radio-app/
+├── public/
+│   ├── icons/                     # App icons for PWA (512x512, etc.)
+│   ├── manifest.json              # PWA manifest
+│   ├── index.html
+│   ├── offline.html               # In case of error official website 
+│   └── service-worker.js
+│
+├── src/
+│   ├── assets/                   # Static assets (images, logos)
+│   │   ├── logos/                # radio logos
+│   │   |   └── screenshots/
+│
+│   ├── components/               # Reusable components
+│   │   ├── Layout/
+│   │   │   ├── SoundBar.js
+│   │   │   └── PageTransition.js
+│
+│   ├── context/                  # React Contexts
+│   │   ├── AudioContext.js
+│   │   ├── FavoritesContext.js
+│   │   └── ThemeContext.js
+│
+│   ├── data/                     # Static data (e.g. station list)
+│   │   └── stations.js
+│
+│   ├── pages/                    # Page components (routed views)
+│   │   ├── Home.js
+│   │   └── NowPlaying.js
+│
+│   ├── Globalstyle.js            # Global styled-components
+│   ├── darkTheme.js              # Theme config (dark)
+│   ├── lightTheme.js             # Theme config (light)
+│   ├── App.js                    # Main component with routes
+│   ├── index.js                  # Entry point (with Providers)
+│   ├── service-worker.js         # Custom service worker (optional)
+│   └── serviceWorkerRegistration.js
+│
+├── package-lock.json
+├── package.json
+├── .gitignore
+└── README.md
 
-/src
-  ├── assets/logos/         # Station logos
-  ├── components/Layout/    # SoundBar audio controller
-  ├── context/              # Audio + Favorites contexts
-  ├── data/stations.js      # List of stations
-  ├── pages/                # Home & Now Playing views
-  ├── App.js
-  └── index.js
 ```
 
 ---
@@ -104,10 +132,16 @@ Use DevTools → Application tab → Check Manifest and Service Worker
 ## 📸 Screenshots
 
 ### Home Screen (Desktop)
-![Desktop Screenshot](./screenshots/desktop-home.png)
+![Home Page Desktop Screenshot](./src/assets/logos/screenshots/desktop-home.png)
+
+### Now Playing View (Desktop)
+![Now Playing Desktop Screenshot](./src/assets/logos/screenshots/now-playing.png)
+
+### Home Screen (Mobile)
+![Home Page Mobile Screenshot](./src/assets/logos/screenshots/mobile-home.png)
 
 ### Now Playing View (Mobile)
-![Mobile Screenshot](./screenshots/mobile-now-playing.png)
+![Now Playing Mobile Screenshot](./src/assets/logos/screenshots/mobile-now-playing.png)
 
 ---
 
