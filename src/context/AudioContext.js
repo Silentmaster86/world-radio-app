@@ -1,4 +1,3 @@
-// src/context/AudioContext.js
 import { createContext, useContext, useRef, useState, useEffect } from "react";
 import { stations } from "../data/stations";
 
@@ -12,9 +11,10 @@ export const AudioProvider = ({ children }) => {
   const [volume, setVolume] = useState(1);
   const [muted, setMuted] = useState(false);
 
+  // 📻 Play a station
   const playStation = async (station, index) => {
     if (!station || !station.url) return;
-  
+
     try {
       audioRef.current.src = station.url;
       await audioRef.current.play();
@@ -22,12 +22,12 @@ export const AudioProvider = ({ children }) => {
       setCurrentStationIndex(index);
       updateMediaSession(station);
     } catch (err) {
-      console.warn("[playStation] error:", err.message);
+      console.warn("[playStation] Autoplay failed:", err.message);
       setIsPlaying(false);
     }
   };
-  
 
+  // ▶️ Toggle play/pause
   const togglePlay = () => {
     if (isPlaying) {
       audioRef.current.pause();
@@ -41,6 +41,7 @@ export const AudioProvider = ({ children }) => {
     }
   };
 
+  // 🔊 Volume
   const changeVolume = (vol) => {
     setVolume(vol);
     audioRef.current.volume = vol;
@@ -52,6 +53,7 @@ export const AudioProvider = ({ children }) => {
     audioRef.current.muted = newMuted;
   };
 
+  // 🎯 Set a specific station
   const setStation = (station) => {
     const index = stations.findIndex(s => s.name === station.name);
     if (index !== -1) {
@@ -59,6 +61,7 @@ export const AudioProvider = ({ children }) => {
     }
   };
 
+  // ⏭️ Next/Previous
   const nextStation = () => {
     const nextIndex = (currentStationIndex + 1) % stations.length;
     const next = stations[nextIndex];
@@ -71,6 +74,7 @@ export const AudioProvider = ({ children }) => {
     playStation(prev, prevIndex);
   };
 
+  // 🖼️ Media session metadata
   const updateMediaSession = (station) => {
     if (!("mediaSession" in navigator)) return;
 
@@ -78,33 +82,36 @@ export const AudioProvider = ({ children }) => {
       title: station.name,
       artist: "Online Radio",
       album: "Live Stream",
-      artwork: [{ src: station.logo, sizes: "512x512", type: "image/png" }],
+      artwork: [
+        { src: station.logo, sizes: "512x512", type: "image/png" }
+      ],
     });
   };
 
+  // ✅ Register Media Session actions (only once)
   useEffect(() => {
     if (!("mediaSession" in navigator)) return;
-  
+
     navigator.mediaSession.setActionHandler("play", () => {
       audioRef.current.play().catch(() => {});
       setIsPlaying(true);
     });
-  
+
     navigator.mediaSession.setActionHandler("pause", () => {
       audioRef.current.pause();
       setIsPlaying(false);
     });
-  
-    navigator.mediaSession.setActionHandler("nexttrack", () => {
-      console.log("Next track triggered");
-      nextStation();
-    });
-    navigator.mediaSession.setActionHandler("previoustrack", () => {
-      console.log("Previous track triggered");
-      prevStation();
-    });
+
+    navigator.mediaSession.setActionHandler("nexttrack", nextStation);
+    navigator.mediaSession.setActionHandler("previoustrack", prevStation);
   }, []);
 
+  // ✅ Update metadata when station changes
+  useEffect(() => {
+    updateMediaSession(stations[currentStationIndex]);
+  }, [currentStationIndex]);
+
+  // ✅ Initial setup: volume, mute, preload
   useEffect(() => {
     audioRef.current.preload = "none";
     audioRef.current.volume = volume;
