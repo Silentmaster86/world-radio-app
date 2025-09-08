@@ -6,32 +6,32 @@ export const useAudio = () => useContext(AudioContext);
 
 export const AudioProvider = ({ children }) => {
   const audioRef = useRef(new Audio(stations[0].url));
+  const currentStationRef = useRef(0); // 🆕 REF zamiast tylko state
+
   const [currentStationIndex, setCurrentStationIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(1);
   const [muted, setMuted] = useState(false);
 
-  // 🔁 Main playback function
   const playStation = async (station, index) => {
-    if (!station || !station.url || index === currentStationIndex) return;
+    if (!station || !station.url) return;
 
-    console.log("[playStation] Switching to:", station.name);
+    currentStationRef.current = index; // 🧠 aktualizuj ref
+    setCurrentStationIndex(index);
+
+    audioRef.current.src = station.url;
 
     try {
-      audioRef.current.pause(); // Ensure stream stops before switching
-      audioRef.current.src = station.url;
       await audioRef.current.play();
-
       setIsPlaying(true);
-      setCurrentStationIndex(index);
-      updateMediaSession(station);
     } catch (err) {
       console.warn("[playStation] Autoplay failed:", err.message);
       setIsPlaying(false);
     }
+
+    updateMediaSession(station);
   };
 
-  // ▶️ Toggle play/pause
   const togglePlay = () => {
     if (isPlaying) {
       audioRef.current.pause();
@@ -45,7 +45,6 @@ export const AudioProvider = ({ children }) => {
     }
   };
 
-  // 🔊 Volume
   const changeVolume = (vol) => {
     setVolume(vol);
     audioRef.current.volume = vol;
@@ -57,7 +56,6 @@ export const AudioProvider = ({ children }) => {
     audioRef.current.muted = newMuted;
   };
 
-  // 📻 Manual set station
   const setStation = (station) => {
     const index = stations.findIndex(s => s.name === station.name);
     if (index !== -1) {
@@ -65,20 +63,16 @@ export const AudioProvider = ({ children }) => {
     }
   };
 
-  // ⏭️ Next/Previous
   const nextStation = () => {
-    const nextIndex = (currentStationIndex + 1) % stations.length;
-    console.log("→ nextStation:", stations[nextIndex].name);
-    playStation(stations[nextIndex], nextIndex);
+    const index = (currentStationRef.current + 1) % stations.length;
+    playStation(stations[index], index);
   };
 
   const prevStation = () => {
-    const prevIndex = (currentStationIndex - 1 + stations.length) % stations.length;
-    console.log("← prevStation:", stations[prevIndex].name);
-    playStation(stations[prevIndex], prevIndex);
+    const index = (currentStationRef.current - 1 + stations.length) % stations.length;
+    playStation(stations[index], index);
   };
 
-  // 🧠 Media Session
   const updateMediaSession = (station) => {
     if (!("mediaSession" in navigator)) return;
 
@@ -90,7 +84,6 @@ export const AudioProvider = ({ children }) => {
     });
   };
 
-  // 📱 Register media button controls
   useEffect(() => {
     if (!("mediaSession" in navigator)) return;
 
@@ -105,17 +98,16 @@ export const AudioProvider = ({ children }) => {
     });
 
     navigator.mediaSession.setActionHandler("nexttrack", () => {
-      console.log("[MediaSession] Next track");
+      console.log("[MediaSession] nexttrack");
       nextStation();
     });
 
     navigator.mediaSession.setActionHandler("previoustrack", () => {
-      console.log("[MediaSession] Previous track");
+      console.log("[MediaSession] previoustrack");
       prevStation();
     });
   }, []);
 
-  // 🔁 Update volume/mute on change
   useEffect(() => {
     audioRef.current.preload = "none";
     audioRef.current.volume = volume;
