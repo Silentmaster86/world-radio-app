@@ -11,13 +11,17 @@ export const AudioProvider = ({ children }) => {
   const [volume, setVolume] = useState(1);
   const [muted, setMuted] = useState(false);
 
-  // 📻 Play a station
+  // 🔁 Main playback function
   const playStation = async (station, index) => {
-    if (!station || !station.url) return;
+    if (!station || !station.url || index === currentStationIndex) return;
+
+    console.log("[playStation] Switching to:", station.name);
 
     try {
+      audioRef.current.pause(); // Ensure stream stops before switching
       audioRef.current.src = station.url;
       await audioRef.current.play();
+
       setIsPlaying(true);
       setCurrentStationIndex(index);
       updateMediaSession(station);
@@ -53,7 +57,7 @@ export const AudioProvider = ({ children }) => {
     audioRef.current.muted = newMuted;
   };
 
-  // 🎯 Set a specific station
+  // 📻 Manual set station
   const setStation = (station) => {
     const index = stations.findIndex(s => s.name === station.name);
     if (index !== -1) {
@@ -64,17 +68,17 @@ export const AudioProvider = ({ children }) => {
   // ⏭️ Next/Previous
   const nextStation = () => {
     const nextIndex = (currentStationIndex + 1) % stations.length;
-    const next = stations[nextIndex];
-    playStation(next, nextIndex);
+    console.log("→ nextStation:", stations[nextIndex].name);
+    playStation(stations[nextIndex], nextIndex);
   };
 
   const prevStation = () => {
     const prevIndex = (currentStationIndex - 1 + stations.length) % stations.length;
-    const prev = stations[prevIndex];
-    playStation(prev, prevIndex);
+    console.log("← prevStation:", stations[prevIndex].name);
+    playStation(stations[prevIndex], prevIndex);
   };
 
-  // 🖼️ Media session metadata
+  // 🧠 Media Session
   const updateMediaSession = (station) => {
     if (!("mediaSession" in navigator)) return;
 
@@ -82,13 +86,11 @@ export const AudioProvider = ({ children }) => {
       title: station.name,
       artist: "Online Radio",
       album: "Live Stream",
-      artwork: [
-        { src: station.logo, sizes: "512x512", type: "image/png" }
-      ],
+      artwork: [{ src: station.logo, sizes: "512x512", type: "image/png" }],
     });
   };
 
-  // ✅ Register Media Session actions (only once)
+  // 📱 Register media button controls
   useEffect(() => {
     if (!("mediaSession" in navigator)) return;
 
@@ -102,16 +104,18 @@ export const AudioProvider = ({ children }) => {
       setIsPlaying(false);
     });
 
-    navigator.mediaSession.setActionHandler("nexttrack", nextStation);
-    navigator.mediaSession.setActionHandler("previoustrack", prevStation);
+    navigator.mediaSession.setActionHandler("nexttrack", () => {
+      console.log("[MediaSession] Next track");
+      nextStation();
+    });
+
+    navigator.mediaSession.setActionHandler("previoustrack", () => {
+      console.log("[MediaSession] Previous track");
+      prevStation();
+    });
   }, []);
 
-  // ✅ Update metadata when station changes
-  useEffect(() => {
-    updateMediaSession(stations[currentStationIndex]);
-  }, [currentStationIndex]);
-
-  // ✅ Initial setup: volume, mute, preload
+  // 🔁 Update volume/mute on change
   useEffect(() => {
     audioRef.current.preload = "none";
     audioRef.current.volume = volume;
