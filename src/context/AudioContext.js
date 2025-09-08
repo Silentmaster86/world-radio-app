@@ -1,4 +1,4 @@
-import { createContext, useContext, useRef, useState, useEffect } from "react";
+import { createContext, useContext, useRef, useState, useEffect, useCallback } from "react";
 import { stations } from "../data/stations";
 
 const AudioContext = createContext();
@@ -6,18 +6,20 @@ export const useAudio = () => useContext(AudioContext);
 
 export const AudioProvider = ({ children }) => {
   const audioRef = useRef(new Audio(stations[0].url));
-  const currentStationRef = useRef(0); // 🆕 REF zamiast tylko state
+  const currentStationIndexRef = useRef(0);
 
   const [currentStationIndex, setCurrentStationIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(1);
   const [muted, setMuted] = useState(false);
 
-  const playStation = async (station, index) => {
-    if (!station || !station.url) return;
+  // 🔁 Zawsze aktualizuj ref przy zmianie indexu
+  useEffect(() => {
+    currentStationIndexRef.current = currentStationIndex;
+  }, [currentStationIndex]);
 
-    currentStationRef.current = index; // 🧠 aktualizuj ref
-    setCurrentStationIndex(index);
+  const playStation = useCallback(async (station, index) => {
+    if (!station || !station.url) return;
 
     audioRef.current.src = station.url;
 
@@ -29,8 +31,22 @@ export const AudioProvider = ({ children }) => {
       setIsPlaying(false);
     }
 
+    setCurrentStationIndex(index);
+    currentStationIndexRef.current = index;
     updateMediaSession(station);
-  };
+  }, []);
+
+  const nextStation = useCallback(() => {
+    const currentIndex = currentStationIndexRef.current;
+    const nextIndex = (currentIndex + 1) % stations.length;
+    playStation(stations[nextIndex], nextIndex);
+  }, [playStation]);
+
+  const prevStation = useCallback(() => {
+    const currentIndex = currentStationIndexRef.current;
+    const prevIndex = (currentIndex - 1 + stations.length) % stations.length;
+    playStation(stations[prevIndex], prevIndex);
+  }, [playStation]);
 
   const togglePlay = () => {
     if (isPlaying) {
@@ -63,16 +79,6 @@ export const AudioProvider = ({ children }) => {
     }
   };
 
-  const nextStation = () => {
-    const index = (currentStationRef.current + 1) % stations.length;
-    playStation(stations[index], index);
-  };
-
-  const prevStation = () => {
-    const index = (currentStationRef.current - 1 + stations.length) % stations.length;
-    playStation(stations[index], index);
-  };
-
   const updateMediaSession = (station) => {
     if (!("mediaSession" in navigator)) return;
 
@@ -84,6 +90,7 @@ export const AudioProvider = ({ children }) => {
     });
   };
 
+  // ✅ Ustaw aktualne wersje next/prev jako handler
   useEffect(() => {
     if (!("mediaSession" in navigator)) return;
 
@@ -97,16 +104,9 @@ export const AudioProvider = ({ children }) => {
       setIsPlaying(false);
     });
 
-    navigator.mediaSession.setActionHandler("nexttrack", () => {
-      console.log("[MediaSession] nexttrack");
-      nextStation();
-    });
-
-    navigator.mediaSession.setActionHandler("previoustrack", () => {
-      console.log("[MediaSession] previoustrack");
-      prevStation();
-    });
-  }, []);
+    navigator.mediaSession.setActionHandler("nexttrack", nextStation);
+    navigator.mediaSession.setActionHandler("previoustrack", prevStation);
+  }, [nextStation, prevStation]);
 
   useEffect(() => {
     audioRef.current.preload = "none";
