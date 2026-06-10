@@ -15,6 +15,7 @@ export const stations = [
       genre: "Dance",
       logo: capitalDance,
       url: "https://media-ice.musicradio.com/CapitalDance",
+      color: "#4c4949",
     },
     {
       name: "Capital FM",
@@ -22,6 +23,7 @@ export const stations = [
       genre: "Dance",
       logo: capitalFM,
       url: "https://media-ice.musicradio.com/CapitalMP3",
+      color: "#ada8a8",
     },
     {
       name: "Heart UK",
@@ -29,6 +31,7 @@ export const stations = [
       genre: "Pop",
       logo: heartUK,
       url: "https://media-ice.musicradio.com/HeartUK",
+      color: "#8e4f52",
     },
     {
       name: "RADIOx 90s",
@@ -36,6 +39,7 @@ export const stations = [
       genre: "Pop",
       logo: radioX,
       url: "https://media-ice.musicradio.com/RadioX90s",
+      color: "#E50914",
     },
     {
       name: "PR Chicago",
@@ -43,6 +47,7 @@ export const stations = [
       genre: "News",
       logo: prChicago,
       url: "https://s1.reliastream.com/proxy/polskieradio?mp=/stream",
+      color: "#E50914",
     },
     {
       name: "PRL",
@@ -50,6 +55,7 @@ export const stations = [
       genre: "News",
       logo: prl,
       url: "https://stream.rcs.revma.com/prfmwmwy768uv",
+      color: "#E50914",
     },
     {
       name: "Radio Bielsko",
@@ -57,6 +63,7 @@ export const stations = [
       genre: "News",
       logo: radioBielsko,
       url: "https://stream.rcs.revma.com/062uq3z3kwzuv",
+      color: "#E50914",
     },
     {
       name: "Radio Eska",
@@ -64,6 +71,7 @@ export const stations = [
       genre: "Dance",
       logo: radioEska,
       url: "https://ic1.smcdn.pl/2330-1.mp3",
+      color: "#E50914",
     },
     {
       name: "RMF MAXX",
@@ -71,5 +79,6 @@ export const stations = [
       genre: "Dance",
       logo: rmfMaxx,
       url: "https://rs201-krk.rmfstream.pl/rmf_maxxx",
+      color: "#E50914",
     }
   ];
