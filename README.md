@@ -1,8 +1,9 @@
 # 🌍 World Radio App
 
-A modern Progressive Web App (PWA) that streams live internet radio stations from around the world. Built with **React**, **Tailwind CSS**, and **Context API** — optimized for desktop, mobile, and car media systems. 
+A modern Progressive Web App (PWA) that streams live internet radio stations from around the world. Built with **React**, **Tailwind CSS**, and **Context API** — optimized for desktop, mobile, and car media systems.
 
 Supports:
+
 - ✅ Live streaming with station switching
 - ✅ Favorites (saved locally)
 - ✅ Search and category filtering
@@ -26,7 +27,7 @@ world-radio-app/
 │   ├── icons/                     # App icons for PWA (512x512, etc.)
 │   ├── manifest.json              # PWA manifest
 │   ├── index.html
-│   ├── offline.html               # In case of error official website 
+│   ├── offline.html               # In case of error official website
 │   └── service-worker.js
 │
 ├── src/
@@ -104,11 +105,13 @@ npm start
 ## 📱 PWA Support
 
 Includes:
+
 - `manifest.json`
 - `service-worker.js`
 - Media Session API for metadata + controls
 
 ### To test locally:
+
 ```bash
 npm run build
 npx serve -s build
@@ -132,15 +135,19 @@ Use DevTools → Application tab → Check Manifest and Service Worker
 ## 📸 Screenshots
 
 ### Home Screen (Desktop)
+
 ![Home Page Desktop Screenshot](./src/assets/logos/screenshots/desktop-home.png)
 
 ### Now Playing View (Desktop)
+
 ![Now Playing Desktop Screenshot](./src/assets/logos/screenshots/now-playing.png)
 
 ### Home Screen (Mobile)
+
 ![Home Page Mobile Screenshot](./src/assets/logos/screenshots/mobile-home.png)
 
 ### Now Playing View (Mobile)
+
 ![Now Playing Mobile Screenshot](./src/assets/logos/screenshots/mobile-now-playing.png)
 
 ---

@@ -1,7 +1,6 @@
 import capitalDance from "../assets/logos/capital_dance.png";
 import capitalFM from "../assets/logos/capital.png";
 import heartUK from "../assets/logos/heart_uk.png";
-import kissFM from "../assets/logos/kiss_fm.png";
 import radioX from "../assets/logos/radio_X.png";
 import prChicago from "../assets/logos/pr_chicago.png";
 import prl from "../assets/logos/polish_radio_london.png";
@@ -12,52 +11,65 @@ import rmfMaxx from "../assets/logos/rmf_maxx.png";
 export const stations = [
     {
       name: "Capital Dance",
-      url: "https://media-ice.musicradio.com/CapitalDance",
+      country: "UK",
+      genre: "Dance",
       logo: capitalDance,
+      url: "https://media-ice.musicradio.com/CapitalDance",
     },
     {
       name: "Capital FM",
-      url: "https://media-ice.musicradio.com/CapitalMP3",
+      country: "UK",
+      genre: "Dance",
       logo: capitalFM,
+      url: "https://media-ice.musicradio.com/CapitalMP3",
     },
     {
       name: "Heart UK",
-      url: "https://media-ice.musicradio.com/HeartUK",
+      country: "UK",
+      genre: "Pop",
       logo: heartUK,
-    },
-    {
-      name: "KISS FM",
-      url: "https://edge-bauerall-01-gos2.sharp-stream.com/kissnational.aac",
-      logo: kissFM,
+      url: "https://media-ice.musicradio.com/HeartUK",
     },
     {
       name: "RADIOx 90s",
-      url: "https://media-ice.musicradio.com/RadioX90s",
+      country: "UK",
+      genre: "Pop",
       logo: radioX,
+      url: "https://media-ice.musicradio.com/RadioX90s",
     },
     {
       name: "PR Chicago",
-      url: "https://s1.reliastream.com/proxy/polskieradio?mp=/stream",
+      country: "UK",
+      genre: "News",
       logo: prChicago,
+      url: "https://s1.reliastream.com/proxy/polskieradio?mp=/stream",
     },
     {
       name: "PRL",
-      url: "https://stream.rcs.revma.com/prfmwmwy768uv",
+      country: "UK",
+      genre: "News",
       logo: prl,
+      url: "https://stream.rcs.revma.com/prfmwmwy768uv",
     },
     {
       name: "Radio Bielsko",
-      url: "https://stream.rcs.revma.com/062uq3z3kwzuv",
+      country: "PL",
+      genre: "News",
       logo: radioBielsko,
+      url: "https://stream.rcs.revma.com/062uq3z3kwzuv",
     },
     {
       name: "Radio Eska",
-      url: "https://ic1.smcdn.pl/2330-1.mp3",
+      country: "PL",
+      genre: "Dance",
       logo: radioEska,
+      url: "https://ic1.smcdn.pl/2330-1.mp3",
     },
     {
       name: "RMF MAXX",
-      url: "https://rs201-krk.rmfstream.pl/rmf_maxxx",
+      country: "PL",
+      genre: "Dance",
       logo: rmfMaxx,
+      url: "https://rs201-krk.rmfstream.pl/rmf_maxxx",
     }
   ];
