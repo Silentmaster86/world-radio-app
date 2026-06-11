@@ -5,26 +5,22 @@ const ControlsWrapper = styled.div`
 	margin-bottom: ${({ theme }) => theme.spacing.md};
 	display: flex;
 	flex-direction: column;
-	gap: ${({ theme }) => theme.spacing.sm};
-`;
+	gap: 0.9rem;
 
-const LeftControls = styled.div`
-	display: flex;
-	flex-direction: column;
-	gap: 2rem;
-
-	@media (min-width: 660px) {
-		flex-direction: row;
-		align-items: center;
-		justify-content: center;
+	@media (max-width: 480px) {
+		gap: 0.75rem;
 	}
 `;
 
 const FilterRow = styled.div`
 	display: flex;
 	flex-wrap: wrap;
-	gap: 1rem;
+	gap: 0.7rem;
 	justify-content: center;
+
+	@media (max-width: 480px) {
+		gap: 0.55rem;
+	}
 `;
 
 const SearchRow = styled.div`
@@ -33,26 +29,49 @@ const SearchRow = styled.div`
 `;
 
 const FilterButton = styled.button`
-	padding: 0.5rem 0.8rem;
+	padding: 0.45rem 0.8rem;
 	border-radius: ${({ theme }) => theme.borderRadius.full};
 
-	background: ${({ $active }) => ($active ? '#fff' : 'rgba(255,255,255,0.1)')};
+	background: ${({ $active, theme }) =>
+		$active
+			? theme.colors.accent
+			: theme.colors.mode === 'dark'
+				? 'rgba(255,255,255,0.1)'
+				: 'rgba(0,0,0,0.08)'};
 
-	color: ${({ $active }) => ($active ? '#000' : '#fff')};
+	color: ${({ $active, theme }) => ($active ? '#fff' : theme.colors.text)};
 
-	border: none;
-	font-weight: 600;
+	border: 1px solid
+		${({ theme }) =>
+			theme.colors.mode === 'dark'
+				? 'rgba(255,255,255,0.08)'
+				: 'rgba(0,0,0,0.08)'};
+
+	font-size: 0.8rem;
+	font-weight: 700;
 	cursor: pointer;
+
+	transition: 0.25s ease;
+
+	&:hover {
+		transform: translateY(-1px);
+	}
 `;
 
 const ToggleButton = styled.button`
-	padding: 0.5rem 1rem;
-	border: none;
+	padding: 0.45rem 0.8rem;
+	border: 1px solid
+		${({ theme }) =>
+			theme.colors.mode === 'dark'
+				? 'rgba(255,255,255,0.12)'
+				: 'rgba(0,0,0,0.2)'};
+
 	border-radius: ${({ theme }) => theme.borderRadius.full};
 
-	background: ${({ $dark }) => ($dark ? 'rgba(255,255,255,0.1)' : '#fff')};
+	background: ${({ theme }) =>
+		theme.colors.mode === 'dark' ? 'rgba(255,255,255,0.1)' : '#fff'};
 
-	color: ${({ $dark }) => ($dark ? '#fff' : '#000')};
+	color: ${({ theme }) => theme.colors.text};
 
 	cursor: pointer;
 `;
@@ -60,8 +79,8 @@ const ToggleButton = styled.button`
 const ToggleThumb = styled.div`
 	width: 1rem;
 	height: 1rem;
-
 	border-radius: 50%;
+
 	background: ${({ theme }) => theme.colors.accent};
 
 	display: flex;
@@ -72,17 +91,38 @@ const ToggleThumb = styled.div`
 `;
 
 const SearchInput = styled.input`
-	padding: 0.5rem 0.8rem;
-
-	width: 250px;
-
-	border: none;
-	outline: none;
+	width: min(100%, 280px);
+	padding: 0.65rem 0.9rem;
 
 	border-radius: ${({ theme }) => theme.borderRadius.md};
 
-	background: #2d2d2d;
-	color: white;
+	border: 1px solid
+		${({ theme }) =>
+			theme.colors.mode === 'dark'
+				? 'rgba(255,255,255,0.1)'
+				: 'rgba(0,0,0,0.18)'};
+
+	outline: none;
+
+	background: ${({ theme }) =>
+		theme.colors.mode === 'dark' ? 'rgba(255,255,255,0.08)' : '#ffffff'};
+
+	color: ${({ theme }) => theme.colors.text};
+
+	box-shadow: ${({ theme }) =>
+		theme.colors.mode === 'dark' ? 'none' : '0 6px 18px rgba(0,0,0,0.08)'};
+
+	&::placeholder {
+		color: ${({ theme }) =>
+			theme.colors.mode === 'dark'
+				? 'rgba(255,255,255,0.55)'
+				: 'rgba(0,0,0,0.45)'};
+	}
+
+	&:focus {
+		border-color: ${({ theme }) => theme.colors.accent};
+		box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.18);
+	}
 `;
 
 export default function StationControls({
@@ -96,34 +136,32 @@ export default function StationControls({
 }) {
 	return (
 		<ControlsWrapper>
-			<LeftControls>
-				<FilterRow>
-					{filters.map((f) => (
-						<FilterButton
-							key={f}
-							$active={filter === f}
-							onClick={() => setFilter(f)}
-						>
-							{f}
-						</FilterButton>
-					))}
+			<FilterRow>
+				{filters.map((f) => (
+					<FilterButton
+						key={f}
+						$active={filter === f}
+						onClick={() => setFilter(f)}
+					>
+						{f}
+					</FilterButton>
+				))}
 
-					<ToggleButton onClick={toggleTheme} $dark={isDarkMode}>
-						<ToggleThumb>
-							{isDarkMode ? <FaMoon size={12} /> : <FaSun size={12} />}
-						</ToggleThumb>
-					</ToggleButton>
-				</FilterRow>
+				<ToggleButton onClick={toggleTheme} $dark={isDarkMode}>
+					<ToggleThumb>
+						{isDarkMode ? <FaMoon size={12} /> : <FaSun size={12} />}
+					</ToggleThumb>
+				</ToggleButton>
+			</FilterRow>
 
-				<SearchRow>
-					<SearchInput
-						type='text'
-						placeholder='🔍 Search stations...'
-						value={query}
-						onChange={(e) => setQuery(e.target.value)}
-					/>
-				</SearchRow>
-			</LeftControls>
+			<SearchRow>
+				<SearchInput
+					type='text'
+					placeholder='🔍 Search stations...'
+					value={query}
+					onChange={(e) => setQuery(e.target.value)}
+				/>
+			</SearchRow>
 		</ControlsWrapper>
 	);
 }

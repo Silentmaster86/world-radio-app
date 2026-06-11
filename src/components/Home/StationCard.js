@@ -9,11 +9,17 @@ const Card = styled.div`
 
 	border-radius: ${({ theme }) => theme.borderRadius.lg};
 	padding: 1rem;
-	text-align: center;
 	position: relative;
 	cursor: pointer;
 
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+
 	backdrop-filter: blur(12px);
+
+	min-height: 150px;
 
 	border: ${({ $active }) =>
 		$active ? '2px solid #ec4899' : '1px solid rgba(255,255,255,0.08)'};
@@ -35,6 +41,16 @@ const Card = styled.div`
 	&:hover {
 		transform: translateY(-5px);
 	}
+
+	@media (max-width: 480px) {
+		min-height: 84px;
+		padding: 0.75rem 0.9rem;
+
+		flex-direction: row;
+		align-items: center;
+		text-align: left;
+		gap: 0.85rem;
+	}
 `;
 
 const Logo = styled.img`
@@ -42,18 +58,46 @@ const Logo = styled.img`
 	height: 80px;
 	border-radius: ${({ theme }) => theme.borderRadius.md};
 	margin-bottom: ${({ theme }) => theme.spacing.sm};
+	object-fit: cover;
+
+	@media (max-width: 480px) {
+		width: 54px;
+		height: 54px;
+		margin-bottom: 0;
+		flex-shrink: 0;
+	}
+`;
+
+const Info = styled.div`
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+	@media (max-width: 480px) {
+		align-items: flex-start;
+		padding-right: 2rem;
+	}
 `;
 
 const Name = styled.h3`
 	color: ${({ theme }) => theme.colors.text};
 	margin: 0 0 0.35rem;
 	font-size: 1rem;
+
+	@media (max-width: 480px) {
+		font-size: 0.9rem;
+		margin-bottom: 0.2rem;
+	}
 `;
 
 const Meta = styled.p`
 	margin: 0;
 	font-size: 0.75rem;
 	color: ${({ theme }) => theme.colors.muted};
+
+	@media (max-width: 480px) {
+		font-size: 0.7rem;
+	}
 `;
 
 const FavoriteButton = styled.button`
@@ -71,7 +115,24 @@ const FavoriteButton = styled.button`
 	&:hover {
 		transform: scale(1.1);
 	}
+
+	@media (max-width: 480px) {
+		top: 50%;
+		right: 0.9rem;
+		transform: translateY(-50%);
+		font-size: 1.25rem;
+
+		&:hover {
+			transform: translateY(-50%) scale(1.1);
+		}
+	}
 `;
+
+const getFlag = (country) => {
+	if (country === 'UK') return '🇬🇧';
+	if (country === 'PL') return '🇵🇱';
+	return '🌍';
+};
 
 export default function StationCard({
 	station,
@@ -95,14 +156,19 @@ export default function StationCard({
 			>
 				<Logo src={station.logo} alt={station.name} />
 
-				<Name>{station.name}</Name>
-				<Meta>{station.country === "UK" ? "🇬🇧" : "🇵🇱"} {station.country} • {station.genre}</Meta>
+				<Info>
+					<Name>{station.name}</Name>
+					<Meta>
+						{getFlag(station.country)} • {station.genre}
+					</Meta>
+				</Info>
 
 				<FavoriteButton
 					onClick={(e) => {
 						e.stopPropagation();
 						onFavorite();
 					}}
+					aria-label={`Toggle favorite for ${station.name}`}
 				>
 					{isFavorite ? '♥' : '♡'}
 				</FavoriteButton>

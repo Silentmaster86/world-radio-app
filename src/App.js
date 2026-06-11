@@ -7,18 +7,19 @@ import NowPlaying from "./pages/NowPlaying";
 import PageTransition from "./components/Layout/PageTransition";
 
 const AppWrapper = styled.div`
-  min-height: 89vh;
-  background: ${({ theme }) => theme.colors.background};
-  color: ${({ theme }) => theme.colors.text};
-  padding: 0 ${({ theme }) => theme.spacing.sm} 8rem;
+	min-height: auto;
+	padding-bottom: 1rem;
+	background: ${({ theme }) => theme.colors.background};
+	color: ${({ theme }) => theme.colors.text};
+	padding: 0 ${({ theme }) => theme.spacing.sm} 8rem;
 
-  @media (max-width: 1440px) {
-    padding-top: 1rem;
-  }
+	@media (max-width: 1440px) {
+		padding-top: 1rem;
+	}
 
-  @media (max-width: 1024px) {
-    padding-bottom: 8.1rem;
-  }
+	@media (max-width: 1024px) {
+		padding-bottom: 1rem;
+	}
 `;
 
 // 👇 Move AnimatePresence and useLocation into a proper route-aware component
@@ -46,7 +47,6 @@ function App() {
     <Router>
       <AppWrapper>
         <AnimatedRoutes />
-        <SoundBar />
       </AppWrapper>
     </Router>
   );

@@ -14,17 +14,35 @@ import StationCard from '../components/Home/StationCard';
 
 import useStationFilters from '../hooks/useStationFilters';
 
-const PageWrapper = styled.div`
-	padding: ${({ theme }) => theme.spacing.sm};
-	min-height: 80vh;
-	background: linear-gradient(to bottom, #1a1a1a, #000);
+const PageWrapper = styled.main`
+	width: 100%;
+	min-height: auto;
+
+	padding: 1rem;
+	padding-bottom: 1rem;
+
+	background: ${({ theme }) =>
+		theme.colors.mode === 'dark'
+			? 'linear-gradient(to bottom, #1a1a1a, #000)'
+			: theme.colors.background};
+
 	color: ${({ theme }) => theme.colors.text};
+
+	@media (max-width: 480px) {
+		padding: 0.85rem;
+		padding-bottom: 0.75rem;
+	}
 `;
 
-const StationGrid = styled.div`
+const StationGrid = styled.section`
 	display: grid;
 	gap: ${({ theme }) => theme.spacing.md};
-	grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+
+	@media (max-width: 480px) {
+		grid-template-columns: 1fr;
+		gap: 0.8rem;
+	}
 `;
 
 export default function Home() {
@@ -60,10 +78,7 @@ export default function Home() {
 						station={station}
 						isActive={station.name === currentStation?.name}
 						isFavorite={favorites.some((f) => f.name === station.name)}
-						onPlay={() => {
-							setStation(station);
-							navigate('/now-playing');
-						}}
+						onPlay={() => setStation(station)}
 						onFavorite={() => toggleFavorite(station)}
 					/>
 				))}

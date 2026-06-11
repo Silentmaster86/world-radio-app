@@ -33,9 +33,17 @@ const toggleMute = () => { const newMuted = !muted; setMuted(newMuted); audioRef
 
 const setStation = (station) => { const index = stations.findIndex(s => s.name === station.name); if (index !== -1) { playStation(station, index); } };
 
-const nextStation = () => { const nextIndex = (currentStationIndex + 1) % stations.length; playStation(stations[nextIndex], nextIndex); };
+const nextStation = () => {
+	const currentIndex = currentStationIndexRef.current;
+	const nextIndex = (currentIndex + 1) % stations.length;
+	playStation(stations[nextIndex], nextIndex);
+};
 
-const prevStation = () => { const prevIndex = (currentStationIndex - 1 + stations.length) % stations.length; playStation(stations[prevIndex], prevIndex); };
+const prevStation = () => {
+	const currentIndex = currentStationIndexRef.current;
+	const prevIndex = (currentIndex - 1 + stations.length) % stations.length;
+	playStation(stations[prevIndex], prevIndex);
+};
 
 const updateMediaSession = (station) => { if (!("mediaSession" in navigator)) return;
 
