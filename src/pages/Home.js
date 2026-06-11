@@ -13,6 +13,7 @@ import StationControls from '../components/Home/StationControls';
 import StationCard from '../components/Home/StationCard';
 
 import useStationFilters from '../hooks/useStationFilters';
+import RadioTicker from '../components/Home/RadioTicker';
 
 const PageWrapper = styled.main`
 	width: 100%;
@@ -83,6 +84,7 @@ export default function Home() {
 					/>
 				))}
 			</StationGrid>
+			<RadioTicker currentStation={currentStation} />
 		</PageWrapper>
 	);
 }
