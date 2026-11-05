@@ -60,11 +60,11 @@ test('the rendered player reports a failed start, retries and returns to paused'
   const audio = window.Audio.mock.results[0].value;
   expect(page.container.querySelector('[data-player-status]').textContent).toContain('Ready to play');
   audio.play.mockRejectedValueOnce(new DOMException('Blocked', 'NotAllowedError'));
-  await act(async () => page.container.querySelector('[aria-label="Play or pause"]').click());
+  await act(async () => page.container.querySelector('[aria-label="Play"]').click());
   expect(page.container.querySelector('[data-player-status]').getAttribute('data-player-status')).toBe('error');
   expect(page.container.textContent).toContain('Playback was blocked');
   await act(async () => page.container.querySelector('[aria-label="Retry current station"]').click());
   expect(page.container.querySelector('[data-player-status]').getAttribute('data-player-status')).toBe('playing');
-  page.click('[aria-label="Play or pause"]');
+  page.click('[aria-label="Pause"]');
   expect(page.container.querySelector('[data-player-status]').textContent).toBe('Paused');
 });
