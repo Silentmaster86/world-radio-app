@@ -130,3 +130,17 @@ test('direct entry to car mode can return to the catalog without autoplay', () =
   page.click('[aria-label="Back to stations"]');
   expect(page.container.querySelectorAll('h3')).toHaveLength(9);
 });
+
+test('rapid edits preserve every filter before the router finishes rendering', () => {
+  const page = mount();
+  const country = page.container.querySelector('#station-country');
+  const genre = page.container.querySelector('#station-genre');
+  act(() => {
+    country.value = 'US'; country.dispatchEvent(new Event('change', { bubbles: true }));
+    genre.value = 'Pop'; genre.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  const params = new URLSearchParams(window.location.search);
+  expect(params.get('country')).toBe('US');
+  expect(params.get('genre')).toBe('Pop');
+  expect(page.container.textContent).toContain('No matching stations');
+});

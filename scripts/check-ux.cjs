@@ -123,12 +123,13 @@ async function main() {
       assert.equal(await page.evaluate(() => document.activeElement.id), 'open-player');
       assert.ok(Math.abs(await page.evaluate(() => scrollY) - scroll) <= 2, 'List scroll was not restored');
       await page.getByRole('button', { name: 'Remove PRL from favorites', exact: true }).click();
-      assert.ok(await page.getByRole('heading', { name: 'Your favorites start here' }).isVisible());
+      await page.getByRole('heading', { name: 'Your favorites start here' }).waitFor();
       await page.getByRole('button', { name: 'Browse all stations' }).click();
       await page.locator('#station-country').selectOption('US');
       await page.locator('#station-genre').selectOption('Pop');
-      assert.ok(await page.getByRole('heading', { name: 'No matching stations' }).isVisible());
+      await page.getByRole('heading', { name: 'No matching stations' }).waitFor();
       await page.getByRole('button', { name: 'Clear search and filters' }).click();
+      await page.waitForFunction(() => document.querySelectorAll('article').length === 9);
       assert.equal(await page.locator('article').count(), 9);
       await page.locator('#appearance').selectOption(mode === 'dark' ? 'light' : 'dark');
       await page.reload({ waitUntil: 'networkidle' });
@@ -151,6 +152,7 @@ async function main() {
     await context.close();
     console.log(JSON.stringify({ passed: true, scenarios: report.length, report }, null, 2));
   } catch (error) {
+    if (activePage && !activePage.isClosed()) console.error('Browser state:', { url: activePage.url(), text: await activePage.locator('body').innerText() });
     if (activePage && !activePage.isClosed()) await screenshot(activePage, 'failure');
     throw error;
   } finally {
