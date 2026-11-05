@@ -18,7 +18,7 @@ function ThemedApp() {
 
 function mount() {
   return render(<ErrorBoundary><FavoritesProvider><AudioProvider>
-    <ThemeProviderToggle><MotionConfig reducedMotion="always"><ThemedApp /></MotionConfig></ThemeProviderToggle>
+    <ThemeProviderToggle><MotionConfig reducedMotion="never" transition={{ duration: 0 }}><ThemedApp /></MotionConfig></ThemeProviderToggle>
   </AudioProvider></FavoritesProvider></ErrorBoundary>);
 }
 
@@ -33,7 +33,7 @@ test('the full app migrates old favorites and plays current catalog data', async
   localStorage.setItem('favorites', '[{"name":"Heart UK","url":"https://old.example/removed"}]');
   const page = mount();
   expect(page.container.querySelectorAll('h3').length).toBe(9);
-  expect(page.container.querySelector('[aria-label="Toggle favorite for Heart UK"]').textContent).toBe('♥');
+  expect(page.container.querySelector('[aria-label="Remove Heart UK from favorites"]').textContent).toBe('♥');
   expect(JSON.parse(localStorage.getItem(FAVORITES_KEY)).stationIds).toEqual(['heart-uk']);
   const favoriteFilter = [...page.container.querySelectorAll('button')].find((item) => item.textContent === 'Favorites');
   act(() => favoriteFilter.click());
@@ -41,6 +41,7 @@ test('the full app migrates old favorites and plays current catalog data', async
   await act(async () => page.container.querySelector('[aria-label="Play Heart UK"]').click());
   expect(page.container.querySelector('h2').textContent).toBe('Heart UK');
   expect(window.Audio.mock.results[0].value.src).toBe(stations.find((station) => station.id === 'heart-uk').url);
+  expect(window.Audio).toHaveBeenCalledTimes(1);
 });
 
 test('the full app uses US data for Chicago and keeps a usable catalog after invalid storage', () => {
