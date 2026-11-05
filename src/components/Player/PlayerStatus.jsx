@@ -16,7 +16,7 @@ const Status = styled.div`
 `;
 
 export default function PlayerStatus({ announce = true }) {
-  const { status, wantsToPlay, online, retryAttempt, error, retry } = useAudio();
+  const { status, wantsToPlay, online, retryAttempt, error, retry, preferenceMessage } = useAudio();
   const labels = {
     idle: 'Ready to play',
     connecting: retryAttempt ? 'Reconnecting…' : 'Connecting…',
@@ -32,6 +32,7 @@ export default function PlayerStatus({ announce = true }) {
     <Status role={announce ? 'status' : undefined} aria-live={announce ? 'polite' : undefined} data-player-status={status}>
       {message}
       {status === 'error' && <button type="button" onClick={retry} aria-label="Retry current station">Try again</button>}
+      {preferenceMessage && <small style={{ display: 'block' }}>{preferenceMessage}</small>}
     </Status>
   );
 }
