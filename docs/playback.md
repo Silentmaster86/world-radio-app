@@ -48,6 +48,10 @@ that ignore volume writes, the UI directs the user to device volume controls.
 
 ## Verification
 
+This stage depends on foundation PR #1. Review/merge that foundation first, then
+playback PR #2. Both drafts target `main` so the current Netlify configuration can
+create previews; until #1 merges, #2 also contains its prerequisite commits.
+
 Run `npm run check`. Regression tests use a controllable audio element for controlled
 event ordering, deferred play promises, retry timers, offline/online, cancellation,
 Media Session, preferences, StrictMode and full-app integration. No live station
