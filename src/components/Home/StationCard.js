@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import StationLogo from '../StationLogo';
 import { getCountryFlag, getCountryName } from '../../lib/stationUtils';
 
 const Card = styled.article`
@@ -17,7 +18,7 @@ const StationButton = styled.button`
     text-align: left; padding-right: 2.75rem;
   }
 `;
-const Logo = styled.img`
+const Logo = styled(StationLogo)`
   width: 80px; height: 80px; border-radius: 0.75rem; margin-bottom: 1rem; object-fit: contain;
   @media (max-width: 640px) { width: 54px; height: 54px; margin: 0; flex-shrink: 0; }
 `;
@@ -33,7 +34,7 @@ export default function StationCard({ station, isActive, isSelected, playbackSta
   const status = isActive ? 'Playing' : ({ idle: 'Selected', connecting: 'Connecting…', playing: 'Playing', buffering: 'Buffering…', paused: 'Paused', error: 'Unavailable' })[playbackStatus];
   return <Card $selected={isSelected}>
     <StationButton type='button' onClick={onPlay} aria-label={`Play ${station.name}`} aria-current={isSelected ? 'true' : undefined}>
-      <Logo src={station.logo} alt='' width='80' height='80' loading='lazy' decoding='async' />
+      <Logo station={station} sizes='(max-width: 640px) 54px, 80px' />
       <Info><Name>{station.name}</Name><Meta><span role='img' aria-label={getCountryName(station.countryCode)}>{getCountryFlag(station.countryCode)}</span> · {station.genres.join(', ')}</Meta>
         {isSelected && <Meta>{status}</Meta>}
       </Info>

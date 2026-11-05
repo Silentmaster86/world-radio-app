@@ -17,6 +17,7 @@ const Controls = styled.div`
 	gap: ${({ $compact, $car }) => ($car ? '1.4rem' : $compact ? '0.5rem' : '1rem')};
 	flex-wrap: wrap;
 	@media (max-width: 480px) { gap: 0.5rem; }
+	@media (max-height: 450px) { gap: 0.5rem; }
 `;
 
 const HideOnMobile = styled.div`
@@ -31,6 +32,10 @@ const IconButton = styled.button`
 	width: ${({ $car }) => ($car ? '64px' : '44px')};
 	height: ${({ $car }) => ($car ? '64px' : '44px')};
 	flex-shrink: 0;
+	@media (min-width: 520px) and (max-height: 450px) {
+		width: ${({ $car }) => ($car ? '58px' : '44px')};
+		height: ${({ $car }) => ($car ? '58px' : '44px')};
+	}
 	@media (max-width: 480px) {
 		width: ${({ $car }) => ($car ? '58px' : '44px')};
 		height: ${({ $car }) => ($car ? '58px' : '44px')};
@@ -74,6 +79,10 @@ const PlayButton = styled(IconButton)`
 		height: ${({ $car }) => ($car ? '72px' : '44px')};
 	}
 	background: ${({ theme }) => theme.colors.accent};
+	@media (min-width: 520px) and (max-height: 450px) {
+		width: ${({ $car }) => ($car ? '72px' : '44px')};
+		height: ${({ $car }) => ($car ? '72px' : '44px')};
+	}
 	color: ${({ theme }) => theme.colors.onAccent};
 	border: none;
 

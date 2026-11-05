@@ -6,6 +6,7 @@ import { useAudio } from '../context/AudioContext';
 import { getCountryFlag, getCountryName } from '../lib/stationUtils';
 import PlayerStatus from '../components/Player/PlayerStatus';
 import PlayerControls from '../components/Player/PlayerControls';
+import StationLogo from '../components/StationLogo';
 
 const Wrapper = styled.main`
   min-height: 100dvh;
@@ -31,7 +32,7 @@ const TopBar = styled.div`
   grid-area: top; width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 1rem;
 `;
 const HomeButton = styled.button`
-  width: 48px; height: 48px; border-radius: 50%; border: 1px solid currentColor;
+  width: 44px; height: 44px; border-radius: 50%; border: 1px solid currentColor;
   display: grid; place-items: center; background: transparent; cursor: pointer;
 `;
 const CarBadge = styled.span`
@@ -46,8 +47,8 @@ const LogoWrapper = styled.div`
 `;
 const Details = styled.div`
   grid-area: details; text-align: center; min-width: 0;
-  h1 { margin: 0; font-size: clamp(1.4rem, 3vw, 2rem); overflow-wrap: anywhere; }
-  p { color: ${({ theme }) => theme.colors.muted}; margin: 0.5rem 0; }
+  h1 { margin: 0; font-size: clamp(1.4rem, 3vw, 2rem); line-height: 1.2; overflow-wrap: anywhere; }
+  p { color: ${({ theme }) => theme.colors.muted}; font-size: 0.875rem; margin: 0.25rem 0; }
 `;
 const Description = styled.p`
   grid-area: description; font-size: 0.875rem; line-height: 1.5; text-align: center; margin: 0;
@@ -67,7 +68,7 @@ export default function NowPlaying() {
         <HomeButton type='button' onClick={returnToStations} aria-label='Back to stations'><FaHome aria-hidden='true' /></HomeButton>
         <CarBadge><FaCarSide aria-hidden='true' /> Car Mode</CarBadge>
       </TopBar>
-      <LogoWrapper><img src={currentStation.logo} alt='' width='168' height='168' /></LogoWrapper>
+      <LogoWrapper><StationLogo station={currentStation} size={168} loading='eager' /></LogoWrapper>
       <Details>
         <h1 ref={heading} tabIndex={-1}>{currentStation.name}</h1>
         <p><span role='img' aria-label={getCountryName(currentStation.countryCode)}>{getCountryFlag(currentStation.countryCode)}</span> · {currentStation.genres.join(', ')}</p>

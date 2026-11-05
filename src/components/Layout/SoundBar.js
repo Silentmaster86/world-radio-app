@@ -5,6 +5,7 @@ import { useAudio } from '../../context/AudioContext';
 import { usePlayerNavigation } from '../../context/BrowsingContext';
 import PlayerControls from '../Player/PlayerControls';
 import PlayerStatus from '../Player/PlayerStatus';
+import StationLogo from '../StationLogo';
 
 const Dock = styled.aside`
   position: fixed; z-index: 20; inset: auto 0 0;
@@ -38,17 +39,26 @@ export default function SoundBar({ onHeightChange }) {
   const { currentStation } = useAudio();
   const { openPlayer } = usePlayerNavigation();
   useLayoutEffect(() => {
-    const measure = () => onHeightChange(Math.ceil(ref.current?.getBoundingClientRect().height || 176));
+    const previous = document.documentElement.style.getPropertyValue('--radio-player-height');
+    const measure = () => {
+      const height = Math.ceil(ref.current?.getBoundingClientRect().height || 176);
+      document.documentElement.style.setProperty('--radio-player-height', `${height}px`);
+      onHeightChange(height);
+    };
     measure();
     const observer = typeof ResizeObserver === 'function' ? new ResizeObserver(measure) : null;
     if (ref.current) observer?.observe(ref.current);
     window.addEventListener('resize', measure);
-    return () => { observer?.disconnect(); window.removeEventListener('resize', measure); };
+    return () => {
+      observer?.disconnect(); window.removeEventListener('resize', measure);
+      if (previous) document.documentElement.style.setProperty('--radio-player-height', previous);
+      else document.documentElement.style.removeProperty('--radio-player-height');
+    };
   }, [onHeightChange]);
   if (!currentStation) return null;
   return <Dock ref={ref} aria-label='Radio player'>
     <Content>
-      <Info><img src={currentStation.logo} width='48' height='48' alt='' /><div><h2>{currentStation.name}</h2><p>Selected station</p></div></Info>
+      <Info><StationLogo station={currentStation} size={48} loading='eager' /><div><h2>{currentStation.name}</h2><p>Selected station</p></div></Info>
       <PlayerControls compact mobileMini />
       <OpenButton id='open-player' type='button' onClick={openPlayer} aria-label='Open car mode'><FaCarSide aria-hidden='true' /></OpenButton>
       <StatusRow><PlayerStatus /></StatusRow>
