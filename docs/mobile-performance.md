@@ -36,6 +36,8 @@ builds them independently with their lockfiles, and compares the production
 builds on one runner. `scripts/measure-performance.cjs` uses:
 
 - Lighthouse 13.6.0 and Playwright 1.62.1's Chromium, provisioned outside the app.
+- Browser binaries are cached by version; installation steps have a four-minute
+  timeout. The standard Ubuntu GitHub runner supplies Chrome's shared libraries.
 - A fresh browser/profile for each sample and alternating baseline/candidate order.
 - Three mobile samples per build, summarized using medians, and one desktop
   sample per build. Lighthouse's standard mobile and desktop configurations apply.
