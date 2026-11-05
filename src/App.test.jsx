@@ -1,5 +1,4 @@
 import { act } from 'react';
-import { MotionConfig } from 'framer-motion';
 import { ThemeProvider } from 'styled-components';
 import App from './App';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -18,7 +17,7 @@ function ThemedApp() {
 
 function mount() {
   return render(<ErrorBoundary><FavoritesProvider><AudioProvider>
-    <ThemeProviderToggle><MotionConfig reducedMotion="never" transition={{ duration: 0 }}><ThemedApp /></MotionConfig></ThemeProviderToggle>
+    <ThemeProviderToggle><ThemedApp /></ThemeProviderToggle>
   </AudioProvider></FavoritesProvider></ErrorBoundary>);
 }
 

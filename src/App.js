@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import SoundBar from './components/Layout/SoundBar';
 import Home from './pages/Home';
 import NowPlaying from './pages/NowPlaying';
-import PageTransition from './components/Layout/PageTransition';
 import { BrowsingProvider } from './context/BrowsingContext';
 
 const AppWrapper = styled.div`
@@ -19,8 +18,8 @@ function AppShell() {
   const [playerHeight, setPlayerHeight] = useState(176);
   return <AppWrapper $car={isCar} $playerHeight={playerHeight}>
     <Routes>
-      <Route path='/' element={<PageTransition><Home /></PageTransition>} />
-      <Route path='/now-playing' element={<PageTransition><NowPlaying /></PageTransition>} />
+      <Route path='/' element={<Home />} />
+      <Route path='/now-playing' element={<NowPlaying />} />
       <Route path='*' element={<Navigate to='/' replace />} />
     </Routes>
     {!isCar && <SoundBar onHeightChange={setPlayerHeight} />}

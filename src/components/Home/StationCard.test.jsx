@@ -1,4 +1,3 @@
-import { MotionConfig } from 'framer-motion';
 import { ThemeProvider } from 'styled-components';
 import StationCard from './StationCard';
 import { stations } from '../../data/stations';
@@ -6,9 +5,9 @@ import { darkTheme } from '../../darkTheme';
 import { render } from '../../test/render';
 
 const station = stations[0];
-const view = (props) => <ThemeProvider theme={darkTheme}><MotionConfig reducedMotion="never" transition={{ duration: 0 }}>
+const view = (props) => <ThemeProvider theme={darkTheme}>
   <StationCard station={station} {...props} />
-</MotionConfig></ThemeProvider>;
+</ThemeProvider>;
 
 test('station selection is a native focusable button with an independent favorite action', () => {
   const onPlay = jest.fn();
