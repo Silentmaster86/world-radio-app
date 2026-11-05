@@ -50,7 +50,7 @@ export default function Home() {
 	const navigate = useNavigate();
 
 	const { setStation, currentStation } = useAudio();
-	const { favorites, toggleFavorite } = useFavorites();
+	const { favorites, toggleFavorite, storageMessage } = useFavorites();
 	const { isDarkMode, toggleTheme } = useTheme();
 
 	const { filters, filter, setFilter, query, setQuery, searchedStations } =
@@ -71,6 +71,8 @@ export default function Home() {
 				isDarkMode={isDarkMode}
 				toggleTheme={toggleTheme}
 			/>
+
+			{storageMessage && <p role='status'>{storageMessage}</p>}
 
 			<StationGrid>
 				{searchedStations.map((station) => (
