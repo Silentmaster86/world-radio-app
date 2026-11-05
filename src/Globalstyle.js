@@ -25,4 +25,9 @@ export const GlobalStyle = createGlobalStyle`
   select, input {
     font-family: inherit;
   }
+
+  button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible {
+    outline: 3px solid ${({ theme }) => theme.colors.accent};
+    outline-offset: 3px;
+  }
 `;

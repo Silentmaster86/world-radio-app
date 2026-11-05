@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { getCountryFlag, getCountryName } from '../../lib/stationUtils';
 
-const Card = styled.div`
+const Card = styled.article`
 	background: ${({ theme }) =>
 		theme.colors.mode === 'dark'
 			? 'linear-gradient(135deg, rgba(93,12,255,0.15), rgba(155,0,250,0.1))'
@@ -11,7 +11,6 @@ const Card = styled.div`
 	border-radius: ${({ theme }) => theme.borderRadius.lg};
 	padding: 1rem;
 	position: relative;
-	cursor: pointer;
 
 	display: flex;
 	flex-direction: column;
@@ -22,8 +21,8 @@ const Card = styled.div`
 
 	min-height: 150px;
 
-	border: ${({ $active }) =>
-		$active ? '2px solid #ec4899' : '1px solid rgba(255,255,255,0.08)'};
+	border: 2px solid ${({ $active, $selected }) =>
+		$active ? '#ec4899' : $selected ? 'rgba(236,72,153,0.5)' : 'rgba(255,255,255,0.08)'};
 
 	box-shadow: ${({ $active }) =>
 		$active
@@ -54,6 +53,26 @@ const Card = styled.div`
 	}
 `;
 
+const StationButton = styled.button`
+	width: 100%;
+	min-width: 0;
+	padding: 0;
+	border: 0;
+	border-radius: 0.5rem;
+	background: transparent;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	font: inherit;
+	@media (max-width: 480px) {
+		flex-direction: row;
+		gap: 0.85rem;
+		text-align: left;
+		padding-right: 2.5rem;
+	}
+`;
+
 const Logo = styled.img`
 	width: 80px;
 	height: 80px;
@@ -76,7 +95,6 @@ const Info = styled.div`
 
 	@media (max-width: 480px) {
 		align-items: flex-start;
-		padding-right: 2rem;
 	}
 `;
 
@@ -102,6 +120,8 @@ const Meta = styled.p`
 `;
 
 const FavoriteButton = styled.button`
+	width: 44px;
+	height: 44px;
 	position: absolute;
 	top: 0.75rem;
 	right: 1rem;
@@ -132,6 +152,8 @@ const FavoriteButton = styled.button`
 export default function StationCard({
 	station,
 	isActive,
+	isSelected,
+	playbackStatus,
 	isFavorite,
 	onPlay,
 	onFavorite,
@@ -146,9 +168,9 @@ export default function StationCard({
 		>
 			<Card
 				$active={isActive}
-				onClick={onPlay}
-				aria-label={`Play ${station.name}`}
+				$selected={isSelected}
 			>
+				<StationButton type='button' onClick={onPlay} aria-label={`Play ${station.name}`} aria-current={isSelected ? 'true' : undefined}>
 				<Logo src={station.logo} alt={station.name} />
 
 				<Info>
@@ -158,14 +180,18 @@ export default function StationCard({
 							{getCountryFlag(station.countryCode)}
 						</span> • {station.genres.join(', ')}
 					</Meta>
+					{isSelected && <Meta>{({
+						idle: 'Selected', connecting: 'Connecting…', playing: 'Playing',
+						buffering: 'Buffering…', paused: 'Paused', error: 'Unavailable',
+					})[playbackStatus]}</Meta>}
 				</Info>
+				</StationButton>
 
 				<FavoriteButton
-					onClick={(e) => {
-						e.stopPropagation();
-						onFavorite();
-					}}
-					aria-label={`Toggle favorite for ${station.name}`}
+					type='button'
+					onClick={onFavorite}
+					aria-label={`${isFavorite ? 'Remove' : 'Add'} ${station.name} ${isFavorite ? 'from' : 'to'} favorites`}
+					aria-pressed={isFavorite}
 				>
 					{isFavorite ? '♥' : '♡'}
 				</FavoriteButton>

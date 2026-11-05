@@ -12,7 +12,6 @@ import StationControls from '../components/Home/StationControls';
 import StationCard from '../components/Home/StationCard';
 
 import useStationFilters from '../hooks/useStationFilters';
-import RadioTicker from '../components/Home/RadioTicker';
 
 const PageWrapper = styled.main`
 	width: 100%;
@@ -46,7 +45,7 @@ const StationGrid = styled.section`
 `;
 
 export default function Home() {
-	const { setStation, currentStation } = useAudio();
+	const { setStation, currentStation, playingStationId, status } = useAudio();
 	const { favoriteIds, isFavorite, toggleFavorite, storageMessage } = useFavorites();
 	const { isDarkMode, toggleTheme } = useTheme();
 
@@ -76,14 +75,15 @@ export default function Home() {
 					<StationCard
 						key={station.id}
 						station={station}
-						isActive={station.id === currentStation?.id}
+						isSelected={station.id === currentStation?.id}
+						isActive={station.id === playingStationId && status === 'playing'}
+						playbackStatus={station.id === currentStation?.id ? status : undefined}
 						isFavorite={isFavorite(station.id)}
 						onPlay={() => setStation(station)}
 						onFavorite={() => toggleFavorite(station.id)}
 					/>
 				))}
 			</StationGrid>
-			<RadioTicker currentStation={currentStation} />
 		</PageWrapper>
 	);
 }

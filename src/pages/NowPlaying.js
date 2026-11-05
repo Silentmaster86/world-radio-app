@@ -2,12 +2,10 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAudio } from '../context/AudioContext';
 import { getCountryFlag, getCountryName } from '../lib/stationUtils';
+import PlayerStatus from '../components/Player/PlayerStatus';
+import PlayerControls from '../components/Player/PlayerControls';
 import {
 	FaHome,
-	FaPlay,
-	FaPause,
-	FaStepForward,
-	FaStepBackward,
 	FaCarSide,
 } from 'react-icons/fa';
 
@@ -155,80 +153,10 @@ const Meta = styled.p`
 	font-size: 0.95rem;
 `;
 
-const Status = styled.p`
-	margin: 1.25rem 0 2rem;
-
-	font-size: 0.8rem;
-	text-transform: uppercase;
-	letter-spacing: 0.12em;
-
-	color: ${({ theme }) => theme.colors.accent};
-`;
-
-const Controls = styled.div`
-	display: flex;
-	align-items: center;
-	justify-content: center;
-
-	gap: 1.4rem;
-
-	margin-top: 0.5rem;
-`;
-
-const ControlButton = styled.button`
-	width: 64px;
-	height: 64px;
-
-	border-radius: 50%;
-	border: none;
-
-	display: flex;
-	align-items: center;
-	justify-content: center;
-
-	cursor: pointer;
-
-	background: ${({ theme }) =>
-		theme.colors.mode === 'dark'
-			? 'rgba(255,255,255,0.12)'
-			: 'rgba(0,0,0,0.08)'};
-
-	color: ${({ theme }) => theme.colors.text};
-
-	font-size: 1.2rem;
-
-	transition: 0.2s ease;
-
-	&:hover {
-		transform: scale(1.08);
-	}
-
-	@media (max-width: 480px) {
-		width: 58px;
-		height: 58px;
-	}
-`;
-
-const MainPlayButton = styled(ControlButton)`
-	width: 82px;
-	height: 82px;
-
-	background: ${({ theme }) => theme.colors.accent};
-	color: #fff;
-
-	font-size: 1.4rem;
-
-	@media (max-width: 480px) {
-		width: 72px;
-		height: 72px;
-	}
-`;
-
 export default function NowPlaying() {
 	const navigate = useNavigate();
 
-	const { currentStation, isPlaying, togglePlay, nextStation, prevStation } =
-		useAudio();
+	const { currentStation } = useAudio();
 
 	if (!currentStation?.name) {
 		return (
@@ -266,21 +194,10 @@ export default function NowPlaying() {
 					</span> • {currentStation.genres.join(', ')}
 				</Meta>
 
-				<Status>Streaming Live</Status>
+				<PlayerStatus />
 
-				<Controls>
-					<ControlButton onClick={prevStation} aria-label='Previous station'>
-						<FaStepBackward />
-					</ControlButton>
-
-					<MainPlayButton onClick={togglePlay} aria-label='Play or pause'>
-						{isPlaying ? <FaPause /> : <FaPlay />}
-					</MainPlayButton>
-
-					<ControlButton onClick={nextStation} aria-label='Next station'>
-						<FaStepForward />
-					</ControlButton>
-				</Controls>
+				<PlayerControls variant='car' />
+				<p style={{ fontSize: '0.85rem', lineHeight: 1.4, textAlign: 'center' }}>{currentStation.description}</p>
 			</PlayerCard>
 		</Wrapper>
 	);

@@ -28,6 +28,9 @@
   build. Before that setup, at least run `npm run build`.
 - Check direct routes on Netlify deploy previews; a local SPA fallback alone does
   not verify production routing.
+- For this site's current Netlify setup, target `main` to obtain a PR preview.
+  A dependent draft must clearly state its prerequisite PR and review/merge order.
+  Working-branch targets require enabling branch deploys in Netlify first.
 - Verify keyboard access, mobile layout and both themes for relevant UI changes.
 - Document what passed and any remaining limitations in the pull request.
 - Keep deployment, audio refactoring and optional feature work in separate stages.

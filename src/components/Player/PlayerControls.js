@@ -14,7 +14,9 @@ const Controls = styled.div`
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	gap: ${({ $compact }) => ($compact ? '0.5rem' : '1rem')};
+	gap: ${({ $compact, $car }) => ($car ? '1.4rem' : $compact ? '0.5rem' : '1rem')};
+	flex-wrap: wrap;
+	@media (max-width: 480px) { gap: 0.5rem; }
 `;
 
 const HideOnMobile = styled.div`
@@ -26,8 +28,13 @@ const HideOnMobile = styled.div`
 `;
 
 const IconButton = styled.button`
-	width: ${({ $compact }) => ($compact ? '36px' : '44px')};
-	height: ${({ $compact }) => ($compact ? '36px' : '44px')};
+	width: ${({ $car }) => ($car ? '64px' : '44px')};
+	height: ${({ $car }) => ($car ? '64px' : '44px')};
+	flex-shrink: 0;
+	@media (max-width: 480px) {
+		width: ${({ $car }) => ($car ? '58px' : '44px')};
+		height: ${({ $car }) => ($car ? '58px' : '44px')};
+	}
 
 	border-radius: 50%;
 	border: 1px solid
@@ -60,6 +67,12 @@ const IconButton = styled.button`
 `;
 
 const PlayButton = styled(IconButton)`
+	width: ${({ $car }) => ($car ? '82px' : '44px')};
+	height: ${({ $car }) => ($car ? '82px' : '44px')};
+	@media (max-width: 480px) {
+		width: ${({ $car }) => ($car ? '72px' : '44px')};
+		height: ${({ $car }) => ($car ? '72px' : '44px')};
+	}
 	background: ${({ theme }) => theme.colors.accent};
 	color: #fff;
 	border: none;
@@ -73,6 +86,8 @@ const VolumeGroup = styled.div`
 	display: flex;
 	align-items: center;
 	gap: 0.55rem;
+	flex-basis: 100%;
+	justify-content: center;
 
 	@media (max-width: 480px) {
 		width: 100%;
@@ -92,40 +107,54 @@ export default function PlayerControls({
 	showVolume = true,
 	compact = false,
 	mobileMini = false,
+	variant = 'default',
 }) {
 	const {
 		togglePlay,
 		nextStation,
 		prevStation,
-		isPlaying,
+		wantsToPlay,
+		status,
 		volume,
 		changeVolume,
 		muted,
 		toggleMute,
+		canChangeVolume,
 	} = useAudio();
 
 	return (
-		<Controls $compact={compact}>
+		<Controls $compact={compact} $car={variant === 'car'} role='group' aria-label='Playback controls'>
 			<HideOnMobile $hide={mobileMini}>
-				<IconButton $compact={compact} onClick={prevStation}>
-					<FaStepBackward />
+				<IconButton type='button' $car={variant === 'car'} onClick={prevStation} aria-label='Previous station'>
+					<FaStepBackward aria-hidden='true' />
 				</IconButton>
 			</HideOnMobile>
 
 			<PlayButton
 				$main
 				$compact={compact}
+				$car={variant === 'car'}
+				type='button'
 				onClick={togglePlay}
-				aria-label='Play or pause'
+				aria-label={wantsToPlay ? status === 'connecting' ? 'Cancel connection' : 'Pause' : 'Play'}
 			>
-				{isPlaying ? <FaPause /> : <FaPlay />}
+				{wantsToPlay ? <FaPause aria-hidden='true' /> : <FaPlay aria-hidden='true' />}
 			</PlayButton>
 
 			<HideOnMobile $hide={mobileMini}>
-				<IconButton $compact={compact} onClick={nextStation}>
-					<FaStepForward />
+				<IconButton type='button' $car={variant === 'car'} onClick={nextStation} aria-label='Next station'>
+					<FaStepForward aria-hidden='true' />
 				</IconButton>
 			</HideOnMobile>
+			{showVolume && <VolumeGroup role='group' aria-label='Volume controls'>
+				<IconButton type='button' onClick={toggleMute} aria-label={muted ? 'Unmute' : 'Mute'} aria-pressed={muted}>
+					{muted ? <FaVolumeMute aria-hidden='true' /> : <FaVolumeUp aria-hidden='true' />}
+				</IconButton>
+				{canChangeVolume !== false ? <>
+					<VolumeSlider type='range' min='0' max='1' step='0.01' value={volume} aria-label='Volume' aria-valuetext={`${Math.round(volume * 100)}%`} onChange={(event) => changeVolume(Number(event.target.value))} />
+					<span aria-hidden='true'>{Math.round(volume * 100)}%</span>
+				</> : <small>Use device volume controls</small>}
+			</VolumeGroup>}
 		</Controls>
 	);
 }
