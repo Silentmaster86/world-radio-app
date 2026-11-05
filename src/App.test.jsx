@@ -34,14 +34,14 @@ afterEach(() => jest.restoreAllMocks());
 test('the full app migrates old favorites and plays current catalog data', async () => {
   localStorage.setItem('favorites', '[{"name":"Heart UK","url":"https://old.example/removed"}]');
   const page = mount();
-  expect(page.container.querySelectorAll('h3').length).toBe(9);
+  expect(page.container.querySelectorAll('[data-station-title]').length).toBe(9);
   expect(page.container.querySelector('[aria-label="Remove Heart UK from favorites"]').textContent).toBe('♥');
   expect(JSON.parse(localStorage.getItem(FAVORITES_KEY)).stationIds).toEqual(['heart-uk']);
   const favoriteFilter = [...page.container.querySelectorAll('button')].find((item) => item.textContent.startsWith('Favorites ('));
   act(() => favoriteFilter.click());
-  expect([...page.container.querySelectorAll('h3')].map((item) => item.textContent)).toEqual(['Heart UK']);
-  await act(async () => page.container.querySelector('[aria-label="Play Heart UK"]').click());
-  expect(page.container.querySelector('h2').textContent).toBe('Heart UK');
+  expect([...page.container.querySelectorAll('[data-station-title]')].map((item) => item.textContent)).toEqual(['Heart UK']);
+  await act(async () => page.container.querySelector('[data-station-id="heart-uk"]').click());
+  expect(page.container.querySelector('[aria-label="Radio player"] h2').textContent).toBe('Heart UK');
   expect(window.Audio.mock.results[0].value.src).toBe(stations.find((station) => station.id === 'heart-uk').url);
   expect(window.Audio).toHaveBeenCalledTimes(1);
 });
@@ -50,10 +50,10 @@ test('the full app uses US data for Chicago and keeps a usable catalog after inv
   localStorage.setItem('favorites', '{');
   const page = mount();
   expect(page.container.querySelector('h1').textContent).toContain('World Radio App');
-  expect(page.container.querySelectorAll('h3').length).toBe(9);
+  expect(page.container.querySelectorAll('[data-station-title]').length).toBe(9);
   const us = page.container.querySelector('#station-country');
   act(() => { us.value = 'US'; us.dispatchEvent(new Event('change', { bubbles: true })); });
-  expect([...page.container.querySelectorAll('h3')].map((item) => item.textContent)).toEqual(['PR Chicago']);
+  expect([...page.container.querySelectorAll('[data-station-title]')].map((item) => item.textContent)).toEqual(['PR Chicago']);
   expect(page.container.querySelector('[aria-label="United States"]')).not.toBeNull();
   expect(page.container.querySelector('[role=alert]')).toBeNull();
 });
@@ -75,13 +75,13 @@ test('the rendered player reports a failed start, retries and returns to paused'
 test('combined URL filters survive reload and reset without removing unrelated parameters', () => {
   window.history.replaceState({}, '', '/?country=GB&genre=News&language=pl&q=prl&campaign=demo');
   let page = mount();
-  expect([...page.container.querySelectorAll('h3')].map((item) => item.textContent)).toEqual(['PRL']);
+  expect([...page.container.querySelectorAll('[data-station-title]')].map((item) => item.textContent)).toEqual(['PRL']);
   page.unmount();
   page = mount();
   expect(page.container.querySelector('#station-search').value).toBe('prl');
   const reset = [...page.container.querySelectorAll('button')].find((item) => item.textContent === 'Reset filters');
   act(() => reset.click());
-  expect(page.container.querySelectorAll('h3')).toHaveLength(9);
+  expect(page.container.querySelectorAll('[data-station-title]')).toHaveLength(9);
   expect(window.location.search).toBe('?campaign=demo');
 });
 
@@ -90,14 +90,14 @@ test('empty favorites guide the user to stations; unmatched refinements can be c
   const page = mount();
   expect(page.container.textContent).toContain('Your favorites start here');
   act(() => [...page.container.querySelectorAll('button')].find((item) => item.textContent === 'Browse all stations').click());
-  expect(page.container.querySelectorAll('h3')).toHaveLength(9);
+  expect(page.container.querySelectorAll('[data-station-title]')).toHaveLength(9);
   const country = page.container.querySelector('#station-country');
   const genre = page.container.querySelector('#station-genre');
   act(() => { country.value = 'US'; country.dispatchEvent(new Event('change', { bubbles: true })); });
   act(() => { genre.value = 'Pop'; genre.dispatchEvent(new Event('change', { bubbles: true })); });
   expect(page.container.textContent).toContain('No matching stations');
   act(() => [...page.container.querySelectorAll('button')].find((item) => item.textContent === 'Clear search and filters').click());
-  expect(page.container.querySelectorAll('h3')).toHaveLength(9);
+  expect(page.container.querySelectorAll('[data-station-title]')).toHaveLength(9);
 });
 
 test('the shared player survives route changes and restores the list, scroll and keyboard focus', async () => {
@@ -106,7 +106,7 @@ test('the shared player survives route changes and restores the list, scroll and
   window.scrollY = 420;
   const page = mount();
   page.click('[aria-controls="station-refinements"]');
-  await act(async () => page.container.querySelector('[aria-label="Play PRL"]').click());
+  await act(async () => page.container.querySelector('[data-station-id="prl"]').click());
   const audio = window.Audio.mock.results[0].value;
   const pauseCount = audio.pause.mock.calls.length;
   const open = page.container.querySelector('#open-player');
@@ -117,7 +117,7 @@ test('the shared player survives route changes and restores the list, scroll and
   expect(page.container.querySelector('[data-player-status]').getAttribute('data-player-status')).toBe('playing');
   page.click('[aria-label="Back to stations"]');
   expect(window.location.pathname + window.location.search).toBe('/?country=GB&genre=News');
-  expect([...page.container.querySelectorAll('h3')].map((item) => item.textContent)).toEqual(['PRL']);
+  expect([...page.container.querySelectorAll('[data-station-title]')].map((item) => item.textContent)).toEqual(['PRL']);
   expect(scroll).toHaveBeenLastCalledWith(0, 420);
   expect(document.activeElement.id).toBe('open-player');
   expect(page.container.querySelector('[aria-controls="station-refinements"]').getAttribute('aria-expanded')).toBe('true');
@@ -130,7 +130,7 @@ test('direct entry to car mode can return to the catalog without autoplay', () =
   const page = mount();
   expect(window.Audio.mock.results[0].value.play).not.toHaveBeenCalled();
   page.click('[aria-label="Back to stations"]');
-  expect(page.container.querySelectorAll('h3')).toHaveLength(9);
+  expect(page.container.querySelectorAll('[data-station-title]')).toHaveLength(9);
 });
 
 test('rapid edits preserve every filter before the router finishes rendering', () => {
