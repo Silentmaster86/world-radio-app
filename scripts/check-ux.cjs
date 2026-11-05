@@ -143,11 +143,29 @@ async function main() {
     }
     // Use real Audio here: startup must not request a stream or autoplay.
     const context = await browser.newContext();
+    await context.addInitScript(() => {
+      const NativeAudio = window.Audio;
+      window.__radioStartupAudio = [];
+      window.Audio = function Audio(...args) {
+        const audio = new NativeAudio(...args);
+        const play = audio.play;
+        audio.startupPlayCalls = 0;
+        audio.play = function (...playArgs) {
+          audio.startupPlayCalls += 1;
+          return play.apply(this, playArgs);
+        };
+        window.__radioStartupAudio.push(audio);
+        return audio;
+      };
+      window.Audio.prototype = NativeAudio.prototype;
+      Object.setPrototypeOf(window.Audio, NativeAudio);
+    });
     const page = await context.newPage(); activePage = page;
-    const media = [];
-    page.on('request', (request) => { if (request.resourceType() === 'media') media.push(request.url()); });
     await page.goto(base, { waitUntil: 'networkidle' });
-    assert.deepEqual(media, []);
+    // Inspect the application's native audio object; preview-toolbar videos
+    // belong to Netlify and are independent of radio startup behavior.
+    const audioState = await page.evaluate(() => window.__radioStartupAudio.map((audio) => ({ source: audio.getAttribute('src'), paused: audio.paused, playCalls: audio.startupPlayCalls })));
+    assert.deepEqual(audioState, [{ source: null, paused: true, playCalls: 0 }]);
     assert.equal(await page.locator('[data-player-status]').getAttribute('data-player-status'), 'idle');
     await context.close();
     console.log(JSON.stringify({ passed: true, scenarios: report.length, report }, null, 2));
