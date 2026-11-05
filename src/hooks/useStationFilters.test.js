@@ -1,23 +1,23 @@
 import { stations } from '../data/stations';
-import { filterStations } from './useStationFilters';
-
-test('Chicago is included in US and excluded from GB', () => {
-  expect(filterStations(stations, [], 'US', '').map((station) => station.id)).toEqual(['pr-chicago']);
-  expect(filterStations(stations, [], 'GB', '').some((station) => station.id === 'pr-chicago')).toBe(false);
+import { filterStations, getFilterOptions, readFilters } from './useStationFilters';
+const ids = (filters, favorites = []) => filterStations(stations, favorites, filters).map((station) => station.id);
+test('country is independent of station language', () => {
+  expect(ids({ country: 'US', language: 'pl' })).toEqual(['pr-chicago']);
+  expect(ids({ country: 'GB', language: 'pl' })).toEqual(['prl']);
 });
-
-test('favorites are filtered by stable ID and use current catalog data', () => {
-  const renamed = stations.map((station) => station.id === 'capital-dance'
-    ? { ...station, name: 'Updated name', url: 'https://example.com/new' } : station);
-  expect(filterStations(renamed, ['capital-dance', 'missing'], 'Favorites', '')).toEqual([renamed[0]]);
+test('all refinements intersect with favorites and search', () => {
+  expect(ids({ section: 'favorites', country: 'GB', genre: 'News', language: 'pl', q: ' PRL ' }, ['prl', 'pr-chicago', 'missing'])).toEqual(['prl']);
+  expect(ids({ country: 'US', genre: 'Pop' })).toEqual([]);
+  expect(ids({ q: ' CaPiTaL ' })).toEqual(['capital-dance', 'capital-fm']);
 });
-
-test('search remains case insensitive and tolerates surrounding spaces', () => {
-  expect(filterStations(stations, [], 'All', ' CaPiTaL ').map((station) => station.id))
-    .toEqual(['capital-dance', 'capital-fm']);
+test('favorites use stable IDs and current catalog data', () => {
+  const renamed = [{ ...stations[0], name: 'Updated', url: 'https://example.com/new' }];
+  expect(filterStations(renamed, ['capital-dance', 'missing'], { section: 'favorites' })).toEqual(renamed);
 });
-
-test('genre filtering uses the genre array and can narrow search results', () => {
-  expect(filterStations(stations, [], 'News', 'Chicago').map((station) => station.id)).toEqual(['pr-chicago']);
-  expect(filterStations(stations, [], 'Pop', 'Chicago')).toEqual([]);
+test('valid URLs restore all refinements; invalid parameters safely fall back', () => {
+  const options = getFilterOptions(stations);
+  expect(readFilters(new URLSearchParams('section=favorites&country=GB&genre=News&language=pl&q=PRL'), options))
+    .toEqual({ section: 'favorites', country: 'GB', genre: 'News', language: 'pl', q: 'PRL' });
+  expect(readFilters(new URLSearchParams('section=oops&country=XX&genre=unknown&language=xx'), options))
+    .toEqual({ section: 'all', country: '', genre: '', language: '', q: '' });
 });
