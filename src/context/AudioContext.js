@@ -1,114 +1,68 @@
-// src/context/AudioContext.js
-import { createContext, useContext, useRef, useState, useEffect } from "react"; import { stations } from "../data/stations";
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { stations } from '../data/stations';
+import { createAudioPlayer, createInitialPlayerState } from '../lib/audioPlayer';
 
-const AudioContext = createContext(); export const useAudio = () => useContext(AudioContext);
+const AudioContext = createContext();
+export const useAudio = () => useContext(AudioContext);
 
-export const AudioProvider = ({ children }) => { const audioRef = useRef(new Audio(stations[0].url)); const currentStationIndexRef = useRef(0); // This keeps track in MediaSession scope
+export function AudioProvider({ children }) {
+  const playerRef = useRef(null);
+  const [snapshot, setSnapshot] = useState(() => createInitialPlayerState(stations));
 
-const [currentStationIndex, setCurrentStationIndex] = useState(0); const [isPlaying, setIsPlaying] = useState(false); const [volume, setVolume] = useState(1); const [muted, setMuted] = useState(false);
+  useEffect(() => {
+    const player = createAudioPlayer({ stations, initialOnline: navigator.onLine });
+    playerRef.current = player;
+    const session = navigator.mediaSession;
+    let lastStationId;
+    const sync = (next) => {
+      setSnapshot(next);
+      const station = player.getStation();
+      if (session && next.wantsToPlay && station?.id !== lastStationId && typeof window.MediaMetadata === 'function') {
+        try {
+          session.metadata = new window.MediaMetadata({ title: station.name, artist: 'Online Radio', album: 'Live Stream', artwork: [{ src: station.logo }] });
+          lastStationId = station.id;
+        } catch { /* Optional system metadata must not break audio. */ }
+      }
+    };
+    const unsubscribe = player.subscribe(sync);
+    sync(player.getSnapshot());
+    const handlers = { play: player.play, pause: player.pause, nexttrack: player.nextStation, previoustrack: player.prevStation };
+    const installed = [];
+    if (session) {
+      Object.entries(handlers).forEach(([name, handler]) => {
+        try { session.setActionHandler(name, handler); installed.push(name); } catch { /* Unsupported action. */ }
+      });
+    }
+    const online = () => player.setOnline(true);
+    const offline = () => player.setOnline(false);
+    window.addEventListener('online', online);
+    window.addEventListener('offline', offline);
+    return () => {
+      unsubscribe();
+      window.removeEventListener('online', online);
+      window.removeEventListener('offline', offline);
+      installed.forEach((name) => { try { session.setActionHandler(name, null); } catch { /* Unsupported action. */ } });
+      player.dispose();
+      playerRef.current = null;
+    };
+  }, []);
 
-const playStation = async (station, index) => { if (!station || !station.url) return;
-
-audioRef.current.src = station.url;
-
-try {
-  await audioRef.current.play();
-  setIsPlaying(true);
-} catch (err) {
-  console.warn("[playStation] Autoplay failed:", err.message);
-  setIsPlaying(false);
+  const invoke = (name, ...args) => playerRef.current?.[name](...args);
+  const currentStation = stations.find((station) => station.id === snapshot.selectedStationId);
+  return <AudioContext.Provider value={{
+    ...snapshot,
+    currentStation,
+    playingStation: stations.find((station) => station.id === snapshot.playingStationId) || null,
+    isPlaying: snapshot.status === 'playing',
+    selectStation: (id) => invoke('selectStation', id),
+    setStation: (station) => invoke('selectStation', station?.id),
+    play: () => invoke('play'),
+    pause: () => invoke('pause'),
+    retry: () => invoke('retry'),
+    togglePlay: () => invoke('togglePlay'),
+    nextStation: () => invoke('nextStation'),
+    prevStation: () => invoke('prevStation'),
+    changeVolume: (volume) => invoke('setVolume', volume),
+    toggleMute: () => invoke('toggleMute'),
+  }}>{children}</AudioContext.Provider>;
 }
-
-setCurrentStationIndex(index);
-currentStationIndexRef.current = index;
-updateMediaSession(station);
-
-};
-
-const togglePlay = () => { if (isPlaying) { audioRef.current.pause(); setIsPlaying(false); } else { audioRef.current.play().then(() => { setIsPlaying(true); }).catch((err) => { console.warn("[togglePlay] Autoplay error:", err.message); }); } };
-
-const changeVolume = (vol) => { setVolume(vol); audioRef.current.volume = vol; };
-
-const toggleMute = () => { const newMuted = !muted; setMuted(newMuted); audioRef.current.muted = newMuted; };
-
-const setStation = (station) => { const index = stations.findIndex(s => s.id === station?.id); if (index !== -1) { playStation(stations[index], index); } };
-
-const nextStation = () => {
-	const currentIndex = currentStationIndexRef.current;
-	const nextIndex = (currentIndex + 1) % stations.length;
-	playStation(stations[nextIndex], nextIndex);
-};
-
-const prevStation = () => {
-	const currentIndex = currentStationIndexRef.current;
-	const prevIndex = (currentIndex - 1 + stations.length) % stations.length;
-	playStation(stations[prevIndex], prevIndex);
-};
-
-const updateMediaSession = (station) => { if (!("mediaSession" in navigator)) return;
-
-navigator.mediaSession.metadata = new window.MediaMetadata({
-  title: station.name,
-  artist: "Online Radio",
-  album: "Live Stream",
-  artwork: [
-    { src: station.logo, sizes: "512x512", type: "image/png" },
-  ],
-});
-
-};
-
-useEffect(() => { if (!("mediaSession" in navigator)) return;
-
-navigator.mediaSession.setActionHandler("play", () => {
-  audioRef.current.play().catch(() => {});
-  setIsPlaying(true);
-});
-
-navigator.mediaSession.setActionHandler("pause", () => {
-  audioRef.current.pause();
-  setIsPlaying(false);
-});
-
-navigator.mediaSession.setActionHandler("nexttrack", async () => {
-  const currentIndex = currentStationIndexRef.current;
-  const nextIndex = (currentIndex + 1) % stations.length;
-  const nextStation = stations[nextIndex];
-
-  audioRef.current.src = nextStation.url;
-  try {
-    await audioRef.current.play();
-    setIsPlaying(true);
-    setCurrentStationIndex(nextIndex);
-    currentStationIndexRef.current = nextIndex;
-
-    updateMediaSession(nextStation);
-  } catch (err) {
-    console.warn("[MediaSession nexttrack] error:", err.message);
-  }
-});
-
-navigator.mediaSession.setActionHandler("previoustrack", async () => {
-  const currentIndex = currentStationIndexRef.current;
-  const prevIndex = (currentIndex - 1 + stations.length) % stations.length;
-  const prevStation = stations[prevIndex];
-
-  audioRef.current.src = prevStation.url;
-  try {
-    await audioRef.current.play();
-    setIsPlaying(true);
-    setCurrentStationIndex(prevIndex);
-    currentStationIndexRef.current = prevIndex;
-
-    updateMediaSession(prevStation);
-  } catch (err) {
-    console.warn("[MediaSession previoustrack] error:", err.message);
-  }
-});
-
-}, []);
-
-useEffect(() => { audioRef.current.preload = "none"; audioRef.current.volume = volume; audioRef.current.muted = muted; }, [volume, muted]);
-
-return ( <AudioContext.Provider value={{ audio: audioRef.current, currentStation: stations[currentStationIndex], setStation, togglePlay, nextStation, prevStation, isPlaying, volume, changeVolume, muted, toggleMute, }} > {children} </AudioContext.Provider> ); };
-

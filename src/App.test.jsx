@@ -9,6 +9,7 @@ import { ThemeProviderToggle, useTheme } from './context/ThemeContext';
 import { stations } from './data/stations';
 import { FAVORITES_KEY } from './lib/favoritesStorage';
 import { render } from './test/render';
+import { FakeAudio } from './test/FakeAudio';
 
 function ThemedApp() {
   const { theme } = useTheme();
@@ -24,9 +25,7 @@ function mount() {
 beforeEach(() => {
   localStorage.clear();
   window.history.replaceState({}, '', '/');
-  jest.spyOn(window, 'Audio').mockImplementation(() => ({
-    play: jest.fn().mockResolvedValue(), pause: jest.fn(),
-  }));
+  jest.spyOn(window, 'Audio').mockImplementation(() => new FakeAudio());
 });
 afterEach(() => jest.restoreAllMocks());
 
