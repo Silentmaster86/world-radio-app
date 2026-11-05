@@ -49,6 +49,8 @@ Scores are diagnostic rather than a fixed CI score threshold because runner
 load and browser timing vary. The gzip budget is deterministic. These laboratory
 results compare the code under controlled delivery; they are not measurements
 of the user's phone, Netlify CDN latency or real radio-stream availability.
+The job also saves one separate mobile report for the current production URL.
+That online result is reported separately from the controlled build comparison.
 
 The existing Chromium/axe job also runs against the built app and the current
 Netlify preview. Mobile widths include 320, 390, 481, 510 and 640 px. It checks

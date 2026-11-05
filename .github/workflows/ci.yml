@@ -101,6 +101,7 @@ jobs:
         env:
           WRA_BASE_BUILD: ${{ github.workspace }}/baseline/build
           PERFORMANCE_RUNS: 3
+          WRA_PRODUCTION_URL: https://worldradioapp.netlify.app/
         run: NODE_PATH="$RUNNER_TEMP/wra-performance/node_modules" node scripts/measure-performance.cjs
       - uses: actions/upload-artifact@v4
         if: always()

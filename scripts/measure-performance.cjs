@@ -91,6 +91,14 @@ async function main() {
     }
     fs.writeFileSync(path.join(output, 'comparison.json'), JSON.stringify(comparison, null, 2));
     console.log('PERFORMANCE_COMPARISON ' + JSON.stringify(comparison));
+    if (process.env.WRA_PRODUCTION_URL) {
+      chrome = await launch({ chromePath: chromium.executablePath(), chromeFlags: ['--headless=new', '--no-sandbox', '--disable-dev-shm-usage'] });
+      const result = await lighthouse(process.env.WRA_PRODUCTION_URL, { port: chrome.port, output: ['html', 'json'], onlyCategories: ['performance', 'accessibility', 'best-practices', 'seo'], logLevel: 'error', maxWaitForLoad: 35000 });
+      if (result.lhr.runtimeError) throw new Error(JSON.stringify(result.lhr.runtimeError));
+      fs.writeFileSync(path.join(output, 'production-mobile.html'), result.report[0]);
+      fs.writeFileSync(path.join(output, 'production-mobile.json'), result.report[1]);
+      console.log('PRODUCTION_RESULT ' + JSON.stringify({ url: result.lhr.finalDisplayedUrl, scores: Object.fromEntries(Object.entries(result.lhr.categories).map(([key, value]) => [key, value.score])), metrics: Object.fromEntries(metricIds.map((id) => [id, result.lhr.audits[id]?.numericValue])) }));
+    }
   } finally {
     fs.writeFileSync(path.join(output, 'summary.json'), JSON.stringify(summaries, null, 2));
     await chrome?.kill();

@@ -73,7 +73,7 @@ async function main() {
           assert.equal(await page.locator('#station-country').isVisible(), false, 'Extra mobile filters should start collapsed');
           const first = await page.locator('article button').first().boundingBox();
           const dock = await page.locator('[aria-label="Radio player"]').boundingBox();
-          assert.ok(first.y >= 0 && first.y + first.height <= dock.y + 1, 'First station should be usable before scrolling');
+          assert.ok(first.y >= 0 && first.y + first.height <= dock.y + 1, `First station should be usable before scrolling: ${JSON.stringify({ viewport, first, dock })}`);
           await screenshot(page, `${mode}-initial-${viewport.width}`);
         }
         await page.locator('article').last().scrollIntoViewIfNeeded();
