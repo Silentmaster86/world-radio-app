@@ -23,6 +23,7 @@ function mount() {
 }
 
 beforeEach(() => {
+  window.history.scrollRestoration = 'auto';
   jest.spyOn(window, 'scrollTo').mockImplementation(() => {});
   window.scrollY = 0;
   localStorage.clear();
@@ -143,4 +144,11 @@ test('rapid edits preserve every filter before the router finishes rendering', (
   expect(params.get('country')).toBe('US');
   expect(params.get('genre')).toBe('Pop');
   expect(page.container.textContent).toContain('No matching stations');
+});
+
+test('the router owns scroll restoration while mounted and releases it on cleanup', () => {
+  const page = mount();
+  expect(window.history.scrollRestoration).toBe('manual');
+  page.unmount();
+  expect(window.history.scrollRestoration).toBe('auto');
 });

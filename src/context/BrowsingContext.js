@@ -4,6 +4,12 @@ import { useLocation, useNavigate } from 'react-router-dom';
 const BrowsingContext = createContext();
 export function BrowsingProvider({ children }) {
   const lastBrowse = useRef(null);
+  useLayoutEffect(() => {
+    if (!('scrollRestoration' in window.history)) return undefined;
+    const previous = window.history.scrollRestoration;
+    window.history.scrollRestoration = 'manual';
+    return () => { window.history.scrollRestoration = previous; };
+  }, []);
   return <BrowsingContext.Provider value={lastBrowse}>{children}</BrowsingContext.Provider>;
 }
 export function safeBrowseSearch(value) {

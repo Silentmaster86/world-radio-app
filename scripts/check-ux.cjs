@@ -98,7 +98,7 @@ async function main() {
       await page.locator('[aria-label="Radio player"]').waitFor({ state: 'detached' });
       await page.goBack({ waitUntil: 'networkidle' });
       await page.locator('#station-search').waitFor();
-      assert.ok(Math.abs(await page.evaluate(() => scrollY) - fullListScroll) <= 2, 'Browser Back did not restore the list scroll');
+      await page.waitForFunction((expected) => Math.abs(scrollY - expected) <= 2, fullListScroll, { timeout: 5000 });
       assert.equal(await page.evaluate(() => document.activeElement.id), 'open-player');
       await page.goto(`${base}/?country=GB&genre=News&language=pl&q=PRL`, { waitUntil: 'networkidle' });
       assert.equal(await page.locator('article').count(), 1);
@@ -121,7 +121,7 @@ async function main() {
       await page.locator('#station-search').waitFor();
       assert.equal(await page.locator('#station-search').inputValue(), 'PRL');
       assert.equal(await page.evaluate(() => document.activeElement.id), 'open-player');
-      assert.ok(Math.abs(await page.evaluate(() => scrollY) - scroll) <= 2, 'List scroll was not restored');
+      await page.waitForFunction((expected) => Math.abs(scrollY - expected) <= 2, scroll, { timeout: 5000 });
       await page.getByRole('button', { name: 'Remove PRL from favorites', exact: true }).click();
       await page.getByRole('heading', { name: 'Your favorites start here' }).waitFor();
       await page.getByRole('button', { name: 'Browse all stations' }).click();
@@ -152,7 +152,7 @@ async function main() {
     await context.close();
     console.log(JSON.stringify({ passed: true, scenarios: report.length, report }, null, 2));
   } catch (error) {
-    if (activePage && !activePage.isClosed()) console.error('Browser state:', { url: activePage.url(), text: await activePage.locator('body').innerText() });
+    if (activePage && !activePage.isClosed()) console.error('Browser state:', { url: activePage.url(), position: await activePage.evaluate(() => ({ scrollY, focus: document.activeElement.id })), text: await activePage.locator('body').innerText() });
     if (activePage && !activePage.isClosed()) await screenshot(activePage, 'failure');
     throw error;
   } finally {
