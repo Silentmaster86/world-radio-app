@@ -168,3 +168,6 @@ Browsing, combined URL filters, the persistent player, system/light/dark appeara
 and responsive logo generation are described in [docs/ux.md](docs/ux.md). The
 `ux-browser` CI job checks the production build in Chromium and uploads its
 screenshots, accessibility results and layout measurements for review.
+
+Mobile layout, loading measurements and the initial JavaScript budget are
+described in [docs/mobile-performance.md](docs/mobile-performance.md).

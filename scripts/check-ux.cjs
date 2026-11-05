@@ -60,15 +60,23 @@ async function main() {
   const base = process.env.WRA_BASE_URL || `http://127.0.0.1:${server.address().port}`;
   const browser = await chromium.launch({ headless: true });
   let activePage;
+  let navigationDiagnostics;
   try {
     for (const mode of ['light', 'dark']) {
       const context = await browser.newContext({ colorScheme: mode, reducedMotion: 'reduce', deviceScaleFactor: mode === 'dark' ? 2 : 1 });
       const page = await context.newPage(); activePage = page;
       const errors = [];
       page.on('pageerror', (error) => errors.push(error.message));
-      for (const viewport of [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 481, height: 800 }, { width: 1440, height: 900 }]) {
+      for (const viewport of [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 481, height: 800 }, { width: 510, height: 800 }, { width: 640, height: 800 }, { width: 1440, height: 900 }]) {
         await page.setViewportSize(viewport);
         await page.goto(base, { waitUntil: 'networkidle' });
+        if (viewport.width <= 640) {
+          assert.equal(await page.locator('#station-country').isVisible(), false, 'Extra mobile filters should start collapsed');
+          const first = await page.locator('article button').first().boundingBox();
+          const dock = await page.locator('[aria-label="Radio player"]').boundingBox();
+          assert.ok(first.y >= 0 && first.y + first.height <= dock.y + 1, `First station should be usable before scrolling: ${JSON.stringify({ viewport, first, dock })}`);
+          await screenshot(page, `${mode}-initial-${viewport.width}`);
+        }
         await page.locator('article').last().scrollIntoViewIfNeeded();
         await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
         const label = `${mode}-home-${viewport.width}`;
@@ -89,17 +97,22 @@ async function main() {
       // Direct routes, keyboard favorites, combined filters, reload and return navigation.
       await page.setViewportSize({ width: 390, height: 844 });
       await page.goto(base, { waitUntil: 'networkidle' });
+      await page.locator('[aria-controls="station-refinements"]').click();
       await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+      await page.locator('#open-player').evaluate((element) => element.focus({ preventScroll: true }));
       const fullListScroll = await page.evaluate(() => scrollY);
+      navigationDiagnostics = { expected: fullListScroll, before: await page.evaluate(() => ({ height: document.documentElement.scrollHeight, y: scrollY, padding: getComputedStyle(document.getElementById('root').firstElementChild).paddingBottom })) };
       assert.ok(fullListScroll > 0, 'The mobile catalog should scroll');
-      await page.locator('#open-player').focus();
       await page.keyboard.press('Enter');
       await page.waitForURL('**/now-playing');
       await page.locator('[aria-label="Radio player"]').waitFor({ state: 'detached' });
+      navigationDiagnostics.playerState = await page.evaluate(() => window.history.state?.usr?.browse);
       await page.goBack({ waitUntil: 'networkidle' });
       await page.locator('#station-search').waitFor();
+      navigationDiagnostics.after = await page.evaluate(() => ({ height: document.documentElement.scrollHeight, y: scrollY, expanded: document.querySelector('[aria-controls="station-refinements"]').getAttribute('aria-expanded') }));
       await page.waitForFunction((expected) => Math.abs(scrollY - expected) <= 2, fullListScroll, { timeout: 5000 });
       assert.equal(await page.evaluate(() => document.activeElement.id), 'open-player');
+      assert.equal(await page.locator('[aria-controls="station-refinements"]').getAttribute('aria-expanded'), 'true');
       await page.goto(`${base}/?country=GB&genre=News&language=pl&q=PRL`, { waitUntil: 'networkidle' });
       assert.equal(await page.locator('article').count(), 1);
       await page.getByRole('button', { name: 'Add PRL to favorites', exact: true }).focus();
@@ -110,8 +123,8 @@ async function main() {
       assert.equal(await page.locator('article').count(), 1);
       const search = new URL(page.url()).search;
       await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+      await page.locator('#open-player').evaluate((element) => element.focus({ preventScroll: true }));
       const scroll = await page.evaluate(() => scrollY);
-      await page.locator('#open-player').focus();
       await page.keyboard.press('Enter');
       await page.waitForURL('**/now-playing');
       await page.locator('[aria-label="Radio player"]').waitFor({ state: 'detached' });
@@ -125,6 +138,7 @@ async function main() {
       await page.getByRole('button', { name: 'Remove PRL from favorites', exact: true }).click();
       await page.getByRole('heading', { name: 'Your favorites start here' }).waitFor();
       await page.getByRole('button', { name: 'Browse all stations' }).click();
+      await page.locator('[aria-controls="station-refinements"]').click();
       await page.locator('#station-country').selectOption('US');
       await page.locator('#station-genre').selectOption('Pop');
       await page.getByRole('heading', { name: 'No matching stations' }).waitFor();
@@ -170,7 +184,7 @@ async function main() {
     await context.close();
     console.log(JSON.stringify({ passed: true, scenarios: report.length, report }, null, 2));
   } catch (error) {
-    if (activePage && !activePage.isClosed()) console.error('Browser state:', { url: activePage.url(), position: await activePage.evaluate(() => ({ scrollY, focus: document.activeElement.id })), text: await activePage.locator('body').innerText() });
+    if (activePage && !activePage.isClosed()) console.error('Browser state:', { url: activePage.url(), navigationDiagnostics, position: await activePage.evaluate(() => ({ scrollY, height: document.documentElement.scrollHeight, focus: document.activeElement.id })), text: await activePage.locator('body').innerText() });
     if (activePage && !activePage.isClosed()) await screenshot(activePage, 'failure');
     throw error;
   } finally {
