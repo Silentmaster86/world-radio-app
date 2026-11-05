@@ -113,7 +113,7 @@ async function main() {
       await second.evaluate(async () => { const registration = await navigator.serviceWorker.getRegistration('/'); await registration.update(); });
       const nextWorker = await created;
       await page.waitForFunction(async () => Boolean((await navigator.serviceWorker.getRegistration('/')).waiting));
-      await page.getByText('Update ready. Finish listening, close all app windows, then reopen to use it.', { exact: true }).waitFor();
+      await page.getByText('Update ready. Finish listening, close all app windows and tabs, then reopen.', { exact: true }).waitFor();
       assert.equal((await status(page)).version, first.version);
       assert.equal(await page.evaluate(() => window.__pwaDocument), 'original');
       assert.equal(await page.locator('[data-player-status]').getAttribute('data-player-status'), 'playing');

@@ -9,5 +9,5 @@ const Notice = styled.div`
 export default function UpdateNotice() {
   const pwa = usePwa();
   if (!pwa?.updateVisible) return null;
-  return <Notice role='status'><p>Update ready. Finish listening, close all app windows, then reopen to use it.</p><button type='button' onClick={pwa.dismissUpdate}>Later</button></Notice>;
+  return <Notice role='status'><p>Update ready. Finish listening, close all app windows and tabs, then reopen.</p><button type='button' onClick={pwa.dismissUpdate}>Later</button></Notice>;
 }

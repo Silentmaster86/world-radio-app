@@ -1,5 +1,5 @@
 export function isStandalone(win, nav) {
-  try { return nav.standalone === true || win.matchMedia?.('(display-mode: standalone)').matches === true; } catch { return nav.standalone === true; }
+  try { return nav.standalone === true || win.matchMedia?.('(display-mode: standalone)').matches === true; } catch { return false; }
 }
 export function isIOS(nav) {
   return /iPad|iPhone|iPod/.test(nav.userAgent || '') || (nav.platform === 'MacIntel' && nav.maxTouchPoints > 1);
@@ -8,7 +8,9 @@ export function isMacSafari(nav) {
   return !isIOS(nav) && /Macintosh/.test(nav.userAgent || '') && /Safari/.test(nav.userAgent || '') && !/Chrome|Chromium|Edg|OPR|Firefox/.test(nav.userAgent || '');
 }
 export function createPwaManager({ win = window, nav = navigator, enabled = process.env.NODE_ENV === 'production' } = {}) {
-  let state = { status: enabled && nav.serviceWorker ? 'checking' : 'unsupported', offlineReady: false, updateAvailable: false, updateId: 0, installAvailable: false, installed: isStandalone(win, nav), ios: isIOS(nav), macSafari: isMacSafari(nav) };
+  let serviceWorker;
+  try { serviceWorker = nav.serviceWorker; } catch { /* Blocked browser storage must not block the app. */ }
+  let state = { status: enabled && serviceWorker ? 'checking' : 'unsupported', offlineReady: false, updateAvailable: false, updateId: 0, installAvailable: false, installed: isStandalone(win, nav), ios: isIOS(nav), macSafari: isMacSafari(nav) };
   let disposed = false, started = false, scheduled = false, registration, promptEvent, idleId, timerId, lastWaiting, probing, cancelProbe;
   const listeners = new Set(), cleanups = [];
   const publish = (patch) => { if (!disposed) { state = { ...state, ...patch }; listeners.forEach((fn) => fn(state)); } };
@@ -17,7 +19,8 @@ export function createPwaManager({ win = window, nav = navigator, enabled = proc
     cleanups.push(() => target?.removeEventListener?.(name, handler));
   };
   function probe(worker) {
-    if (!worker || worker.state !== 'activated' || worker === probing || !win.MessageChannel) return;
+    if (!worker || worker.state !== 'activated' || worker === probing) return;
+    if (!win.MessageChannel) { publish({ status: 'error', offlineReady: false }); return; }
     cancelProbe?.(); probing = worker;
     const channel = new win.MessageChannel();
     const finish = () => { win.clearTimeout(timeout); channel.port1.close(); channel.port2.close(); probing = null; };
@@ -48,14 +51,14 @@ export function createPwaManager({ win = window, nav = navigator, enabled = proc
     else probe(registration.active);
   }
   async function setup() {
-    if (disposed || !enabled || !nav.serviceWorker) return;
+    if (disposed || !enabled || !serviceWorker) return;
     publish({ status: 'checking' });
     try {
-      const existing = await nav.serviceWorker.getRegistration?.('/');
+      const existing = await serviceWorker.getRegistration?.('/');
       if (disposed) return;
       if (existing && registration !== existing) { registration = existing; listen(registration, 'updatefound', refresh); refresh(); }
       if (existing && nav.onLine === false) return;
-      const result = await nav.serviceWorker.register('/service-worker.js', { scope: '/', updateViaCache: 'none' });
+      const result = await serviceWorker.register('/service-worker.js', { scope: '/', updateViaCache: 'none' });
       if (disposed) return;
       if (registration !== result) { registration = result; listen(registration, 'updatefound', refresh); }
       refresh();
@@ -68,7 +71,7 @@ export function createPwaManager({ win = window, nav = navigator, enabled = proc
     else timerId = win.setTimeout(setup, 0);
   }
   async function check() {
-    if (!registration) return setup();
+    if (!registration?.active) return setup();
     try { await registration.update(); refresh(); } catch { /* Keep the saved release usable while offline. */ }
   }
   return {
@@ -85,8 +88,8 @@ export function createPwaManager({ win = window, nav = navigator, enabled = proc
         if (query?.addEventListener) listen(query, 'change', changed);
         else if (query?.addListener) { query.addListener(changed); cleanups.push(() => query.removeListener(changed)); }
       } catch { /* Optional display-mode API. */ }
-      if (enabled && nav.serviceWorker) {
-        listen(nav.serviceWorker, 'controllerchange', refresh);
+      if (enabled && serviceWorker) {
+        listen(serviceWorker, 'controllerchange', refresh);
         listen(win, 'online', check);
         if (win.document.readyState === 'complete') schedule();
         else listen(win, 'load', schedule);

@@ -1,4 +1,4 @@
-import { createPwaManager, isIOS } from './pwaManager';
+import { createPwaManager, isIOS, isMacSafari } from './pwaManager';
 function platform({ enabled = true, offline = false, failing = false } = {}) {
   const win = new EventTarget();
   win.document = { readyState: 'complete' };
@@ -64,10 +64,12 @@ test('disposal ignores late registration and removes install listeners', async (
   await flush(); p.win.dispatchEvent(new Event('appinstalled'));
   expect(listener).not.toHaveBeenCalled();
 });
-test('iPad desktop identity is recognized for Safari installation help', () => {
+test('platform detection separates iPad and desktop Safari installation help', () => {
   expect(isIOS({ platform: 'MacIntel', maxTouchPoints: 5 })).toBe(true);
   expect(isIOS({ userAgent: 'iPhone' })).toBe(true);
   expect(isIOS({ platform: 'MacIntel', maxTouchPoints: 0 })).toBe(false);
+  expect(isMacSafari({ userAgent: 'Macintosh Version/18 Safari/605', maxTouchPoints: 0 })).toBe(true);
+  expect(isMacSafari({ userAgent: 'Macintosh Chrome/140 Safari/537' })).toBe(false);
 });
 
 test('a failed worker installation reports unavailable offline access', async () => {
@@ -77,4 +79,12 @@ test('a failed worker installation reports unavailable offline access', async ()
   worker.state = 'redundant'; worker.dispatchEvent(new Event('statechange'));
   expect(manager.getSnapshot().status).toBe('error');
   expect(manager.getSnapshot().offlineReady).toBe(false);
+});
+
+test('blocked access to the worker API does not throw or register anything', () => {
+  const p = platform();
+  Object.defineProperty(p.nav, 'serviceWorker', { get() { throw new DOMException('blocked', 'SecurityError'); } });
+  manager = createPwaManager({ win: p.win, nav: p.nav, enabled: true });
+  expect(() => manager.start()).not.toThrow();
+  expect(manager.getSnapshot().status).toBe('unsupported');
 });
