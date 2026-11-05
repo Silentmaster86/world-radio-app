@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { usePlayerNavigation } from '../context/BrowsingContext';
 import styled from 'styled-components';
 import { useAudio } from '../context/AudioContext';
 import { getCountryFlag, getCountryName } from '../lib/stationUtils';
@@ -154,7 +154,7 @@ const Meta = styled.p`
 `;
 
 export default function NowPlaying() {
-	const navigate = useNavigate();
+	const { returnToStations } = usePlayerNavigation();
 
 	const { currentStation } = useAudio();
 
@@ -172,7 +172,7 @@ export default function NowPlaying() {
 		<Wrapper>
 			<PlayerCard>
 				<TopBar>
-					<IconButton onClick={() => navigate('/')} aria-label='Back to home'>
+					<IconButton onClick={returnToStations} aria-label='Back to stations'>
 						<FaHome />
 					</IconButton>
 

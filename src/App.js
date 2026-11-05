@@ -1,55 +1,31 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
-import styled from "styled-components";
-import { AnimatePresence } from "framer-motion";
-import SoundBar from "./components/Layout/SoundBar";
-import Home from "./pages/Home";
-import NowPlaying from "./pages/NowPlaying";
-import PageTransition from "./components/Layout/PageTransition";
+import { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import styled from 'styled-components';
+import SoundBar from './components/Layout/SoundBar';
+import Home from './pages/Home';
+import NowPlaying from './pages/NowPlaying';
+import PageTransition from './components/Layout/PageTransition';
+import { BrowsingProvider } from './context/BrowsingContext';
 
 const AppWrapper = styled.div`
-	min-height: auto;
-	padding-bottom: 1rem;
-	background: ${({ theme }) => theme.colors.background};
-	color: ${({ theme }) => theme.colors.text};
-	padding: 0 ${({ theme }) => theme.spacing.sm} 8rem;
-
-	@media (max-width: 1440px) {
-		padding-top: 1rem;
-	}
-
-	@media (max-width: 1024px) {
-		padding-bottom: 1rem;
-	}
+  min-height: 100dvh;
+  padding-bottom: ${({ $car, $playerHeight }) => $car ? '0' : `calc(${$playerHeight}px + 1.5rem)`};
+  background: ${({ theme }) => theme.colors.background};
+  color: ${({ theme }) => theme.colors.text};
 `;
-
-// 👇 Move AnimatePresence and useLocation into a proper route-aware component
-function AnimatedRoutes() {
+function AppShell() {
   const location = useLocation();
-
-  return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route
-          path="/"
-          element={<PageTransition><Home /></PageTransition>}
-        />
-        <Route
-          path="/now-playing"
-          element={<PageTransition><NowPlaying /></PageTransition>}
-        />
-      </Routes>
-    </AnimatePresence>
-  );
+  const isCar = location.pathname === '/now-playing';
+  const [playerHeight, setPlayerHeight] = useState(176);
+  return <AppWrapper $car={isCar} $playerHeight={playerHeight}>
+    <Routes>
+      <Route path='/' element={<PageTransition><Home /></PageTransition>} />
+      <Route path='/now-playing' element={<PageTransition><NowPlaying /></PageTransition>} />
+      <Route path='*' element={<Navigate to='/' replace />} />
+    </Routes>
+    {!isCar && <SoundBar onHeightChange={setPlayerHeight} />}
+  </AppWrapper>;
 }
-
-function App() {
-  return (
-    <Router>
-      <AppWrapper>
-        <AnimatedRoutes />
-      </AppWrapper>
-    </Router>
-  );
+export default function App() {
+  return <Router><BrowsingProvider><AppShell /></BrowsingProvider></Router>;
 }
-
-export default App;

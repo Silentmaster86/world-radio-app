@@ -1,137 +1,57 @@
-// src/components/Layout/SoundBar.js
+import { useLayoutEffect, useRef } from 'react';
 import styled from 'styled-components';
+import { FaCarSide } from 'react-icons/fa';
 import { useAudio } from '../../context/AudioContext';
+import { usePlayerNavigation } from '../../context/BrowsingContext';
 import PlayerControls from '../Player/PlayerControls';
-import {
-	FaPlay,
-	FaPause,
-	FaVolumeMute,
-	FaVolumeUp,
-	FaStepForward,
-	FaStepBackward,
-} from 'react-icons/fa';
+import PlayerStatus from '../Player/PlayerStatus';
 
-const Bar = styled.div`
-	position: fixed;
-	left: 0.8rem;
-	right: 0.8rem;
-	bottom: 5rem;
-	width: 98%;
-	margin-right: 1rem;
-	background: ${({ theme }) => theme.colors.surface};
-	color: ${({ theme }) => theme.colors.text};
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	justify-content: space-between;
-	padding: ${({ theme }) => theme.spacing.sm};
-	z-index: 10;
-	border-radius: ${({ theme }) => theme.borderRadius.md};
-	box-shadow: 0 6px 15px rgb(88, 70, 70);
-
-	@media (max-width: 1440px) {
-		bottom: 2.3rem;
-	}
-
-	@media (max-width: 1024px) {
-		width: 97.2%;
-	}
-
-	@media (max-width: 768px) {
-		width: 96.2%;
-		bottom: 2.3rem;
-	}
-
-	@media (max-width: 425px) {
-		width: 93.2%;
-		bottom: 1rem;
-	}
-
-	@media (max-width: 375px) {
-		width: 92.5%;
-		bottom: 1rem;
-	}
-
-	@media (max-width: 320px) {
-		width: 91%;
-		bottom: 0.5rem;
-	}
+const Dock = styled.aside`
+  position: fixed; z-index: 20; inset: auto 0 0;
+  padding: 0.75rem max(1rem, env(safe-area-inset-right)) calc(0.75rem + env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+  background: ${({ theme }) => theme.colors.surface || theme.colors.background};
+  border-top: 1px solid ${({ theme }) => theme.colors.muted};
+  box-shadow: 0 -4px 24px #0002;
 `;
-
+const Content = styled.div`
+  max-width: 1200px; margin: auto;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center; gap: 0.6rem 1rem;
+  @media (max-width: 640px) { gap: 0.5rem; }
+`;
 const Info = styled.div`
-	display: flex;
-	align-items: center;
-	gap: ${({ theme }) => theme.spacing.xs};
-	margin-bottom: 0.5rem;
-
-	@media (min-width: 640px) {
-		margin-bottom: 0;
-	}
+  display: flex; align-items: center; gap: 0.75rem; min-width: 0;
+  img { width: 48px; height: 48px; flex-shrink: 0; border-radius: 0.65rem; }
+  h2 { font-size: 1rem; margin: 0; overflow-wrap: anywhere; }
+  p { color: ${({ theme }) => theme.colors.muted}; font-size: 0.8rem; margin: 0.2rem 0 0; }
+  @media (max-width: 360px) { img { display: none; } }
+`;
+const StatusRow = styled.div`grid-column: 1 / -1;`;
+const OpenButton = styled.button`
+  display: grid; place-items: center;
+  width: 44px; height: 44px; border: 1px solid currentColor; border-radius: 50%;
+  background: transparent; cursor: pointer;
 `;
 
-const Logo = styled.img`
-	width: 40px;
-	height: 40px;
-	border-radius: ${({ theme }) => theme.borderRadius.md};
-`;
-
-const Controls = styled.div`
-	display: flex;
-	align-items: center;
-	gap: ${({ theme }) => theme.spacing.sm};
-	flex-wrap: wrap;
-	justify-content: center;
-`;
-
-const VolumeSlider = styled.input`
-	width: 100px;
-	height: 4px;
-	appearance: none;
-	background: #444;
-	border-radius: 9999px;
-	outline: none;
-	margin: 0 0.5rem;
-	transition: background 0.3s ease;
-
-	&::-webkit-slider-thumb {
-		appearance: none;
-		width: 12px;
-		height: 12px;
-		background: ${({ theme }) => theme.colors.accent};
-		border-radius: 50%;
-		cursor: pointer;
-		transition: transform 0.2s;
-	}
-
-	&::-webkit-slider-thumb:hover {
-		transform: scale(1.2);
-	}
-`;
-
-export default function SoundBar() {
-	const {
-		currentStation,
-		togglePlay,
-		nextStation,
-		prevStation,
-		isPlaying,
-		volume,
-		changeVolume,
-		muted,
-		toggleMute,
-	} = useAudio();
-
-	return (
-		<Bar>
-			<Info>
-				<Logo src={currentStation.logo} alt={currentStation.name} />
-				<div>
-					<div style={{ fontWeight: 'bold' }}>{currentStation.name}</div>
-					<div style={{ fontSize: '0.8rem', color: '#ccc' }}>Live Radio</div>
-				</div>
-			</Info>
-
-			<PlayerControls />
-		</Bar>
-	);
+export default function SoundBar({ onHeightChange }) {
+  const ref = useRef(null);
+  const { currentStation } = useAudio();
+  const { openPlayer } = usePlayerNavigation();
+  useLayoutEffect(() => {
+    const measure = () => onHeightChange(Math.ceil(ref.current?.getBoundingClientRect().height || 176));
+    measure();
+    const observer = typeof ResizeObserver === 'function' ? new ResizeObserver(measure) : null;
+    if (ref.current) observer?.observe(ref.current);
+    window.addEventListener('resize', measure);
+    return () => { observer?.disconnect(); window.removeEventListener('resize', measure); };
+  }, [onHeightChange]);
+  if (!currentStation) return null;
+  return <Dock ref={ref} aria-label='Radio player'>
+    <Content>
+      <Info><img src={currentStation.logo} width='48' height='48' alt='' /><div><h2>{currentStation.name}</h2><p>Selected station</p></div></Info>
+      <PlayerControls compact mobileMini />
+      <OpenButton id='open-player' type='button' onClick={openPlayer} aria-label='Open car mode'><FaCarSide aria-hidden='true' /></OpenButton>
+      <StatusRow><PlayerStatus /></StatusRow>
+    </Content>
+  </Dock>;
 }

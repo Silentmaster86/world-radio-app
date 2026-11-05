@@ -22,7 +22,7 @@ const Controls = styled.div`
 const HideOnMobile = styled.div`
 	display: contents;
 
-	@media (max-width: 480px) {
+	@media (max-width: 640px) {
 		display: ${({ $hide }) => ($hide ? 'none' : 'contents')};
 	}
 `;
@@ -86,10 +86,11 @@ const VolumeGroup = styled.div`
 	display: flex;
 	align-items: center;
 	gap: 0.55rem;
-	flex-basis: 100%;
+	flex-basis: ${({ $mini }) => $mini ? 'auto' : '100%'};
 	justify-content: center;
 
-	@media (max-width: 480px) {
+	@media (max-width: 640px) {
+		display: ${({ $mini }) => $mini ? 'none' : 'flex'};
 		width: 100%;
 		justify-content: center;
 	}
@@ -146,7 +147,7 @@ export default function PlayerControls({
 					<FaStepForward aria-hidden='true' />
 				</IconButton>
 			</HideOnMobile>
-			{showVolume && <VolumeGroup role='group' aria-label='Volume controls'>
+			{showVolume && <VolumeGroup $mini={mobileMini} role='group' aria-label='Volume controls'>
 				<IconButton type='button' onClick={toggleMute} aria-label={muted ? 'Unmute' : 'Mute'} aria-pressed={muted}>
 					{muted ? <FaVolumeMute aria-hidden='true' /> : <FaVolumeUp aria-hidden='true' />}
 				</IconButton>

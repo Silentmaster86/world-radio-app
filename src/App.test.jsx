@@ -23,6 +23,7 @@ function mount() {
 }
 
 beforeEach(() => {
+  window.scrollY = 0;
   localStorage.clear();
   window.history.replaceState({}, '', '/');
   jest.spyOn(window, 'Audio').mockImplementation(() => new FakeAudio());
@@ -95,5 +96,36 @@ test('empty favorites guide the user to stations; unmatched refinements can be c
   act(() => { genre.value = 'Pop'; genre.dispatchEvent(new Event('change', { bubbles: true })); });
   expect(page.container.textContent).toContain('No matching stations');
   act(() => [...page.container.querySelectorAll('button')].find((item) => item.textContent === 'Clear search and filters').click());
+  expect(page.container.querySelectorAll('h3')).toHaveLength(9);
+});
+
+test('the shared player survives route changes and restores the list, scroll and keyboard focus', async () => {
+  window.history.replaceState({}, '', '/?country=GB&genre=News');
+  const scroll = jest.spyOn(window, 'scrollTo').mockImplementation(() => {});
+  window.scrollY = 420;
+  const page = mount();
+  await act(async () => page.container.querySelector('[aria-label="Play PRL"]').click());
+  const audio = window.Audio.mock.results[0].value;
+  const pauseCount = audio.pause.mock.calls.length;
+  const open = page.container.querySelector('#open-player');
+  open.focus();
+  page.click('#open-player');
+  expect(window.location.pathname).toBe('/now-playing');
+  expect(page.container.querySelector('[aria-label="Radio player"]')).toBeNull();
+  expect(page.container.querySelector('[data-player-status]').getAttribute('data-player-status')).toBe('playing');
+  page.click('[aria-label="Back to stations"]');
+  expect(window.location.pathname + window.location.search).toBe('/?country=GB&genre=News');
+  expect([...page.container.querySelectorAll('h3')].map((item) => item.textContent)).toEqual(['PRL']);
+  expect(scroll).toHaveBeenLastCalledWith(0, 420);
+  expect(document.activeElement.id).toBe('open-player');
+  expect(window.Audio).toHaveBeenCalledTimes(1);
+  expect(audio.pause).toHaveBeenCalledTimes(pauseCount);
+});
+
+test('direct entry to car mode can return to the catalog without autoplay', () => {
+  window.history.replaceState({}, '', '/now-playing');
+  const page = mount();
+  expect(window.Audio.mock.results[0].value.play).not.toHaveBeenCalled();
+  page.click('[aria-label="Back to stations"]');
   expect(page.container.querySelectorAll('h3')).toHaveLength(9);
 });
