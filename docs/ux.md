@@ -40,7 +40,7 @@ none of the draft branches changes production until merged.
   tokens. Text/accent colors support both backgrounds. Cards use restrained
   borders and readable metadata. System fonts avoid an undeclared font download.
   Cards have no movement; global reduced-motion rules disable CSS animation and
-  the route wrapper honors the motion preference.
+  routes render directly without an animation runtime.
 
 ## Logos
 

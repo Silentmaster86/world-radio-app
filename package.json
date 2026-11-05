@@ -8,8 +8,9 @@
     "build": "react-scripts build",
     "serve": "serve -s build",
     "test": "react-scripts test --watchAll=false --runInBand",
-    "check": "npm test && npm run build",
-    "eject": "react-scripts eject"
+    "check": "npm test && npm run build && npm run check:bundle",
+    "eject": "react-scripts eject",
+    "check:bundle": "node scripts/check-bundle.cjs"
   },
   "repository": {
     "type": "git",
