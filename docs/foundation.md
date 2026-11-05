@@ -47,8 +47,8 @@ the manifest use root-relative addresses, including on `/now-playing/`.
 
 ## Separate follow-up work
 
-This stage does not claim to resolve the existing audio lifecycle/race issues,
-full playback status synchronization, keyboard selection of station cards,
-landscape car layout, persistent mini player, PWA offline/update behavior or
-toolchain migration. Those are the next planned stages. The service worker is
-still disabled until its cache/update strategy is repaired.
+The subsequent [playback stage](./playback.md) addresses the audio lifecycle,
+playback status, system controls and native station-selection buttons. Remaining
+stages cover landscape car layout, a persistent mini player, combined filters,
+theme improvements, PWA offline/update behavior and toolchain migration. The
+service worker remains disabled until its cache/update strategy is repaired.
