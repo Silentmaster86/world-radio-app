@@ -1,204 +1,80 @@
-import { usePlayerNavigation } from '../context/BrowsingContext';
+import { useLayoutEffect, useRef } from 'react';
 import styled from 'styled-components';
+import { FaHome, FaCarSide } from 'react-icons/fa';
+import { usePlayerNavigation } from '../context/BrowsingContext';
 import { useAudio } from '../context/AudioContext';
 import { getCountryFlag, getCountryName } from '../lib/stationUtils';
 import PlayerStatus from '../components/Player/PlayerStatus';
 import PlayerControls from '../components/Player/PlayerControls';
-import {
-	FaHome,
-	FaCarSide,
-} from 'react-icons/fa';
 
 const Wrapper = styled.main`
-	min-height: 100dvh;
-	padding: 1rem;
-
-	display: flex;
-	align-items: center;
-	justify-content: center;
-
-	background: ${({ theme }) =>
-		theme.colors.mode === 'dark'
-			? 'radial-gradient(circle at top, #2a0a3d, #050505 55%)'
-			: 'linear-gradient(180deg, #ffffff, #f5f5f7)'};
-
-	color: ${({ theme }) => theme.colors.text};
+  min-height: 100dvh;
+  padding: max(0.75rem, env(safe-area-inset-top)) max(0.75rem, env(safe-area-inset-right)) max(0.75rem, env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-left));
+  display: grid; place-items: center;
 `;
-
 const PlayerCard = styled.section`
-	width: min(100%, 430px);
-	min-height: 82dvh;
-
-	padding: 1.5rem;
-
-	border-radius: 2rem;
-
-	background: ${({ theme }) =>
-		theme.colors.mode === 'dark' ? 'rgba(255,255,255,0.06)' : '#ffffff'};
-
-	border: 1px solid
-		${({ theme }) =>
-			theme.colors.mode === 'dark'
-				? 'rgba(255,255,255,0.1)'
-				: 'rgba(0,0,0,0.08)'};
-
-	box-shadow: ${({ theme }) =>
-		theme.colors.mode === 'dark'
-			? '0 0 40px rgba(236,72,153,0.25)'
-			: '0 20px 50px rgba(0,0,0,0.12)'};
-
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
+  width: min(100%, 480px); padding: 1.25rem;
+  border-radius: 1.25rem;
+  background: ${({ theme }) => theme.colors.surface || theme.colors.background};
+  border: 1px solid ${({ theme }) => theme.colors.muted};
+  display: grid; gap: 1.25rem; justify-items: center;
+  grid-template-areas: 'top' 'art' 'details' 'controls' 'description';
+  > [data-area='controls'] { grid-area: controls; min-width: 0; width: 100%; }
+  @media (min-width: 520px) and (max-height: 600px) {
+    width: min(100%, 960px); padding: 0.75rem; gap: 0.5rem 1rem;
+    grid-template-columns: minmax(120px, 0.7fr) minmax(0, 1.3fr);
+    grid-template-areas: 'top top' 'art details' 'art controls';
+    > [data-area='description'] { display: none; }
+  }
 `;
-
 const TopBar = styled.div`
-	width: 100%;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
+  grid-area: top; width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 1rem;
 `;
-
-const IconButton = styled.button`
-	width: 46px;
-	height: 46px;
-
-	border-radius: 50%;
-	border: none;
-
-	display: flex;
-	align-items: center;
-	justify-content: center;
-
-	cursor: pointer;
-
-	background: ${({ theme }) =>
-		theme.colors.mode === 'dark'
-			? 'rgba(255,255,255,0.12)'
-			: 'rgba(0,0,0,0.06)'};
-
-	color: ${({ theme }) => theme.colors.text};
-
-	transition: 0.2s ease;
-
-	&:hover {
-		transform: scale(1.08);
-	}
+const HomeButton = styled.button`
+  width: 48px; height: 48px; border-radius: 50%; border: 1px solid currentColor;
+  display: grid; place-items: center; background: transparent; cursor: pointer;
 `;
-
-const CarBadge = styled.div`
-	display: flex;
-	align-items: center;
-	gap: 0.4rem;
-
-	padding: 0.45rem 0.75rem;
-
-	border-radius: 999px;
-
-	font-size: 0.8rem;
-	font-weight: 700;
-
-	background: ${({ theme }) =>
-		theme.colors.mode === 'dark'
-			? 'rgba(236,72,153,0.18)'
-			: 'rgba(236,72,153,0.12)'};
-
-	color: ${({ theme }) => theme.colors.accent};
+const CarBadge = styled.span`
+  display: flex; align-items: center; gap: 0.5rem; color: ${({ theme }) => theme.colors.accent}; font-weight: 700;
 `;
-
 const LogoWrapper = styled.div`
-	margin: 3rem 0 1.5rem;
-
-	padding: 1rem;
-
-	border-radius: 2rem;
-
-	background: ${({ theme }) =>
-		theme.colors.mode === 'dark' ? 'rgba(0,0,0,0.25)' : '#f4f4f5'};
-
-	box-shadow: 0 18px 35px rgba(0, 0, 0, 0.25);
+  grid-area: art; align-self: center;
+  img { display: block; width: 168px; height: 168px; max-width: 100%; border-radius: 1rem; object-fit: contain; }
+  @media (min-width: 520px) and (max-height: 600px) {
+    img { width: clamp(96px, 35dvh, 168px); height: clamp(96px, 35dvh, 168px); }
+  }
 `;
-
-const StationLogo = styled.img`
-	width: 170px;
-	height: 170px;
-
-	border-radius: 1.5rem;
-
-	object-fit: cover;
-
-	@media (max-width: 480px) {
-		width: 145px;
-		height: 145px;
-	}
+const Details = styled.div`
+  grid-area: details; text-align: center; min-width: 0;
+  h1 { margin: 0; font-size: clamp(1.4rem, 3vw, 2rem); overflow-wrap: anywhere; }
+  p { color: ${({ theme }) => theme.colors.muted}; margin: 0.5rem 0; }
 `;
-
-const StationName = styled.h1`
-	margin: 0;
-
-	font-size: 2rem;
-	text-align: center;
-
-	@media (max-width: 480px) {
-		font-size: 1.6rem;
-	}
+const Description = styled.p`
+  grid-area: description; font-size: 0.875rem; line-height: 1.5; text-align: center; margin: 0;
+  color: ${({ theme }) => theme.colors.muted};
 `;
-
-const Meta = styled.p`
-	margin: 0.5rem 0 0;
-
-	color: ${({ theme }) => theme.colors.muted};
-
-	font-size: 0.95rem;
-`;
-
 export default function NowPlaying() {
-	const { returnToStations } = usePlayerNavigation();
-
-	const { currentStation } = useAudio();
-
-	if (!currentStation?.name) {
-		return (
-			<Wrapper>
-				<PlayerCard>
-					<p>Loading station...</p>
-				</PlayerCard>
-			</Wrapper>
-		);
-	}
-
-	return (
-		<Wrapper>
-			<PlayerCard>
-				<TopBar>
-					<IconButton onClick={returnToStations} aria-label='Back to stations'>
-						<FaHome />
-					</IconButton>
-
-					<CarBadge>
-						<FaCarSide />
-						Car Mode
-					</CarBadge>
-				</TopBar>
-
-				<LogoWrapper>
-					<StationLogo src={currentStation.logo} alt={currentStation.name} />
-				</LogoWrapper>
-
-				<StationName>{currentStation.name}</StationName>
-
-				<Meta>
-					<span role='img' aria-label={getCountryName(currentStation.countryCode)}>
-						{getCountryFlag(currentStation.countryCode)}
-					</span> • {currentStation.genres.join(', ')}
-				</Meta>
-
-				<PlayerStatus />
-
-				<PlayerControls variant='car' />
-				<p style={{ fontSize: '0.85rem', lineHeight: 1.4, textAlign: 'center' }}>{currentStation.description}</p>
-			</PlayerCard>
-		</Wrapper>
-	);
+  const { returnToStations } = usePlayerNavigation();
+  const { currentStation } = useAudio();
+  const heading = useRef(null);
+  useLayoutEffect(() => {
+    heading.current?.focus({ preventScroll: true });
+    window.scrollTo(0, 0);
+  }, []);
+  return <Wrapper>
+    <PlayerCard aria-label='Car mode player'>
+      <TopBar>
+        <HomeButton type='button' onClick={returnToStations} aria-label='Back to stations'><FaHome aria-hidden='true' /></HomeButton>
+        <CarBadge><FaCarSide aria-hidden='true' /> Car Mode</CarBadge>
+      </TopBar>
+      <LogoWrapper><img src={currentStation.logo} alt='' width='168' height='168' /></LogoWrapper>
+      <Details>
+        <h1 ref={heading} tabIndex={-1}>{currentStation.name}</h1>
+        <p><span role='img' aria-label={getCountryName(currentStation.countryCode)}>{getCountryFlag(currentStation.countryCode)}</span> · {currentStation.genres.join(', ')}</p>
+        <PlayerStatus />
+      </Details>
+      <div data-area='controls'><PlayerControls variant='car' /></div>
+      <Description data-area='description'>{currentStation.description}</Description>
+    </PlayerCard>
+  </Wrapper>;
 }
