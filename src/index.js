@@ -5,10 +5,8 @@ import { FavoritesProvider } from './context/FavoritesContext';
 import { ThemeProvider } from 'styled-components';
 import { GlobalStyle } from './Globalstyle.js';
 import { ThemeProviderToggle, useTheme } from './context/ThemeContext';
-import { register, unregister } from './serviceWorkerRegistration';
 import ErrorBoundary from './components/ErrorBoundary';
 
-unregister();
 const AppWithTheme = () => {
 	const { theme } = useTheme();
 	return (

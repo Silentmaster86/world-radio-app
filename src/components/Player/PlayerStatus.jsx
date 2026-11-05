@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { useAudio } from '../../context/AudioContext';
+import { usePwa } from '../../context/PwaContext';
 
 const Status = styled.div`
   font-size: 0.8rem;
@@ -18,6 +19,7 @@ const Status = styled.div`
 
 export default function PlayerStatus({ announce = true }) {
   const { status, wantsToPlay, online, retryAttempt, error, retry, preferenceMessage } = useAudio();
+  const pwa = usePwa();
   const labels = {
     idle: 'Ready to play',
     connecting: retryAttempt ? 'Reconnecting…' : 'Connecting…',
@@ -27,7 +29,7 @@ export default function PlayerStatus({ announce = true }) {
     error: error?.message || 'The station is currently unavailable.',
   };
   const message = online === false && status !== 'playing'
-    ? wantsToPlay ? 'Offline. Waiting for a connection…' : 'Offline. Connect to listen.'
+    ? wantsToPlay ? 'Offline. Waiting for a connection…' : pwa?.offlineReady ? 'Offline. Saved stations are available; connect to listen.' : 'Offline. Connect to listen.'
     : labels[status];
   return (
     <Status role={announce ? 'status' : undefined} aria-live={announce ? 'polite' : undefined} data-player-status={status}>

@@ -1,16 +1,17 @@
 {
   "name": "world-radio-app",
   "version": "1.0.0",
-  "description": "A modern Progressive Web App (PWA) that streams live internet radio stations from around the world. Built with React, Tailwind CSS, and Context API — optimized for desktop, mobile, and car media systems.",
+  "description": "Live internet radio with favorites, car controls and an installable offline app shell. Built with React and styled-components.",
   "main": "index.js",
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build && node scripts/build-service-worker.cjs",
     "serve": "serve -s build",
     "test": "react-scripts test --watchAll=false --runInBand",
-    "check": "npm test && npm run build && npm run check:bundle",
+    "check": "npm test && npm run test:pwa && npm run build && npm run check:bundle",
     "eject": "react-scripts eject",
-    "check:bundle": "node scripts/check-bundle.cjs"
+    "check:bundle": "node scripts/check-bundle.cjs",
+    "test:pwa": "node scripts/pwa-worker.test.cjs"
   },
   "repository": {
     "type": "git",

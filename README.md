@@ -171,3 +171,7 @@ screenshots, accessibility results and layout measurements for review.
 
 Mobile layout, loading measurements and the initial JavaScript budget are
 described in [docs/mobile-performance.md](docs/mobile-performance.md).
+
+Installation, offline behavior, safe updates and PWA verification are documented
+in [docs/pwa.md](docs/pwa.md). Offline access covers the app and saved stations;
+live radio needs an internet connection.
