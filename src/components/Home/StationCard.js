@@ -22,8 +22,8 @@ const Card = styled.div`
 
 	min-height: 150px;
 
-	border: ${({ $active }) =>
-		$active ? '2px solid #ec4899' : '1px solid rgba(255,255,255,0.08)'};
+	border: 2px solid ${({ $active, $selected }) =>
+		$active ? '#ec4899' : $selected ? 'rgba(236,72,153,0.5)' : 'rgba(255,255,255,0.08)'};
 
 	box-shadow: ${({ $active }) =>
 		$active
@@ -132,6 +132,8 @@ const FavoriteButton = styled.button`
 export default function StationCard({
 	station,
 	isActive,
+	isSelected,
+	playbackStatus,
 	isFavorite,
 	onPlay,
 	onFavorite,
@@ -146,6 +148,7 @@ export default function StationCard({
 		>
 			<Card
 				$active={isActive}
+				$selected={isSelected}
 				onClick={onPlay}
 				aria-label={`Play ${station.name}`}
 			>
@@ -158,6 +161,10 @@ export default function StationCard({
 							{getCountryFlag(station.countryCode)}
 						</span> • {station.genres.join(', ')}
 					</Meta>
+					{isSelected && <Meta>{({
+						idle: 'Selected', connecting: 'Connecting…', playing: 'Playing',
+						buffering: 'Buffering…', paused: 'Paused', error: 'Unavailable',
+					})[playbackStatus]}</Meta>}
 				</Info>
 
 				<FavoriteButton

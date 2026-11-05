@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAudio } from '../context/AudioContext';
 import { getCountryFlag, getCountryName } from '../lib/stationUtils';
+import PlayerStatus from '../components/Player/PlayerStatus';
 import {
 	FaHome,
 	FaPlay,
@@ -155,16 +156,6 @@ const Meta = styled.p`
 	font-size: 0.95rem;
 `;
 
-const Status = styled.p`
-	margin: 1.25rem 0 2rem;
-
-	font-size: 0.8rem;
-	text-transform: uppercase;
-	letter-spacing: 0.12em;
-
-	color: ${({ theme }) => theme.colors.accent};
-`;
-
 const Controls = styled.div`
 	display: flex;
 	align-items: center;
@@ -266,7 +257,7 @@ export default function NowPlaying() {
 					</span> • {currentStation.genres.join(', ')}
 				</Meta>
 
-				<Status>Streaming Live</Status>
+				<PlayerStatus />
 
 				<Controls>
 					<ControlButton onClick={prevStation} aria-label='Previous station'>
@@ -281,6 +272,7 @@ export default function NowPlaying() {
 						<FaStepForward />
 					</ControlButton>
 				</Controls>
+				<p style={{ fontSize: '0.85rem', lineHeight: 1.4, textAlign: 'center' }}>{currentStation.description}</p>
 			</PlayerCard>
 		</Wrapper>
 	);

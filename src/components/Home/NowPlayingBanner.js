@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { FaCarSide } from 'react-icons/fa';
 import PlayerControls from '../Player/PlayerControls';
+import PlayerStatus from '../Player/PlayerStatus';
 
 const Banner = styled.div`
 	display: flex;
@@ -53,12 +54,6 @@ const StationName = styled.h2`
 		font-size: 0.7rem;
 	}
 `;
-const Label = styled.div`
-	font-size: 0.75rem;
-	opacity: 0.7;
-	text-transform: uppercase;
-`;
-
 const RightSide = styled.div`
 	display: flex;
 	align-items: center;
@@ -106,8 +101,8 @@ export default function NowPlayingBanner({ station }) {
 				<Logo src={station.logo} alt={station.name} />
 
 				<div>
-					<Label>NOW PLAYING</Label>
 					<StationName>{station.name}</StationName>
+					<PlayerStatus />
 				</div>
 			</LeftSide>
 

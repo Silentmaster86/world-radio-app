@@ -54,3 +54,17 @@ test('the full app uses US data for Chicago and keeps a usable catalog after inv
   expect(page.container.querySelector('[aria-label="United States"]')).not.toBeNull();
   expect(page.container.querySelector('[role=alert]')).toBeNull();
 });
+
+test('the rendered player reports a failed start, retries and returns to paused', async () => {
+  const page = mount();
+  const audio = window.Audio.mock.results[0].value;
+  expect(page.container.querySelector('[data-player-status]').textContent).toContain('Ready to play');
+  audio.play.mockRejectedValueOnce(new DOMException('Blocked', 'NotAllowedError'));
+  await act(async () => page.container.querySelector('[aria-label="Play or pause"]').click());
+  expect(page.container.querySelector('[data-player-status]').getAttribute('data-player-status')).toBe('error');
+  expect(page.container.textContent).toContain('Playback was blocked');
+  await act(async () => page.container.querySelector('[aria-label="Retry current station"]').click());
+  expect(page.container.querySelector('[data-player-status]').getAttribute('data-player-status')).toBe('playing');
+  page.click('[aria-label="Play or pause"]');
+  expect(page.container.querySelector('[data-player-status]').textContent).toBe('Paused');
+});
