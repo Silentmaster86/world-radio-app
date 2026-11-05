@@ -182,6 +182,17 @@ test('selecting a playing station again does not restart its stream', async () =
   expect(audio.play).toHaveBeenCalledTimes(1);
 });
 
+test('station changes never publish a playing state for an unconfirmed station', async () => {
+  const { audio, player } = setup();
+  await player.play();
+  const snapshots = [];
+  player.subscribe((snapshot) => snapshots.push(snapshot));
+  audio.play.mockImplementationOnce(() => new Promise(() => {}));
+  player.nextStation();
+  expect(snapshots.every((snapshot) => snapshot.status !== 'playing'
+    || snapshot.playingStationId === snapshot.selectedStationId)).toBe(true);
+});
+
 test('unknown stations and an empty catalog are safe', async () => {
   const { audio, player } = setup({ stations: [] });
   expect(await player.play()).toBe(false);

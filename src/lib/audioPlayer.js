@@ -198,7 +198,7 @@ export function createAudioPlayer({
     if (id === state.selectedStationId && state.wantsToPlay) return active?.result || Promise.resolve(state.status === 'playing');
     invalidate();
     failures = 0;
-    publish({ selectedStationId: id, playingStationId: null, wantsToPlay: true, retryAttempt: 0, error: null });
+    publish({ selectedStationId: id, playingStationId: null, status: state.online ? 'connecting' : 'buffering', wantsToPlay: true, retryAttempt: 0, error: null });
     return startAttempt();
   }
 
