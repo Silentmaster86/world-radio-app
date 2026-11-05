@@ -105,6 +105,7 @@ test('the shared player survives route changes and restores the list, scroll and
   const scroll = jest.spyOn(window, 'scrollTo').mockImplementation(() => {});
   window.scrollY = 420;
   const page = mount();
+  page.click('[aria-controls="station-refinements"]');
   await act(async () => page.container.querySelector('[aria-label="Play PRL"]').click());
   const audio = window.Audio.mock.results[0].value;
   const pauseCount = audio.pause.mock.calls.length;
@@ -119,6 +120,7 @@ test('the shared player survives route changes and restores the list, scroll and
   expect([...page.container.querySelectorAll('h3')].map((item) => item.textContent)).toEqual(['PRL']);
   expect(scroll).toHaveBeenLastCalledWith(0, 420);
   expect(document.activeElement.id).toBe('open-player');
+  expect(page.container.querySelector('[aria-controls="station-refinements"]').getAttribute('aria-expanded')).toBe('true');
   expect(window.Audio).toHaveBeenCalledTimes(1);
   expect(audio.pause).toHaveBeenCalledTimes(pauseCount);
 });

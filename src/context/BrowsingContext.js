@@ -1,16 +1,22 @@
-import { createContext, useContext, useLayoutEffect, useRef } from 'react';
+import { createContext, useContext, useLayoutEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const BrowsingContext = createContext();
 export function BrowsingProvider({ children }) {
   const lastBrowse = useRef(null);
+  const [filtersExpanded, setFiltersExpanded] = useState(false);
   useLayoutEffect(() => {
     if (!('scrollRestoration' in window.history)) return undefined;
     const previous = window.history.scrollRestoration;
     window.history.scrollRestoration = 'manual';
     return () => { window.history.scrollRestoration = previous; };
   }, []);
-  return <BrowsingContext.Provider value={lastBrowse}>{children}</BrowsingContext.Provider>;
+  return <BrowsingContext.Provider value={{ lastBrowse, filtersExpanded, setFiltersExpanded }}>{children}</BrowsingContext.Provider>;
+}
+export function useFilterDisclosure() {
+  const shared = useContext(BrowsingContext);
+  const [local, setLocal] = useState(false);
+  return shared ? [shared.filtersExpanded, shared.setFiltersExpanded] : [local, setLocal];
 }
 export function safeBrowseSearch(value) {
   return typeof value === 'string' && (value === '' || value.startsWith('?')) ? value : '';
@@ -18,7 +24,7 @@ export function safeBrowseSearch(value) {
 export function usePlayerNavigation() {
   const location = useLocation();
   const navigate = useNavigate();
-  const lastBrowse = useContext(BrowsingContext);
+  const { lastBrowse } = useContext(BrowsingContext);
   return {
     openPlayer() {
       const browse = { search: location.search, scrollY: window.scrollY, focusId: document.activeElement?.id };
@@ -33,7 +39,7 @@ export function usePlayerNavigation() {
 }
 export function useBrowseRestoration() {
   const location = useLocation();
-  const lastBrowse = useContext(BrowsingContext);
+  const { lastBrowse } = useContext(BrowsingContext);
   const initial = useRef(location);
   useLayoutEffect(() => {
     const entry = initial.current;

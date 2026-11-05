@@ -1,8 +1,10 @@
 import styled from 'styled-components';
+import { useFilterDisclosure } from '../../context/BrowsingContext';
 import { getCountryName } from '../../lib/stationUtils';
 
 const Controls = styled.section`
   margin: 1.5rem 0; display: grid; gap: 1rem;
+  @media (max-width: 640px) { margin: 0.75rem 0; gap: 0.65rem; }
 `;
 const Row = styled.div`
   display: flex; flex-wrap: wrap; align-items: end; gap: 0.75rem;
@@ -25,7 +27,18 @@ const SectionButton = styled.button`
   cursor: pointer;
 `;
 const Reset = styled(SectionButton)`border-radius: 0.65rem;`;
+const FilterButton = styled(Reset)`
+  display: none;
+  @media (max-width: 640px) { display: inline-block; }
+`;
+const MobileToolbar = styled(Row)`display: none; @media (max-width: 640px) { display: flex; }`;
+const DesktopReset = styled(Reset)`@media (max-width: 640px) { display: none; }`;
+const Refinements = styled(Row)`
+  @media (max-width: 640px) { display: ${({ $open }) => $open ? 'flex' : 'none'}; }
+`;
 export default function StationControls({ filters, options, updateFilters, resetFilters, total, favoriteCount }) {
+  const [expanded, setExpanded] = useFilterDisclosure();
+  const activeCount = [filters.country, filters.genre, filters.language].filter(Boolean).length;
   const languages = { en: 'English', pl: 'Polish' };
   return <Controls aria-label='Find stations'>
     <Row role='group' aria-label='Station collection'>
@@ -35,7 +48,13 @@ export default function StationControls({ filters, options, updateFilters, reset
     <Field htmlFor='station-search'>Search stations
       <input id='station-search' type='search' placeholder='Station name…' value={filters.q} onChange={(event) => updateFilters({ q: event.target.value })} />
     </Field>
-    <Row>
+    <MobileToolbar>
+      <FilterButton type='button' aria-expanded={expanded} aria-controls='station-refinements' onClick={() => setExpanded((value) => !value)}>
+        Filters{activeCount ? ` (${activeCount})` : ''}
+      </FilterButton>
+      <Reset type='button' onClick={resetFilters}>Reset filters</Reset>
+    </MobileToolbar>
+    <Refinements id='station-refinements' $open={expanded}>
       <Field htmlFor='station-country'>Country<select id='station-country' value={filters.country} onChange={(event) => updateFilters({ country: event.target.value })}>
         <option value=''>All countries</option>{options.countries.map((code) => <option key={code} value={code}>{getCountryName(code)}</option>)}
       </select></Field>
@@ -45,7 +64,7 @@ export default function StationControls({ filters, options, updateFilters, reset
       <Field htmlFor='station-language'>Language<select id='station-language' value={filters.language} onChange={(event) => updateFilters({ language: event.target.value })}>
         <option value=''>All languages</option>{options.languages.map((code) => <option key={code} value={code}>{languages[code] || code}</option>)}
       </select></Field>
-      <Reset type='button' onClick={resetFilters}>Reset filters</Reset>
-    </Row>
+      <DesktopReset type='button' onClick={resetFilters}>Reset filters</DesktopReset>
+    </Refinements>
   </Controls>;
 }

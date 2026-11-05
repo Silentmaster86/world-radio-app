@@ -37,11 +37,13 @@ const StationGrid = styled.section`
 	gap: ${({ theme }) => theme.spacing.md};
 	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 
-	@media (max-width: 480px) {
+	@media (max-width: 640px) {
 		grid-template-columns: 1fr;
 		gap: 0.8rem;
 	}
 `;
+
+const ResultCount = styled.p`margin: 0 0 0.75rem;`;
 
 export default function Home() {
 	useBrowseRestoration();
@@ -63,7 +65,7 @@ export default function Home() {
 
 			{storageMessage && <p role='status'>{storageMessage}</p>}
 
-			<p role='status' aria-live='polite'>{searchedStations.length} of {filters.section === 'favorites' ? favoriteCount : stations.length} stations</p>
+			<ResultCount role='status' aria-live='polite'>{searchedStations.length} of {filters.section === 'favorites' ? favoriteCount : stations.length} stations</ResultCount>
 			{searchedStations.length === 0 && <EmptyState
 				emptyFavorites={filters.section === 'favorites' && favoriteCount === 0}
 				onClear={browsing.clearRefinements}
