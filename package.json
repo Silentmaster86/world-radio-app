@@ -7,7 +7,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "serve": "serve -s build",
-    "test": "echo \"No tests yet\"",
+    "test": "react-scripts test --watchAll=false --runInBand",
+    "check": "npm test && npm run build",
     "eject": "react-scripts eject"
   },
   "repository": {
@@ -20,7 +21,7 @@
   "bugs": {
     "url": "https://github.com/Silentmaster86/world-radio-app/issues"
   },
-  "homepage": ".",
+  "homepage": "/",
   "dependencies": {
     "framer-motion": "^12.18.1",
     "react": "^18.2.0",
@@ -30,6 +31,12 @@
     "react-scripts": "^5.0.1",
     "serve": "^14.2.0",
     "styled-components": "^6.1.18"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "^react-router-dom$": "<rootDir>/node_modules/react-router-dom/dist/index.js",
+      "^react-router/dom$": "<rootDir>/node_modules/react-router/dist/development/dom-export.js"
+    }
   },
   "browserslist": {
     "production": [

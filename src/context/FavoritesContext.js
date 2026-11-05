@@ -1,26 +1,36 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { findStationById } from '../lib/stationUtils';
+import { loadFavorites, saveFavorites, SESSION_ONLY_MESSAGE } from '../lib/favoritesStorage';
 
 const FavoritesContext = createContext();
 export const useFavorites = () => useContext(FavoritesContext);
 
 export const FavoritesProvider = ({ children }) => {
-  const [favorites, setFavorites] = useState(() => {
-    const stored = localStorage.getItem("favorites");
-    return stored ? JSON.parse(stored) : [];
-  });
+  const [saved] = useState(loadFavorites);
+  const [favoriteIds, setFavoriteIds] = useState(saved.favoriteIds);
+  const [dirty, setDirty] = useState(false);
+  const [storageMessage, setStorageMessage] = useState(saved.message);
+  const legacyPending = useRef(saved.removeLegacyAfterSave);
 
-  const toggleFavorite = (station) => {
-    const exists = favorites.find((f) => f.name === station.name);
-    const updated = exists
-      ? favorites.filter((f) => f.name !== station.name)
-      : [...favorites, station];
+  useEffect(() => {
+    if ((!dirty && !saved.shouldMigrate) || !saved.canPersist) return;
+    const persisted = saveFavorites(favoriteIds, legacyPending.current);
+    if (persisted) legacyPending.current = false;
+    setStorageMessage(persisted ? saved.preservedMessage : SESSION_ONLY_MESSAGE);
+  }, [favoriteIds, dirty, saved]);
 
-    setFavorites(updated);
-    localStorage.setItem("favorites", JSON.stringify(updated));
+  const toggleFavorite = (id) => {
+    if (!findStationById(id)) return;
+    setFavoriteIds((previous) => previous.includes(id)
+      ? previous.filter((item) => item !== id)
+      : [...previous, id]);
+    setDirty(true);
   };
 
   return (
-    <FavoritesContext.Provider value={{ favorites, toggleFavorite }}>
+    <FavoritesContext.Provider value={{
+      favoriteIds, isFavorite: (id) => favoriteIds.includes(id), toggleFavorite, storageMessage,
+    }}>
       {children}
     </FavoritesContext.Provider>
   );

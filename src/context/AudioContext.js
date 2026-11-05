@@ -31,7 +31,7 @@ const changeVolume = (vol) => { setVolume(vol); audioRef.current.volume = vol; }
 
 const toggleMute = () => { const newMuted = !muted; setMuted(newMuted); audioRef.current.muted = newMuted; };
 
-const setStation = (station) => { const index = stations.findIndex(s => s.name === station.name); if (index !== -1) { playStation(station, index); } };
+const setStation = (station) => { const index = stations.findIndex(s => s.id === station?.id); if (index !== -1) { playStation(stations[index], index); } };
 
 const nextStation = () => {
 	const currentIndex = currentStationIndexRef.current;

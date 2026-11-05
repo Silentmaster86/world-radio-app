@@ -38,14 +38,11 @@ const TickerText = styled.span`
 
 export default function RadioTicker({ currentStation }) {
 	const tickerText =
-		currentStation?.ticker ||
-		`LIVE • Now playing: ${currentStation?.name || 'World Radio App'} • ${
-			currentStation?.genre || 'Live Radio'
-		}`;
+		currentStation?.description || currentStation?.name || 'World Radio App';
 
 	return (
 		<TickerWrapper>
-			<TickerTrack key={currentStation?.name || 'default'}>
+			<TickerTrack key={currentStation?.id || 'default'}>
 				<TickerText>{tickerText}</TickerText>
 			</TickerTrack>
 		</TickerWrapper>

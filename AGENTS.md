@@ -1,0 +1,33 @@
+# Working on World Radio App
+
+## Scope and structure
+
+- This repository currently uses React 18, Create React App, styled-components,
+  React Router and Context API. Do not assume a Vite or Tailwind setup.
+- Application code lives in `src/`; public deployment files live in `public/`.
+- Netlify builds the source into `build/`. Never edit or commit generated build
+  output, dependency directories, credentials or test reports.
+- Keep changes in small, working commits. Include all consumers when changing a
+  station model or a context contract.
+
+## Data and playback
+
+- Preserve existing favorites and preferences when changing their storage format.
+  Validate persisted data and handle storage failures without blocking playback.
+- Identify stations with stable IDs. Country, language and genre are separate data.
+- Keep playback shared across routes. Avoid adding a second audio element or a
+  separate source of playback state in a view.
+- Report actual audio events and failures in the UI. Do not describe static station
+  copy as current song metadata.
+- Treat external stream availability separately from deterministic regression tests.
+
+## Verification and delivery
+
+- Add meaningful regression tests for behavioral fixes and schema migrations.
+- After the test setup is installed, `npm run check` runs unit tests and a production
+  build. Before that setup, at least run `npm run build`.
+- Check direct routes on Netlify deploy previews; a local SPA fallback alone does
+  not verify production routing.
+- Verify keyboard access, mobile layout and both themes for relevant UI changes.
+- Document what passed and any remaining limitations in the pull request.
+- Keep deployment, audio refactoring and optional feature work in separate stages.
