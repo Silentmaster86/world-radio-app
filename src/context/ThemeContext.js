@@ -54,8 +54,8 @@ export function ThemeProviderToggle({ children }) {
   const setThemeMode = (next) => {
     if (!modes.includes(next)) return;
     setMode(next);
-    if (!initial.preserve && !writeStorage(THEME_KEY, { version: 1, mode: next }))
-      setMessage('Appearance changes apply for this session because storage is unavailable.');
+    if (!initial.preserve)
+      setMessage(writeStorage(THEME_KEY, { version: 1, mode: next }) ? '' : 'Appearance changes apply for this session because storage is unavailable.');
   };
   return <ThemeContext.Provider value={{ mode, setThemeMode, isDarkMode, theme, storageMessage: message }}>{children}</ThemeContext.Provider>;
 }

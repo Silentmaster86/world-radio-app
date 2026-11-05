@@ -36,6 +36,7 @@ const OpenButton = styled.button`
 
 export default function SoundBar({ onHeightChange }) {
   const ref = useRef(null);
+  const measureRef = useRef(() => {});
   const { currentStation } = useAudio();
   const { openPlayer } = usePlayerNavigation();
   useLayoutEffect(() => {
@@ -45,6 +46,7 @@ export default function SoundBar({ onHeightChange }) {
       document.documentElement.style.setProperty('--radio-player-height', `${height}px`);
       onHeightChange(height);
     };
+    measureRef.current = measure;
     measure();
     const observer = typeof ResizeObserver === 'function' ? new ResizeObserver(measure) : null;
     if (ref.current) observer?.observe(ref.current);
@@ -55,6 +57,8 @@ export default function SoundBar({ onHeightChange }) {
       else document.documentElement.style.removeProperty('--radio-player-height');
     };
   }, [onHeightChange]);
+  // Also measure content changes in browsers without ResizeObserver.
+  useLayoutEffect(() => { measureRef.current(); });
   if (!currentStation) return null;
   return <Dock ref={ref} aria-label='Radio player'>
     <Content>

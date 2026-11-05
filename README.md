@@ -163,3 +163,8 @@ This project is licensed under the MIT License.
 
 Built by Przemyslaw Pietkun (https://github.com/Silentmaster86)  
 Inspired by the simplicity of music and power of the web 🌐
+
+Browsing, combined URL filters, the persistent player, system/light/dark appearance
+and responsive logo generation are described in [docs/ux.md](docs/ux.md). The
+`ux-browser` CI job checks the production build in Chromium and uploads its
+screenshots, accessibility results and layout measurements for review.
