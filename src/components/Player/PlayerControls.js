@@ -74,7 +74,7 @@ const PlayButton = styled(IconButton)`
 		height: ${({ $car }) => ($car ? '72px' : '44px')};
 	}
 	background: ${({ theme }) => theme.colors.accent};
-	color: #fff;
+	color: ${({ theme }) => theme.colors.onAccent};
 	border: none;
 
 	&:hover {
@@ -98,6 +98,7 @@ const VolumeGroup = styled.div`
 
 const VolumeSlider = styled.input`
 	width: ${({ $compact }) => ($compact ? '80px' : '120px')};
+	min-height: 44px;
 
 	@media (max-width: 480px) {
 		width: 90px;

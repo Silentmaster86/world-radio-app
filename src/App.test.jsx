@@ -23,6 +23,7 @@ function mount() {
 }
 
 beforeEach(() => {
+  jest.spyOn(window, 'scrollTo').mockImplementation(() => {});
   window.scrollY = 0;
   localStorage.clear();
   window.history.replaceState({}, '', '/');
