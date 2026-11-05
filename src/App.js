@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import SoundBar from './components/Layout/SoundBar';
 import Home from './pages/Home';
 import NowPlaying from './pages/NowPlaying';
+import { PwaProvider } from './context/PwaContext';
 import { BrowsingProvider } from './context/BrowsingContext';
 
 const AppWrapper = styled.div`
@@ -26,5 +27,5 @@ function AppShell() {
   </AppWrapper>;
 }
 export default function App() {
-  return <Router><BrowsingProvider><AppShell /></BrowsingProvider></Router>;
+  return <PwaProvider><Router><BrowsingProvider><AppShell /></BrowsingProvider></Router></PwaProvider>;
 }

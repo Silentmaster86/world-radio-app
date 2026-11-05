@@ -5,6 +5,8 @@ import { useAudio } from '../../context/AudioContext';
 import { usePlayerNavigation } from '../../context/BrowsingContext';
 import PlayerControls from '../Player/PlayerControls';
 import PlayerStatus from '../Player/PlayerStatus';
+import InstallApp from '../Pwa/InstallApp';
+import UpdateNotice from '../Pwa/UpdateNotice';
 import StationLogo from '../StationLogo';
 
 const Dock = styled.aside`
@@ -16,7 +18,7 @@ const Dock = styled.aside`
 `;
 const Content = styled.div`
   max-width: 1200px; margin: auto;
-  display: grid; grid-template-columns: minmax(0, 1fr) auto auto;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto;
   align-items: center; gap: 0.6rem 1rem;
   @media (max-width: 640px) { gap: 0.5rem; }
 `;
@@ -65,7 +67,8 @@ export default function SoundBar({ onHeightChange }) {
       <Info><StationLogo station={currentStation} size={48} loading='eager' /><div><h2>{currentStation.name}</h2><p>Selected station</p></div></Info>
       <PlayerControls compact mobileMini />
       <OpenButton id='open-player' type='button' onClick={openPlayer} aria-label='Open car mode'><FaCarSide aria-hidden='true' /></OpenButton>
-      <StatusRow><PlayerStatus /></StatusRow>
+      <InstallApp />
+      <StatusRow><PlayerStatus /><UpdateNotice /></StatusRow>
     </Content>
   </Dock>;
 }
