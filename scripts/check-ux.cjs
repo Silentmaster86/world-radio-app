@@ -60,6 +60,7 @@ async function main() {
   const base = process.env.WRA_BASE_URL || `http://127.0.0.1:${server.address().port}`;
   const browser = await chromium.launch({ headless: true });
   let activePage;
+  let navigationDiagnostics;
   try {
     for (const mode of ['light', 'dark']) {
       const context = await browser.newContext({ colorScheme: mode, reducedMotion: 'reduce', deviceScaleFactor: mode === 'dark' ? 2 : 1 });
@@ -100,12 +101,15 @@ async function main() {
       await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
       await page.locator('#open-player').evaluate((element) => element.focus({ preventScroll: true }));
       const fullListScroll = await page.evaluate(() => scrollY);
+      navigationDiagnostics = { expected: fullListScroll, before: await page.evaluate(() => ({ height: document.documentElement.scrollHeight, y: scrollY, padding: getComputedStyle(document.getElementById('root').firstElementChild).paddingBottom })) };
       assert.ok(fullListScroll > 0, 'The mobile catalog should scroll');
       await page.keyboard.press('Enter');
       await page.waitForURL('**/now-playing');
       await page.locator('[aria-label="Radio player"]').waitFor({ state: 'detached' });
+      navigationDiagnostics.playerState = await page.evaluate(() => window.history.state?.usr?.browse);
       await page.goBack({ waitUntil: 'networkidle' });
       await page.locator('#station-search').waitFor();
+      navigationDiagnostics.after = await page.evaluate(() => ({ height: document.documentElement.scrollHeight, y: scrollY, expanded: document.querySelector('[aria-controls="station-refinements"]').getAttribute('aria-expanded') }));
       await page.waitForFunction((expected) => Math.abs(scrollY - expected) <= 2, fullListScroll, { timeout: 5000 });
       assert.equal(await page.evaluate(() => document.activeElement.id), 'open-player');
       assert.equal(await page.locator('[aria-controls="station-refinements"]').getAttribute('aria-expanded'), 'true');
@@ -180,7 +184,7 @@ async function main() {
     await context.close();
     console.log(JSON.stringify({ passed: true, scenarios: report.length, report }, null, 2));
   } catch (error) {
-    if (activePage && !activePage.isClosed()) console.error('Browser state:', { url: activePage.url(), position: await activePage.evaluate(() => ({ scrollY, focus: document.activeElement.id })), text: await activePage.locator('body').innerText() });
+    if (activePage && !activePage.isClosed()) console.error('Browser state:', { url: activePage.url(), navigationDiagnostics, position: await activePage.evaluate(() => ({ scrollY, height: document.documentElement.scrollHeight, focus: document.activeElement.id })), text: await activePage.locator('body').innerText() });
     if (activePage && !activePage.isClosed()) await screenshot(activePage, 'failure');
     throw error;
   } finally {

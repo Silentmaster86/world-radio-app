@@ -46,7 +46,19 @@ export function useBrowseRestoration() {
     const browse = entry.state?.restoreBrowse || lastBrowse.current;
     if (browse && safeBrowseSearch(browse.search) === entry.search) {
       document.getElementById(browse.focusId)?.focus({ preventScroll: true });
-      window.scrollTo(0, Number.isFinite(browse.scrollY) ? Math.max(0, browse.scrollY) : 0);
+      const y = Number.isFinite(browse.scrollY) ? Math.max(0, browse.scrollY) : 0;
+      window.scrollTo(0, y);
+      // Dock measurement and browser scroll anchoring can settle after this
+      // layout effect. Reapply once the routed list has completed a paint.
+      let settledFrame;
+      const firstFrame = window.requestAnimationFrame(() => {
+        settledFrame = window.requestAnimationFrame(() => window.scrollTo(0, y));
+      });
+      return () => {
+        window.cancelAnimationFrame(firstFrame);
+        if (settledFrame !== undefined) window.cancelAnimationFrame(settledFrame);
+      };
     }
+    return undefined;
   }, [lastBrowse]);
 }

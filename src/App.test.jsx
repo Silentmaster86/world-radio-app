@@ -153,3 +153,23 @@ test('the router owns scroll restoration while mounted and releases it on cleanu
   page.unmount();
   expect(window.history.scrollRestoration).toBe('auto');
 });
+
+test('return scrolling recovers when the list height settles after the first layout', () => {
+  const callbacks = new Map(); let nextId = 0; let availableScroll = 0;
+  jest.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => { const id = ++nextId; callbacks.set(id, callback); return id; });
+  jest.spyOn(window, 'cancelAnimationFrame').mockImplementation((id) => callbacks.delete(id));
+  window.scrollTo.mockImplementation((x, y) => { window.scrollY = Math.min(y, availableScroll); });
+  const page = mount();
+  window.scrollY = 300;
+  page.click('#open-player');
+  page.click('[aria-label="Back to stations"]');
+  expect(window.scrollY).toBe(0);
+  availableScroll = 600;
+  for (let frame = 0; frame < 2; frame += 1) act(() => {
+    const pending = [...callbacks.entries()];
+    for (const [id, callback] of pending) { callbacks.delete(id); callback(); }
+  });
+  expect(window.scrollY).toBe(300);
+  page.unmount();
+  expect(callbacks.size).toBe(0);
+});
