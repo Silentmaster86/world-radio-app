@@ -1,40 +1,36 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { readStorage, writeStorage } from '../lib/storage';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { findStationById } from '../lib/stationUtils';
+import { loadFavorites, saveFavorites, SESSION_ONLY_MESSAGE } from '../lib/favoritesStorage';
 
 const FavoritesContext = createContext();
 export const useFavorites = () => useContext(FavoritesContext);
 
-function isFavorites(value) {
-  return Array.isArray(value) && value.every((station) => (
-    station && typeof station.name === 'string' && station.name.length > 0
-  ));
-}
-
 export const FavoritesProvider = ({ children }) => {
-  const [saved] = useState(() => readStorage('favorites', [], isFavorites));
-  const [favorites, setFavorites] = useState(saved.value);
+  const [saved] = useState(loadFavorites);
+  const [favoriteIds, setFavoriteIds] = useState(saved.favoriteIds);
   const [dirty, setDirty] = useState(false);
-  const [storageMessage, setStorageMessage] = useState(() => {
-    if (saved.status === 'unavailable') return 'Favorites are available for this session only.';
-    if (saved.status === 'invalid') return 'Saved favorites could not be read. You can continue listening.';
-    return '';
-  });
+  const [storageMessage, setStorageMessage] = useState(saved.message);
+  const legacyPending = useRef(saved.removeLegacyAfterSave);
 
   useEffect(() => {
-    if (!dirty) return;
-    const persisted = writeStorage('favorites', favorites);
-    setStorageMessage(persisted ? '' : 'Favorites are available for this session only. Changes could not be saved.');
-  }, [favorites, dirty]);
+    if ((!dirty && !saved.shouldMigrate) || !saved.canPersist) return;
+    const persisted = saveFavorites(favoriteIds, legacyPending.current);
+    if (persisted) legacyPending.current = false;
+    setStorageMessage(persisted ? saved.preservedMessage : SESSION_ONLY_MESSAGE);
+  }, [favoriteIds, dirty, saved]);
 
-  const toggleFavorite = (station) => {
-    setFavorites((previous) => previous.some((item) => item.name === station.name)
-      ? previous.filter((item) => item.name !== station.name)
-      : [...previous, station]);
+  const toggleFavorite = (id) => {
+    if (!findStationById(id)) return;
+    setFavoriteIds((previous) => previous.includes(id)
+      ? previous.filter((item) => item !== id)
+      : [...previous, id]);
     setDirty(true);
   };
 
   return (
-    <FavoritesContext.Provider value={{ favorites, toggleFavorite, storageMessage }}>
+    <FavoritesContext.Provider value={{
+      favoriteIds, isFavorite: (id) => favoriteIds.includes(id), toggleFavorite, storageMessage,
+    }}>
       {children}
     </FavoritesContext.Provider>
   );

@@ -1,6 +1,6 @@
 # 🌍 World Radio App
 
-A modern Progressive Web App (PWA) that streams live internet radio stations from around the world. Built with **React**, **Tailwind CSS**, and **Context API** — optimized for desktop, mobile, and car media systems.
+A web app that streams selected live internet radio stations. Built with **React**, **styled-components**, and **Context API**.
 
 Supports:
 
@@ -76,16 +76,17 @@ world-radio-app/
 git clone https://github.com/Silentmaster86/world-radio-app.git
 cd world-radio-app
 
-# Install dependencies
-npm install
-npm install react-scripts --save-dev
-npm install react-icons
-npm install styled-components
-npm i --save-dev @types/react
+# Use the Node version in .nvmrc, then install locked dependencies
+npm ci
 
 # Run the development server
 npm start
 ```
+
+Run `npm run check` for regression tests and a production build. GitHub Actions
+runs the same checks on pull requests. See [AGENTS.md](./AGENTS.md) for contributor
+rules and [foundation notes](./docs/foundation.md) for favorites migration,
+Netlify preview checks and remaining follow-up work.
 
 ---
 

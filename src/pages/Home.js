@@ -1,5 +1,4 @@
 // src/pages/Home.js
-import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { stations } from '../data/stations';
@@ -47,14 +46,12 @@ const StationGrid = styled.section`
 `;
 
 export default function Home() {
-	const navigate = useNavigate();
-
 	const { setStation, currentStation } = useAudio();
-	const { favorites, toggleFavorite, storageMessage } = useFavorites();
+	const { favoriteIds, isFavorite, toggleFavorite, storageMessage } = useFavorites();
 	const { isDarkMode, toggleTheme } = useTheme();
 
 	const { filters, filter, setFilter, query, setQuery, searchedStations } =
-		useStationFilters(stations, favorites);
+		useStationFilters(stations, favoriteIds);
 
 	return (
 		<PageWrapper>
@@ -77,12 +74,12 @@ export default function Home() {
 			<StationGrid>
 				{searchedStations.map((station) => (
 					<StationCard
-						key={station.name}
+						key={station.id}
 						station={station}
-						isActive={station.name === currentStation?.name}
-						isFavorite={favorites.some((f) => f.name === station.name)}
+						isActive={station.id === currentStation?.id}
+						isFavorite={isFavorite(station.id)}
 						onPlay={() => setStation(station)}
-						onFavorite={() => toggleFavorite(station)}
+						onFavorite={() => toggleFavorite(station.id)}
 					/>
 				))}
 			</StationGrid>

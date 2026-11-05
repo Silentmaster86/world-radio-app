@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import { getCountryFlag, getCountryName } from '../../lib/stationUtils';
 
 const Card = styled.div`
 	background: ${({ theme }) =>
@@ -128,12 +129,6 @@ const FavoriteButton = styled.button`
 	}
 `;
 
-const getFlag = (country) => {
-	if (country === 'UK') return '🇬🇧';
-	if (country === 'PL') return '🇵🇱';
-	return '🌍';
-};
-
 export default function StationCard({
 	station,
 	isActive,
@@ -159,7 +154,9 @@ export default function StationCard({
 				<Info>
 					<Name>{station.name}</Name>
 					<Meta>
-						{getFlag(station.country)} • {station.genre}
+						<span role='img' aria-label={getCountryName(station.countryCode)}>
+							{getCountryFlag(station.countryCode)}
+						</span> • {station.genres.join(', ')}
 					</Meta>
 				</Info>
 

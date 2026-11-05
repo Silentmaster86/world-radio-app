@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAudio } from '../context/AudioContext';
+import { getCountryFlag, getCountryName } from '../lib/stationUtils';
 import {
 	FaHome,
 	FaPlay,
@@ -223,12 +224,6 @@ const MainPlayButton = styled(ControlButton)`
 	}
 `;
 
-const getFlag = (country) => {
-	if (country === 'UK') return '🇬🇧';
-	if (country === 'PL') return '🇵🇱';
-	return '🌍';
-};
-
 export default function NowPlaying() {
 	const navigate = useNavigate();
 
@@ -266,7 +261,9 @@ export default function NowPlaying() {
 				<StationName>{currentStation.name}</StationName>
 
 				<Meta>
-					{getFlag(currentStation.country)} • {currentStation.genre}
+					<span role='img' aria-label={getCountryName(currentStation.countryCode)}>
+						{getCountryFlag(currentStation.countryCode)}
+					</span> • {currentStation.genres.join(', ')}
 				</Meta>
 
 				<Status>Streaming Live</Status>
