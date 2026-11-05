@@ -75,6 +75,7 @@ packages outside the application dependency tree. It runs `scripts/check-ux.cjs`
 against the production build using Chromium. It checks:
 
 - Both themes at catalog widths 320, 390, 481 and 1440 px.
+- Standard-density light and high-density dark rendering, with decoded visible logos.
 - Horizontal overflow, visible transport targets, dock/content overlap, and car
   controls at 844×390 and 568×320.
 - WCAG A/AA rules in axe, including text contrast; screenshots and geometry are
@@ -94,5 +95,8 @@ that the host returns the application rather than a 404. Check notch/safe areas,
 keyboard focus, both themes, landscape orientation and zoom in Safari/iOS and
 Android. Listen to real streams and test physical volume/media keys separately.
 The browser script accepts `WRA_BASE_URL` to run the same checks against a preview
-when its URL and network access are available. The built-in server alone does
-not establish that Netlify's route fallback works.
+when its URL and network access are available. For PRs the CI job waits for the
+Netlify status on the exact head commit, verifies HTTP/HTML/script responses on
+`/` and `/now-playing`, then repeats the browser checks on that preview. Build
+and preview reports use separate directories in the workflow artifact. The
+built-in server alone does not establish that Netlify's route fallback works.

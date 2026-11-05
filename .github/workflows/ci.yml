@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  statuses: read
 
 concurrency:
   group: checks-${{ github.workflow }}-${{ github.ref }}
@@ -46,6 +47,15 @@ jobs:
           "$RUNNER_TEMP/wra-browser/node_modules/.bin/playwright" install --with-deps chromium
       - name: Check browser layout, navigation and accessibility
         run: NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-ux.cjs
+      - name: Check the current Netlify preview and direct routes
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          WRA_BASE_URL: https://deploy-preview-${{ github.event.pull_request.number }}--worldradioapp.netlify.app
+        run: |
+          node scripts/check-preview.cjs
+          NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-ux.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

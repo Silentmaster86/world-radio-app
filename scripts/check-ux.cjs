@@ -5,7 +5,7 @@ const http = require('node:http');
 const path = require('node:path');
 const { chromium } = require('playwright');
 const { AxeBuilder } = require('@axe-core/playwright');
-const reportDir = path.resolve('test-results/ux');
+const reportDir = path.resolve('test-results/ux', process.env.WRA_BASE_URL ? 'preview' : 'build');
 fs.mkdirSync(reportDir, { recursive: true });
 const root = path.resolve('build');
 const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.webp': 'image/webp', '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon' };
@@ -38,6 +38,13 @@ async function accessible(page, label) {
   assert.deepEqual(result.violations.map(({ id, nodes }) => ({ id, targets: nodes.map(({ target }) => target) })), [], `${label}: accessibility violations`);
 }
 async function screenshot(page, label) {
+  await page.locator('img').evaluateAll(async (images) => {
+    const visible = images.filter((img) => {
+      const rect = img.getBoundingClientRect();
+      return rect.width && rect.height && rect.bottom > 0 && rect.top < innerHeight;
+    });
+    await Promise.all(visible.map((img) => img.decode()));
+  });
   await page.screenshot({ path: path.join(reportDir, `${label}.png`), fullPage: true });
 }
 async function main() {
@@ -55,7 +62,7 @@ async function main() {
   let activePage;
   try {
     for (const mode of ['light', 'dark']) {
-      const context = await browser.newContext({ colorScheme: mode, reducedMotion: 'reduce', deviceScaleFactor: 1 });
+      const context = await browser.newContext({ colorScheme: mode, reducedMotion: 'reduce', deviceScaleFactor: mode === 'dark' ? 2 : 1 });
       const page = await context.newPage(); activePage = page;
       const errors = [];
       page.on('pageerror', (error) => errors.push(error.message));
@@ -88,7 +95,9 @@ async function main() {
       await page.locator('#open-player').focus();
       await page.keyboard.press('Enter');
       await page.waitForURL('**/now-playing');
+      await page.locator('[aria-label="Radio player"]').waitFor({ state: 'detached' });
       await page.goBack({ waitUntil: 'networkidle' });
+      await page.locator('#station-search').waitFor();
       assert.ok(Math.abs(await page.evaluate(() => scrollY) - fullListScroll) <= 2, 'Browser Back did not restore the list scroll');
       assert.equal(await page.evaluate(() => document.activeElement.id), 'open-player');
       await page.goto(`${base}/?country=GB&genre=News&language=pl&q=PRL`, { waitUntil: 'networkidle' });
@@ -105,9 +114,11 @@ async function main() {
       await page.locator('#open-player').focus();
       await page.keyboard.press('Enter');
       await page.waitForURL('**/now-playing');
+      await page.locator('[aria-label="Radio player"]').waitFor({ state: 'detached' });
       assert.equal(await page.locator('[aria-label="Radio player"]').count(), 0);
       await page.getByRole('button', { name: 'Back to stations' }).click();
       await page.waitForURL((url) => url.pathname === '/' && url.search === search);
+      await page.locator('#station-search').waitFor();
       assert.equal(await page.locator('#station-search').inputValue(), 'PRL');
       assert.equal(await page.evaluate(() => document.activeElement.id), 'open-player');
       assert.ok(Math.abs(await page.evaluate(() => scrollY) - scroll) <= 2, 'List scroll was not restored');
