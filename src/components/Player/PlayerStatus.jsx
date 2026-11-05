@@ -7,6 +7,7 @@ const Status = styled.div`
   color: ${({ theme }) => theme.colors.muted};
   overflow-wrap: anywhere;
   button {
+    min-height: 44px;
     margin-left: 0.5rem;
     padding: 0.4rem 0.6rem;
     border: 1px solid currentColor;

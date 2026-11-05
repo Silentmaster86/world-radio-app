@@ -1,12 +1,4 @@
-import capitalDance from '../assets/logos/capital_dance.png';
-import capitalFM from '../assets/logos/capital.png';
-import heartUK from '../assets/logos/heart_uk.png';
-import radioX from '../assets/logos/radio_X.png';
-import prChicago from '../assets/logos/pr_chicago.png';
-import prl from '../assets/logos/polish_radio_london.png';
-import radioBielsko from '../assets/logos/radio_bielsko.png';
-import radioEska from '../assets/logos/radio_eska.png';
-import rmfMaxx from '../assets/logos/rmf_maxx.png';
+import { stationLogos } from './stationLogos';
 
 export const stations = [
 	{
@@ -15,7 +7,7 @@ export const stations = [
 		countryCode: 'GB',
 		languageCodes: ['en'],
 		genres: ['Dance'],
-		logo: capitalDance,
+		...stationLogos['capital_dance'],
 		url: 'https://media-ice.musicradio.com/CapitalDance',
 		color: '#4c4949',
 
@@ -28,7 +20,7 @@ export const stations = [
 		countryCode: 'GB',
 		languageCodes: ['en'],
 		genres: ['Dance'],
-		logo: capitalFM,
+		...stationLogos['capital'],
 		url: 'https://media-ice.musicradio.com/CapitalMP3',
 		color: '#ada8a8',
 
@@ -40,7 +32,7 @@ export const stations = [
 		countryCode: 'GB',
 		languageCodes: ['en'],
 		genres: ['Pop'],
-		logo: heartUK,
+		...stationLogos['heart_uk'],
 		url: 'https://media-ice.musicradio.com/HeartUK',
 		color: '#8e4f52',
 
@@ -52,7 +44,7 @@ export const stations = [
 		countryCode: 'GB',
 		languageCodes: ['en'],
 		genres: ['Pop'],
-		logo: radioX,
+		...stationLogos['radio_X'],
 		url: 'https://media-ice.musicradio.com/RadioX90s',
 		color: '#E50914',
 
@@ -64,7 +56,7 @@ export const stations = [
 		countryCode: 'US',
 		languageCodes: ['pl'],
 		genres: ['News'],
-		logo: prChicago,
+		...stationLogos['pr_chicago'],
 		url: 'https://s1.reliastream.com/proxy/polskieradio?mp=/stream',
 		color: '#E50914',
 
@@ -76,7 +68,7 @@ export const stations = [
 		countryCode: 'GB',
 		languageCodes: ['pl'],
 		genres: ['News'],
-		logo: prl,
+		...stationLogos['polish_radio_london'],
 		url: 'https://stream.rcs.revma.com/prfmwmwy768uv',
 		color: '#E50914',
 
@@ -88,7 +80,7 @@ export const stations = [
 		countryCode: 'PL',
 		languageCodes: ['pl'],
 		genres: ['News'],
-		logo: radioBielsko,
+		...stationLogos['radio_bielsko'],
 		url: 'https://stream.rcs.revma.com/062uq3z3kwzuv',
 		color: '#E50914',
 
@@ -101,7 +93,7 @@ export const stations = [
 		countryCode: 'PL',
 		languageCodes: ['pl'],
 		genres: ['Dance'],
-		logo: radioEska,
+		...stationLogos['radio_eska'],
 		url: 'https://ic1.smcdn.pl/2330-1.mp3',
 		color: '#E50914',
 
@@ -113,7 +105,7 @@ export const stations = [
 		countryCode: 'PL',
 		languageCodes: ['pl'],
 		genres: ['Dance'],
-		logo: rmfMaxx,
+		...stationLogos['rmf_maxx'],
 		url: 'https://rs201-krk.rmfstream.pl/rmf_maxxx',
 		color: '#E50914',
 

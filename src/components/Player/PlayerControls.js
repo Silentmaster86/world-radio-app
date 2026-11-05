@@ -17,12 +17,13 @@ const Controls = styled.div`
 	gap: ${({ $compact, $car }) => ($car ? '1.4rem' : $compact ? '0.5rem' : '1rem')};
 	flex-wrap: wrap;
 	@media (max-width: 480px) { gap: 0.5rem; }
+	@media (max-height: 450px) { gap: 0.5rem; }
 `;
 
 const HideOnMobile = styled.div`
 	display: contents;
 
-	@media (max-width: 480px) {
+	@media (max-width: 640px) {
 		display: ${({ $hide }) => ($hide ? 'none' : 'contents')};
 	}
 `;
@@ -31,6 +32,10 @@ const IconButton = styled.button`
 	width: ${({ $car }) => ($car ? '64px' : '44px')};
 	height: ${({ $car }) => ($car ? '64px' : '44px')};
 	flex-shrink: 0;
+	@media (min-width: 520px) and (max-height: 450px) {
+		width: ${({ $car }) => ($car ? '58px' : '44px')};
+		height: ${({ $car }) => ($car ? '58px' : '44px')};
+	}
 	@media (max-width: 480px) {
 		width: ${({ $car }) => ($car ? '58px' : '44px')};
 		height: ${({ $car }) => ($car ? '58px' : '44px')};
@@ -74,7 +79,11 @@ const PlayButton = styled(IconButton)`
 		height: ${({ $car }) => ($car ? '72px' : '44px')};
 	}
 	background: ${({ theme }) => theme.colors.accent};
-	color: #fff;
+	@media (min-width: 520px) and (max-height: 450px) {
+		width: ${({ $car }) => ($car ? '72px' : '44px')};
+		height: ${({ $car }) => ($car ? '72px' : '44px')};
+	}
+	color: ${({ theme }) => theme.colors.onAccent};
 	border: none;
 
 	&:hover {
@@ -86,10 +95,11 @@ const VolumeGroup = styled.div`
 	display: flex;
 	align-items: center;
 	gap: 0.55rem;
-	flex-basis: 100%;
+	flex-basis: ${({ $mini }) => $mini ? 'auto' : '100%'};
 	justify-content: center;
 
-	@media (max-width: 480px) {
+	@media (max-width: 640px) {
+		display: ${({ $mini }) => $mini ? 'none' : 'flex'};
 		width: 100%;
 		justify-content: center;
 	}
@@ -97,6 +107,7 @@ const VolumeGroup = styled.div`
 
 const VolumeSlider = styled.input`
 	width: ${({ $compact }) => ($compact ? '80px' : '120px')};
+	min-height: 44px;
 
 	@media (max-width: 480px) {
 		width: 90px;
@@ -146,7 +157,7 @@ export default function PlayerControls({
 					<FaStepForward aria-hidden='true' />
 				</IconButton>
 			</HideOnMobile>
-			{showVolume && <VolumeGroup role='group' aria-label='Volume controls'>
+			{showVolume && <VolumeGroup $mini={mobileMini} role='group' aria-label='Volume controls'>
 				<IconButton type='button' onClick={toggleMute} aria-label={muted ? 'Unmute' : 'Mute'} aria-pressed={muted}>
 					{muted ? <FaVolumeMute aria-hidden='true' /> : <FaVolumeUp aria-hidden='true' />}
 				</IconButton>
