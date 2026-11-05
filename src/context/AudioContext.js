@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { stations } from '../data/stations';
 import { createAudioPlayer, createInitialPlayerState } from '../lib/audioPlayer';
+import { bindMediaSession } from '../lib/mediaSession';
 
 const AudioContext = createContext();
 export const useAudio = () => useContext(AudioContext);
@@ -12,27 +13,9 @@ export function AudioProvider({ children }) {
   useEffect(() => {
     const player = createAudioPlayer({ stations, initialOnline: navigator.onLine });
     playerRef.current = player;
-    const session = navigator.mediaSession;
-    let lastStationId;
-    const sync = (next) => {
-      setSnapshot(next);
-      const station = player.getStation();
-      if (session && next.wantsToPlay && station?.id !== lastStationId && typeof window.MediaMetadata === 'function') {
-        try {
-          session.metadata = new window.MediaMetadata({ title: station.name, artist: 'Online Radio', album: 'Live Stream', artwork: [{ src: station.logo }] });
-          lastStationId = station.id;
-        } catch { /* Optional system metadata must not break audio. */ }
-      }
-    };
-    const unsubscribe = player.subscribe(sync);
-    sync(player.getSnapshot());
-    const handlers = { play: player.play, pause: player.pause, nexttrack: player.nextStation, previoustrack: player.prevStation };
-    const installed = [];
-    if (session) {
-      Object.entries(handlers).forEach(([name, handler]) => {
-        try { session.setActionHandler(name, handler); installed.push(name); } catch { /* Unsupported action. */ }
-      });
-    }
+    const unsubscribe = player.subscribe(setSnapshot);
+    setSnapshot(player.getSnapshot());
+    const unbindMediaSession = bindMediaSession(player);
     const online = () => player.setOnline(true);
     const offline = () => player.setOnline(false);
     window.addEventListener('online', online);
@@ -41,7 +24,7 @@ export function AudioProvider({ children }) {
       unsubscribe();
       window.removeEventListener('online', online);
       window.removeEventListener('offline', offline);
-      installed.forEach((name) => { try { session.setActionHandler(name, null); } catch { /* Unsupported action. */ } });
+      unbindMediaSession();
       player.dispose();
       playerRef.current = null;
     };
