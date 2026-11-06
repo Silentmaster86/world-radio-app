@@ -5,6 +5,7 @@ const http = require('node:http');
 const zlib = require('node:zlib');
 const { pathToFileURL } = require('node:url');
 const { chromium } = require('playwright');
+const { initialJavaScript } = require('./build-assets.cjs');
 const output = path.resolve('test-results/performance');
 fs.mkdirSync(output, { recursive: true });
 const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.txt': 'text/plain', '.webp': 'image/webp', '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon' };
@@ -58,12 +59,10 @@ async function main() {
           fs.writeFileSync(path.join(output, `${label}.json`), result.report[1]);
           const lhr = result.lhr;
           const targetBuild = targets.find((item) => item.name === target.name).build;
-          const manifest = JSON.parse(fs.readFileSync(path.join(targetBuild, 'asset-manifest.json')));
-          const mainFile = path.join(targetBuild, manifest.files['main.js']);
           const summary = {
             label, version: lhr.lighthouseVersion, profile,
             scores: Object.fromEntries(Object.entries(lhr.categories).map(([name, value]) => [name, value.score])),
-            mainJavascript: { bytes: fs.statSync(mainFile).size, gzipBytes: zlib.gzipSync(fs.readFileSync(mainFile)).length },
+            mainJavascript: initialJavaScript(targetBuild),
             metrics: Object.fromEntries(metricIds.map((id) => [id, { value: lhr.audits[id]?.numericValue, display: lhr.audits[id]?.displayValue }])),
             findings: Object.values(lhr.audits).filter((audit) => audit.score !== null && audit.score < 1).map(({ id, title, score, displayValue, details }) => ({ id, title, score, displayValue, details })),
           };

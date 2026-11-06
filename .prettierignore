@@ -1,0 +1,9 @@
+node_modules/
+build/
+coverage/
+test-results/
+playwright-report/
+.netlify/
+src/data/stationLogos.js
+src/assets/
+public/icons/

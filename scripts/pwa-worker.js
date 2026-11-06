@@ -1,4 +1,3 @@
-/* global self, caches, fetch, Response, URL */
 const CONFIG = /*WRA_CONFIG*/ null;
 const CACHE_PREFIX = 'wra-shell-';
 const CACHE_NAME = `${CACHE_PREFIX}${CONFIG.version}`;

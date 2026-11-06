@@ -1,5 +1,5 @@
 import ReactDOM from 'react-dom/client';
-import App from './App.js';
+import App from './App';
 import { AudioProvider } from './context/AudioContext';
 import { FavoritesProvider } from './context/FavoritesContext';
 import { ThemeProvider } from 'styled-components';

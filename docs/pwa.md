@@ -20,7 +20,7 @@ Favorites and preferences still use the existing validated localStorage formats.
 Live radio always needs an internet connection. No stream is downloaded for
 later listening, and reopening or reconnecting does not create playback intent.
 
-`npm run build` generates `build/service-worker.js` after CRA builds the app.
+`npm run build` generates `build/service-worker.js` after Vite builds the app.
 The generator hashes the worker source and release assets to produce a stable
 release cache name. It includes hashed assets, the HTML shell, manifest, offline
 fallback and required icons. Generated build files remain ignored by Git.
@@ -78,10 +78,10 @@ Use a separate origin when testing a production build locally, for example:
 
 ```sh
 npm run build
-npm run serve -- --listen 5000
+npm run serve -- --port 5000
 ```
 
-Keep development on port 3000. If an older production worker controls a reused
+Keep development on port 5173. If an older production worker controls a reused
 development origin, unregister that worker in DevTools → Application → Service
 Workers and reload; clearing favorites/localStorage is unnecessary.
 
