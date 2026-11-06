@@ -23,8 +23,8 @@ history; their original follow-up lists are no longer the current backlog.
 1. **Real-device playback review.** Check iOS Safari/Android native MP3/AAC,
    lock-screen controls, background playback, safe areas and installation. HTTP
    stream reachability and Chromium fixtures do not establish those behaviors.
-   Verify PR Chicago's source identity: its configured stream responds with an
-   `icy-name` of `AlienWare`; that header alone does not identify the program.
+   PR Chicago's publisher source has been verified and its current endpoint is
+   documented in [station-sources.md](station-sources.md).
 2. **Recent stations.** Add a bounded list of stations actually listened to.
    The last selected station already restores today; history would add a list.
 3. **Expanded catalog.** Evaluate a station-directory source, search/pagination,
