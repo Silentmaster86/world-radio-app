@@ -45,10 +45,9 @@ the manifest use root-relative addresses, including on `/now-playing/`.
 5. Select a favorite and verify the current catalog URL is used; test switching
    between the home screen and car view.
 
-## Separate follow-up work
+## Subsequent stages
 
-The subsequent [playback stage](./playback.md) addresses the audio lifecycle,
-playback status, system controls and native station-selection buttons. Remaining
-stages cover landscape car layout, a persistent mini player, combined filters,
-theme improvements, PWA offline/update behavior and toolchain migration. The
-service worker remains disabled until its cache/update strategy is repaired.
+Playback, persistent/car controls, filtering, themes, mobile layouts, PWA
+offline/safe updates and the Vite migration have been completed. The production
+service worker is generated and enabled with the strategy in [pwa.md](pwa.md).
+See [roadmap.md](roadmap.md) for the current backlog.

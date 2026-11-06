@@ -86,8 +86,8 @@ against the production build using Chromium. It checks:
 - No media request or autoplay at startup. It does not fake a successful real
   stream and does not use stream availability as a layout-test dependency.
 
-Local Chromium cannot start under the execution sandbox (`sandbox_host_linux`
-operation not permitted), so browser checks run on the GitHub-hosted runner.
+Browser checks run on the GitHub-hosted runner and can also run locally where
+Chromium and its required system libraries are available.
 Automated Chromium/axe results do not replace physical-device and visual review.
 
 On the Netlify preview, also open `/now-playing` directly and refresh it; verify

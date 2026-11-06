@@ -6,6 +6,7 @@ Supports:
 
 - ✅ Live streaming with station switching
 - ✅ Favorites (saved locally)
+- ✅ Sleep timer with selectable duration and cancellation
 - ✅ Search and category filtering
 - ✅ Responsive mobile/desktop layout
 - ✅ Installable as a PWA (Android, desktop)
@@ -162,3 +163,7 @@ live radio needs an internet connection.
 
 Development commands, editor setup and the build/PWA contract are described in
 [docs/tooling.md](docs/tooling.md).
+
+The [current roadmap](docs/roadmap.md) separates completed work from product
+improvements. See [sleep-timer.md](docs/sleep-timer.md) for the timer's behavior
+and browser background limitations.

@@ -28,7 +28,7 @@ layout shift alongside the overall score.
 ## Verification
 
 `npm run check` runs unit tests, the production build and a 125 KiB gzip budget
-for the initial main JavaScript file. `npm run check:bundle` checks an existing
+for all initial JavaScript chunks. `npm run check:bundle` checks an existing
 build. A new large dependency must fit that budget or be deferred deliberately.
 
 The `performance` PR job checks out both the pinned base commit and the candidate,
