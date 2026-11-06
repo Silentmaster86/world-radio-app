@@ -251,6 +251,29 @@ async function main() {
       await page.getByRole('button', { name: 'Clear search and filters' }).click();
       await page.waitForFunction(() => document.querySelectorAll('article').length === 9);
       assert.equal(await page.locator('article').count(), 9);
+      // Timer dialog works with a keyboard and stays active across routes.
+      await page.getByRole('button', { name: 'Sleep timer', exact: true }).click();
+      const timerDialog = page.getByRole('dialog', { name: 'Sleep timer', exact: true });
+      await timerDialog.waitFor();
+      await accessible(page, `${mode}-sleep-timer`);
+      await screenshot(page, `${mode}-sleep-timer`);
+      await page.keyboard.press('Escape');
+      await timerDialog.waitFor({ state: 'hidden' });
+      assert.equal(
+        await page.evaluate(() => document.activeElement.hasAttribute('data-sleep-timer')),
+        true,
+      );
+      await page.locator('[data-sleep-timer]').click();
+      await timerDialog.getByRole('button', { name: '30 min', exact: true }).click();
+      await page.locator('[data-sleep-timer][aria-pressed="true"]').waitFor();
+      await page.locator('#open-player').click();
+      await page.waitForURL('**/now-playing');
+      await page.locator('[data-sleep-timer][aria-pressed="true"]').waitFor();
+      await page.locator('[data-sleep-timer]').click();
+      await page.getByRole('button', { name: 'Cancel timer', exact: true }).click();
+      await page.locator('[data-sleep-timer][aria-pressed="false"]').waitFor();
+      await page.getByRole('button', { name: 'Back to stations', exact: true }).click();
+      await page.locator('#station-search').waitFor();
       await page.locator('#appearance').selectOption(mode === 'dark' ? 'light' : 'dark');
       await page.reload({ waitUntil: 'networkidle' });
       assert.equal(
@@ -302,6 +325,26 @@ async function main() {
     assert.equal(
       await page.locator('[data-player-status]').getAttribute('data-player-status'),
       'idle',
+    );
+    const timedPage = await context.newPage();
+    activePage = timedPage;
+    await timedPage.clock.install();
+    await timedPage.goto(base, { waitUntil: 'networkidle' });
+    await timedPage.locator('[data-sleep-timer]').click();
+    await timedPage.getByRole('button', { name: '15 min', exact: true }).click();
+    await timedPage.locator('#open-player').click();
+    await timedPage.waitForURL('**/now-playing');
+    await timedPage.clock.fastForward(15 * 60_000);
+    await timedPage.locator('[data-player-status="paused"]').waitFor();
+    await timedPage.locator('[data-sleep-timer][aria-pressed="false"]').waitFor();
+    assert.deepEqual(
+      await timedPage.evaluate(() =>
+        window.__radioStartupAudio.map((audio) => ({
+          source: audio.getAttribute('src'),
+          playCalls: audio.startupPlayCalls,
+        })),
+      ),
+      [{ source: null, playCalls: 0 }],
     );
     await context.close();
     console.log(JSON.stringify({ passed: true, scenarios: report.length, report }, null, 2));
