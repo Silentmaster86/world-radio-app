@@ -9,9 +9,15 @@ export function BrowsingProvider({ children }) {
     if (!('scrollRestoration' in window.history)) return undefined;
     const previous = window.history.scrollRestoration;
     window.history.scrollRestoration = 'manual';
-    return () => { window.history.scrollRestoration = previous; };
+    return () => {
+      window.history.scrollRestoration = previous;
+    };
   }, []);
-  return <BrowsingContext.Provider value={{ lastBrowse, filtersExpanded, setFiltersExpanded }}>{children}</BrowsingContext.Provider>;
+  return (
+    <BrowsingContext.Provider value={{ lastBrowse, filtersExpanded, setFiltersExpanded }}>
+      {children}
+    </BrowsingContext.Provider>
+  );
 }
 export function useFilterDisclosure() {
   const shared = useContext(BrowsingContext);
@@ -27,7 +33,11 @@ export function usePlayerNavigation() {
   const { lastBrowse } = useContext(BrowsingContext);
   return {
     openPlayer() {
-      const browse = { search: location.search, scrollY: window.scrollY, focusId: document.activeElement?.id };
+      const browse = {
+        search: location.search,
+        scrollY: window.scrollY,
+        focusId: document.activeElement?.id,
+      };
       lastBrowse.current = browse;
       navigate('/now-playing', { state: { browse } });
     },

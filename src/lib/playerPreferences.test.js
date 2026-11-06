@@ -6,13 +6,22 @@ afterEach(() => jest.restoreAllMocks());
 
 test('restores station, volume and mute from the versioned record', () => {
   expect(savePlayerPreferences({ stationId: 'second', volume: 0.35, muted: true })).toBe(true);
-  expect(loadPlayerPreferences(stations)).toMatchObject({ stationId: 'second', volume: 0.35, muted: true });
+  expect(loadPlayerPreferences(stations)).toMatchObject({
+    stationId: 'second',
+    volume: 0.35,
+    muted: true,
+  });
 });
 
 test.each(['{', 'null', '[]', '42', '{"version":1,"volume":"loud","stationId":"missing"}'])(
-  'recovers invalid settings without modifying the original data: %s', (raw) => {
+  'recovers invalid settings without modifying the original data: %s',
+  (raw) => {
     localStorage.setItem(PLAYER_KEY, raw);
-    expect(loadPlayerPreferences(stations)).toMatchObject({ stationId: 'first', volume: 1, muted: false });
+    expect(loadPlayerPreferences(stations)).toMatchObject({
+      stationId: 'first',
+      volume: 1,
+      muted: false,
+    });
     expect(localStorage.getItem(PLAYER_KEY)).toBe(raw);
   },
 );
@@ -30,8 +39,12 @@ test('protects newer settings records', () => {
 });
 
 test('reports blocked storage without throwing', () => {
-  jest.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new Error('Blocked'); });
-  jest.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('Full'); });
+  jest.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+    throw new Error('Blocked');
+  });
+  jest.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+    throw new Error('Full');
+  });
   expect(loadPlayerPreferences(stations).message).toContain('session');
   expect(savePlayerPreferences({ stationId: 'first', volume: 0.5, muted: false })).toBe(false);
 });

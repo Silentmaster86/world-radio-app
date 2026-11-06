@@ -12,7 +12,7 @@ export function getFilterOptions(stations) {
   };
 }
 export function readFilters(params, options) {
-  const valid = (key, values) => values.includes(params.get(key)) ? params.get(key) : '';
+  const valid = (key, values) => (values.includes(params.get(key)) ? params.get(key) : '');
   return {
     section: params.get('section') === 'favorites' ? 'favorites' : 'all',
     country: valid('country', options.countries),
@@ -24,12 +24,14 @@ export function readFilters(params, options) {
 export function filterStations(stations, favoriteIds, filters = defaultFilters) {
   const { section, country, genre, language, q } = { ...defaultFilters, ...filters };
   const query = normalizeStationQuery(q);
-  return stations.filter((station) =>
-    (section !== 'favorites' || favoriteIds.includes(station.id)) &&
-    (!country || station.countryCode === country) &&
-    (!genre || station.genres.includes(genre)) &&
-    (!language || station.languageCodes.includes(language)) &&
-    normalizeStationQuery(station.name).includes(query));
+  return stations.filter(
+    (station) =>
+      (section !== 'favorites' || favoriteIds.includes(station.id)) &&
+      (!country || station.countryCode === country) &&
+      (!genre || station.genres.includes(genre)) &&
+      (!language || station.languageCodes.includes(language)) &&
+      normalizeStationQuery(station.name).includes(query),
+  );
 }
 export default function useStationFilters(stations, favoriteIds) {
   const [params, setParams] = useSearchParams();
@@ -53,7 +55,9 @@ export default function useStationFilters(stations, favoriteIds) {
     setParams(result, { replace: true, preventScrollReset: true });
   };
   return {
-    filters, options, updateFilters,
+    filters,
+    options,
+    updateFilters,
     resetFilters: () => updateFilters(defaultFilters),
     clearRefinements: () => updateFilters({ country: '', genre: '', language: '', q: '' }),
     searchedStations: filterStations(stations, favoriteIds, filters),

@@ -1,17 +1,33 @@
 import { createAudioPlayer } from './audioPlayer';
 import { FakeAudio, deferred } from '../test/FakeAudio';
 
-const stations = ['first', 'second', 'third'].map((id) => ({ id, name: id, url: `https://radio.example/${id}` }));
+const stations = ['first', 'second', 'third'].map((id) => ({
+  id,
+  name: id,
+  url: `https://radio.example/${id}`,
+}));
 let players;
 function setup(options = {}) {
   const audio = options.audio || new FakeAudio();
   const createAudio = jest.fn(() => audio);
-  const player = createAudioPlayer({ stations, createAudio, connectionTimeoutMs: 100, retryDelays: [10, 20, 30], ...options });
+  const player = createAudioPlayer({
+    stations,
+    createAudio,
+    connectionTimeoutMs: 100,
+    retryDelays: [10, 20, 30],
+    ...options,
+  });
   players.push(player);
   return { audio, player, createAudio };
 }
-const flush = async () => { await Promise.resolve(); await Promise.resolve(); };
-beforeEach(() => { jest.useFakeTimers(); players = []; });
+const flush = async () => {
+  await Promise.resolve();
+  await Promise.resolve();
+};
+beforeEach(() => {
+  jest.useFakeTimers();
+  players = [];
+});
 afterEach(() => {
   players.forEach((player) => player.dispose());
   expect(jest.getTimerCount()).toBe(0);
@@ -24,7 +40,12 @@ test('constructs one source-free audio element and does not preload a station', 
   expect(audio.src).toBe('');
   expect(audio.preload).toBe('none');
   expect(audio.play).not.toHaveBeenCalled();
-  expect(player.getSnapshot()).toMatchObject({ status: 'idle', wantsToPlay: false, selectedStationId: 'first', playingStationId: null });
+  expect(player.getSnapshot()).toMatchObject({
+    status: 'idle',
+    wantsToPlay: false,
+    selectedStationId: 'first',
+    playingStationId: null,
+  });
 });
 
 test('confirms playback from the real audio state and releases the stream on pause', async () => {
@@ -32,7 +53,11 @@ test('confirms playback from the real audio state and releases the stream on pau
   expect(await player.play()).toBe(true);
   expect(player.getSnapshot()).toMatchObject({ status: 'playing', playingStationId: 'first' });
   player.pause();
-  expect(player.getSnapshot()).toMatchObject({ status: 'paused', wantsToPlay: false, playingStationId: null });
+  expect(player.getSnapshot()).toMatchObject({
+    status: 'paused',
+    wantsToPlay: false,
+    playingStationId: null,
+  });
   expect(audio.src).toBe('');
   expect(await player.play()).toBe(true);
   expect(audio.play).toHaveBeenCalledTimes(2);
@@ -41,7 +66,12 @@ test('confirms playback from the real audio state and releases the stream on pau
 test('rapid next actions use the latest selection before play promises settle', async () => {
   const { audio, player, createAudio } = setup();
   const pending = [deferred(), deferred(), deferred()];
-  pending.forEach((request) => audio.play.mockImplementationOnce(() => { audio.paused = false; return request.promise; }));
+  pending.forEach((request) =>
+    audio.play.mockImplementationOnce(() => {
+      audio.paused = false;
+      return request.promise;
+    }),
+  );
   const first = player.play();
   const second = player.nextStation();
   const third = player.nextStation();
@@ -53,14 +83,22 @@ test('rapid next actions use the latest selection before play promises settle', 
   pending[0].reject(new Error('Late error'));
   pending[1].resolve();
   await flush();
-  expect(player.getSnapshot()).toMatchObject({ status: 'playing', selectedStationId: 'third', playingStationId: 'third', error: null });
+  expect(player.getSnapshot()).toMatchObject({
+    status: 'playing',
+    selectedStationId: 'third',
+    playingStationId: 'third',
+    error: null,
+  });
   expect(createAudio).toHaveBeenCalledTimes(1);
 });
 
 test('pause cancels a pending start and ignores its late success', async () => {
   const { audio, player } = setup();
   const pending = deferred();
-  audio.play.mockImplementation(() => { audio.paused = false; return pending.promise; });
+  audio.play.mockImplementation(() => {
+    audio.paused = false;
+    return pending.promise;
+  });
   const outcome = player.play();
   player.pause();
   expect(await outcome).toBe(false);
@@ -73,33 +111,50 @@ test('pause cancels a pending start and ignores its late success', async () => {
 
 test('does not label a resolved play promise as playing without playable data', async () => {
   const { audio, player } = setup({ retryDelays: [] });
-  audio.play.mockImplementation(() => { audio.paused = false; return Promise.resolve(); });
+  audio.play.mockImplementation(() => {
+    audio.paused = false;
+    return Promise.resolve();
+  });
   const outcome = player.play();
   await flush();
   expect(player.getSnapshot().status).toBe('connecting');
   jest.advanceTimersByTime(100);
   expect(await outcome).toBe(false);
-  expect(player.getSnapshot()).toMatchObject({ status: 'error', error: { code: 'timeout' }, wantsToPlay: false });
+  expect(player.getSnapshot()).toMatchObject({
+    status: 'error',
+    error: { code: 'timeout' },
+    wantsToPlay: false,
+  });
 });
 
 test('limits connection attempts and leaves a useful terminal error', async () => {
   const { audio, player } = setup();
-  audio.play.mockImplementation(() => { audio.paused = false; return new Promise(() => {}); });
+  audio.play.mockImplementation(() => {
+    audio.paused = false;
+    return new Promise(() => {});
+  });
   const outcome = player.play();
   jest.runAllTimers();
   expect(await outcome).toBe(false);
   expect(audio.play).toHaveBeenCalledTimes(4);
-  expect(player.getSnapshot()).toMatchObject({ status: 'error', wantsToPlay: false, retryAttempt: 3 });
+  expect(player.getSnapshot()).toMatchObject({
+    status: 'error',
+    wantsToPlay: false,
+    retryAttempt: 3,
+  });
 });
 
-test.each(['NotAllowedError', 'NotSupportedError'])('requires manual action for %s', async (name) => {
-  const { audio, player } = setup();
-  audio.play.mockRejectedValue(new DOMException('Rejected', name));
-  expect(await player.play()).toBe(false);
-  jest.runAllTimers();
-  expect(audio.play).toHaveBeenCalledTimes(1);
-  expect(player.getSnapshot()).toMatchObject({ status: 'error', wantsToPlay: false });
-});
+test.each(['NotAllowedError', 'NotSupportedError'])(
+  'requires manual action for %s',
+  async (name) => {
+    const { audio, player } = setup();
+    audio.play.mockRejectedValue(new DOMException('Rejected', name));
+    expect(await player.play()).toBe(false);
+    jest.runAllTimers();
+    expect(audio.play).toHaveBeenCalledTimes(1);
+    expect(player.getSnapshot()).toMatchObject({ status: 'error', wantsToPlay: false });
+  },
+);
 
 test('manual retry starts a fresh attempt after a failure', async () => {
   const { audio, player } = setup();
@@ -127,7 +182,11 @@ test('an ended stream reconnects within the same bounded retry budget', async ()
   const { audio, player } = setup();
   await player.play();
   audio.emit('ended', { ended: true, paused: true });
-  expect(player.getSnapshot()).toMatchObject({ status: 'connecting', playingStationId: null, retryAttempt: 1 });
+  expect(player.getSnapshot()).toMatchObject({
+    status: 'connecting',
+    playingStationId: null,
+    retryAttempt: 1,
+  });
   jest.advanceTimersByTime(10);
   expect(audio.play).toHaveBeenCalledTimes(2);
   expect(player.getSnapshot().status).toBe('playing');
@@ -189,8 +248,12 @@ test('station changes never publish a playing state for an unconfirmed station',
   player.subscribe((snapshot) => snapshots.push(snapshot));
   audio.play.mockImplementationOnce(() => new Promise(() => {}));
   player.nextStation();
-  expect(snapshots.every((snapshot) => snapshot.status !== 'playing'
-    || snapshot.playingStationId === snapshot.selectedStationId)).toBe(true);
+  expect(
+    snapshots.every(
+      (snapshot) =>
+        snapshot.status !== 'playing' || snapshot.playingStationId === snapshot.selectedStationId,
+    ),
+  ).toBe(true);
 });
 
 test('unknown stations and an empty catalog are safe', async () => {

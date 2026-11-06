@@ -3,24 +3,34 @@ import { resolveLegacyStationId } from './stationUtils';
 
 export const FAVORITES_KEY = 'wra:favorites:v1';
 export const LEGACY_FAVORITES_KEY = 'favorites';
-export const SESSION_ONLY_MESSAGE = 'Favorites are available for this session only. Changes could not be saved.';
+export const SESSION_ONLY_MESSAGE =
+  'Favorites are available for this session only. Changes could not be saved.';
 const RECOVERY_MESSAGE = 'Saved favorites could not be read. You can continue listening.';
-const PRESERVED_MESSAGE = 'Some previous favorites could not be matched. Their original data has been kept.';
+const PRESERVED_MESSAGE =
+  'Some previous favorites could not be matched. Their original data has been kept.';
 
 function isRecord(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
 function isFavoritesRecord(value) {
-  return isRecord(value) && value.version === 1 && Array.isArray(value.stationIds)
-    && value.stationIds.every((id) => typeof id === 'string' && id.length > 0);
+  return (
+    isRecord(value) &&
+    value.version === 1 &&
+    Array.isArray(value.stationIds) &&
+    value.stationIds.every((id) => typeof id === 'string' && id.length > 0)
+  );
 }
 
 // Reading has no write effects: migration runs only after the provider mounts.
 export function loadFavorites() {
   const defaults = {
-    favoriteIds: [], shouldMigrate: false, removeLegacyAfterSave: false,
-    canPersist: true, message: '', preservedMessage: '',
+    favoriteIds: [],
+    shouldMigrate: false,
+    removeLegacyAfterSave: false,
+    canPersist: true,
+    message: '',
+    preservedMessage: '',
   };
   const current = readStorage(FAVORITES_KEY, null, isRecord);
 
@@ -30,8 +40,10 @@ export function loadFavorites() {
   }
   if (current.value?.version > 1) {
     return {
-      ...defaults, canPersist: false,
-      message: 'Saved favorites use a newer format. The original data is preserved; changes will stay in this session.',
+      ...defaults,
+      canPersist: false,
+      message:
+        'Saved favorites use a newer format. The original data is preserved; changes will stay in this session.',
     };
   }
 

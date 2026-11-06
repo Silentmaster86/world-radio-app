@@ -1,10 +1,9 @@
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
-const { gzipSync } = require('node:zlib');
-const manifest = JSON.parse(fs.readFileSync('build/asset-manifest.json'));
-const main = path.join('build', manifest.files['main.js']);
-const bytes = gzipSync(fs.readFileSync(main)).length;
+const { initialJavaScript } = require('./build-assets.cjs');
+const bytes = initialJavaScript('build').gzipBytes;
 const limit = 100 * 1024;
-assert.ok(bytes <= limit, `Initial JavaScript is ${bytes} gzip bytes, above the ${limit}-byte budget. Review new dependencies or split deferred features.`);
+assert.ok(
+  bytes <= limit,
+  `Initial JavaScript is ${bytes} gzip bytes, above the ${limit}-byte budget. Review new dependencies or split deferred features.`,
+);
 console.log(`Initial JavaScript budget passed: ${bytes} / ${limit} gzip bytes.`);

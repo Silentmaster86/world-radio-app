@@ -4,7 +4,12 @@ import { FakeAudio } from '../test/FakeAudio';
 
 const stations = [
   { id: 'first', name: 'First station', url: 'https://radio.example/first', logo: '/first.png' },
-  { id: 'second', name: 'Second station', url: 'https://radio.example/second', logo: '/second.webp' },
+  {
+    id: 'second',
+    name: 'Second station',
+    url: 'https://radio.example/second',
+    logo: '/second.webp',
+  },
 ];
 let player;
 let unbind;
@@ -12,15 +17,22 @@ function setup(unsupported) {
   const audio = new FakeAudio();
   player = createAudioPlayer({ stations, createAudio: () => audio });
   const handlers = {};
-  const session = { setActionHandler: jest.fn((name, action) => {
-    if (name === unsupported) throw new Error('Unsupported');
-    handlers[name] = action;
-  }) };
-  const Metadata = jest.fn(function (values) { Object.assign(this, values); });
+  const session = {
+    setActionHandler: jest.fn((name, action) => {
+      if (name === unsupported) throw new Error('Unsupported');
+      handlers[name] = action;
+    }),
+  };
+  const Metadata = jest.fn(function (values) {
+    Object.assign(this, values);
+  });
   unbind = bindMediaSession(player, { session, Metadata });
   return { audio, session, handlers, Metadata };
 }
-afterEach(() => { unbind?.(); player?.dispose(); });
+afterEach(() => {
+  unbind?.();
+  player?.dispose();
+});
 
 test('initial metadata and playback state follow actual first play and pause', async () => {
   const { session, handlers, Metadata } = setup();

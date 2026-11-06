@@ -16,22 +16,22 @@ none of the draft branches changes production until merged.
 - `StationControls` provides visible labels and native selects. `EmptyState`
   distinguishes an empty favorites collection from refinements with no matches.
   Clearing refinements keeps the selected collection; browsing all resets it.
-- `src/components/Layout/SoundBar.js` mounts outside the routed page. It shares
+- `src/components/Layout/SoundBar.jsx` mounts outside the routed page. It shares
   the existing audio provider. Its measured height reserves space below the list
   and sets scroll padding, including wrapped errors and safe-area insets. There
   is one visible transport: the dock on the catalog, the full player in car mode.
   Mobile keeps Play/Pause and the car-mode button available; volume and station
   stepping remain available in the full player.
-- `src/context/BrowsingContext.js` keeps the last list search, scroll and focused
+- `src/context/BrowsingContext.jsx` keeps the last list search, scroll and focused
   control for in-app return and browser Back. Query/filter values survive reload
   through the URL. Scroll/focus are session navigation state, not stored user
   preferences. Direct car-mode entry returns to the unfiltered catalog.
-- `src/pages/NowPlaying.js` uses a two-column layout on short landscape screens.
+- `src/pages/NowPlaying.jsx` uses a two-column layout on short landscape screens.
   Large logo margins and forced card height are removed. Normal-state transport
   controls fit 844×390 and 568×320; expanded errors and enlarged text may scroll.
   Content is never clipped with fixed-height overflow rules. The heading receives
   focus on entry, and return restores the originating control.
-- `src/context/ThemeContext.js` supports system/light/dark. It stores the user's
+- `src/context/ThemeContext.jsx` supports system/light/dark. It stores the user's
   explicit choice as `wra:theme:v1` with `{version:1,mode}`. System mode tracks OS
   changes; explicit modes detach the subscription. Invalid settings fall back,
   blocked storage leaves working session controls, and future schemas remain

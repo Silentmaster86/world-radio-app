@@ -3,15 +3,15 @@
 ## Development
 
 Use the Node version in `.nvmrc`, install with `npm ci`, and run `npm start`.
-`npm run check` runs the regression tests followed by a production build. The
-GitHub Actions workflow uses the same command on pull requests and main.
-The tests use the existing React and CRA/Jest dependencies; no additional test
-framework installation is required.
+`npm run check` runs lint, formatting, regression tests, the production build and
+bundle checks. GitHub Actions uses the same command on pull requests and main.
+Vite builds the application and standalone Jest runs the React tests; see
+[tooling.md](tooling.md) for commands and editor setup.
 
-CRA's Jest 27 does not resolve the locked React Router 7 package exports correctly.
-The Jest-only module mappings in `package.json` select the real CommonJS entry
-points, so application integration tests run the actual router. Remove/revisit
-these mappings when migrating the test runner or updating the router package.
+The Jest-only module mappings in `jest.config.cjs` select React Router's real
+CommonJS entry points, so application integration tests run the actual router.
+These explicit paths match the locked router version; revisit them when updating
+that package. Vite resolves the normal browser exports in production.
 
 Netlify runs `npm run build` and publishes `build/`. Generated build output is
 ignored and is no longer a second source of truth in Git. `public/_redirects`

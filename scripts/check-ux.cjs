@@ -8,34 +8,85 @@ const { AxeBuilder } = require('@axe-core/playwright');
 const reportDir = path.resolve('test-results/ux', process.env.WRA_BASE_URL ? 'preview' : 'build');
 fs.mkdirSync(reportDir, { recursive: true });
 const root = path.resolve('build');
-const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.webp': 'image/webp', '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon' };
+const mime = {
+  '.html': 'text/html',
+  '.js': 'text/javascript',
+  '.css': 'text/css',
+  '.json': 'application/json',
+  '.webp': 'image/webp',
+  '.png': 'image/png',
+  '.svg': 'image/svg+xml',
+  '.ico': 'image/x-icon',
+};
 const report = [];
 
 async function geometry(page, car = false) {
   const result = await page.evaluate((car) => {
-    const rect = (element) => { const box = element.getBoundingClientRect(); return { x: box.x, y: box.y, right: box.right, bottom: box.bottom, width: box.width, height: box.height }; };
-    const visible = (element) => element.getClientRects().length && getComputedStyle(element).visibility !== 'hidden';
-    const scope = car ? document.querySelector('[aria-label="Car mode player"]') : document.querySelector('[aria-label="Radio player"]');
+    const rect = (element) => {
+      const box = element.getBoundingClientRect();
+      return {
+        x: box.x,
+        y: box.y,
+        right: box.right,
+        bottom: box.bottom,
+        width: box.width,
+        height: box.height,
+      };
+    };
+    const visible = (element) =>
+      element.getClientRects().length && getComputedStyle(element).visibility !== 'hidden';
+    const scope = car
+      ? document.querySelector('[aria-label="Car mode player"]')
+      : document.querySelector('[aria-label="Radio player"]');
     return {
-      width: innerWidth, height: innerHeight, documentWidth: document.documentElement.scrollWidth,
-      controls: [...scope.querySelectorAll('button, input')].filter(visible).map((el) => ({ label: el.getAttribute('aria-label'), ...rect(el) })),
+      width: innerWidth,
+      height: innerHeight,
+      documentWidth: document.documentElement.scrollWidth,
+      controls: [...scope.querySelectorAll('button, input')]
+        .filter(visible)
+        .map((el) => ({ label: el.getAttribute('aria-label'), ...rect(el) })),
       dock: car ? null : rect(scope),
       lastStation: car ? null : rect(document.querySelector('article:last-child')),
     };
   }, car);
-  assert.ok(result.documentWidth <= result.width + 1, `Horizontal overflow: ${JSON.stringify(result)}`);
+  assert.ok(
+    result.documentWidth <= result.width + 1,
+    `Horizontal overflow: ${JSON.stringify(result)}`,
+  );
   for (const control of result.controls) {
-    assert.ok(control.width >= 43 && control.height >= 43, `Small target: ${JSON.stringify(control)}`);
-    assert.ok(control.x >= -1 && control.right <= result.width + 1, `Clipped horizontal control: ${JSON.stringify(control)}`);
-    assert.ok(control.y >= -1 && control.bottom <= result.height + 1, `Control outside viewport: ${JSON.stringify(control)}`);
+    assert.ok(
+      control.width >= 43 && control.height >= 43,
+      `Small target: ${JSON.stringify(control)}`,
+    );
+    assert.ok(
+      control.x >= -1 && control.right <= result.width + 1,
+      `Clipped horizontal control: ${JSON.stringify(control)}`,
+    );
+    assert.ok(
+      control.y >= -1 && control.bottom <= result.height + 1,
+      `Control outside viewport: ${JSON.stringify(control)}`,
+    );
   }
-  if (!car) assert.ok(result.lastStation.bottom <= result.dock.y + 1, `Dock covers the last station: ${JSON.stringify(result)}`);
+  if (!car)
+    assert.ok(
+      result.lastStation.bottom <= result.dock.y + 1,
+      `Dock covers the last station: ${JSON.stringify(result)}`,
+    );
   return result;
 }
 async function accessible(page, label) {
-  const result = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
-  fs.writeFileSync(path.join(reportDir, `${label}-axe.json`), JSON.stringify(result.violations, null, 2));
-  assert.deepEqual(result.violations.map(({ id, nodes }) => ({ id, targets: nodes.map(({ target }) => target) })), [], `${label}: accessibility violations`);
+  const result = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+    .analyze();
+  fs.writeFileSync(
+    path.join(reportDir, `${label}-axe.json`),
+    JSON.stringify(result.violations, null, 2),
+  );
+  assert.deepEqual(
+    result.violations.map(({ id, nodes }) => ({ id, targets: nodes.map(({ target }) => target) })),
+    [],
+    `${label}: accessibility violations`,
+  );
 }
 async function screenshot(page, label) {
   await page.locator('img').evaluateAll(async (images) => {
@@ -51,8 +102,12 @@ async function main() {
   const server = http.createServer((request, response) => {
     const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
     let file = path.resolve(root, `.${pathname}`);
-    if (!file.startsWith(`${root}${path.sep}`) && file !== root) { response.writeHead(403).end(); return; }
-    if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) file = path.join(root, 'index.html');
+    if (!file.startsWith(`${root}${path.sep}`) && file !== root) {
+      response.writeHead(403).end();
+      return;
+    }
+    if (!fs.existsSync(file) || fs.statSync(file).isDirectory())
+      file = path.join(root, 'index.html');
     response.setHeader('Content-Type', mime[path.extname(file)] || 'application/octet-stream');
     fs.createReadStream(file).pipe(response);
   });
@@ -63,18 +118,37 @@ async function main() {
   let navigationDiagnostics;
   try {
     for (const mode of ['light', 'dark']) {
-      const context = await browser.newContext({ colorScheme: mode, reducedMotion: 'reduce', deviceScaleFactor: mode === 'dark' ? 2 : 1 });
-      const page = await context.newPage(); activePage = page;
+      const context = await browser.newContext({
+        colorScheme: mode,
+        reducedMotion: 'reduce',
+        deviceScaleFactor: mode === 'dark' ? 2 : 1,
+      });
+      const page = await context.newPage();
+      activePage = page;
       const errors = [];
       page.on('pageerror', (error) => errors.push(error.message));
-      for (const viewport of [{ width: 320, height: 568 }, { width: 390, height: 844 }, { width: 481, height: 800 }, { width: 510, height: 800 }, { width: 640, height: 800 }, { width: 1440, height: 900 }]) {
+      for (const viewport of [
+        { width: 320, height: 568 },
+        { width: 390, height: 844 },
+        { width: 481, height: 800 },
+        { width: 510, height: 800 },
+        { width: 640, height: 800 },
+        { width: 1440, height: 900 },
+      ]) {
         await page.setViewportSize(viewport);
         await page.goto(base, { waitUntil: 'networkidle' });
         if (viewport.width <= 640) {
-          assert.equal(await page.locator('#station-country').isVisible(), false, 'Extra mobile filters should start collapsed');
+          assert.equal(
+            await page.locator('#station-country').isVisible(),
+            false,
+            'Extra mobile filters should start collapsed',
+          );
           const first = await page.locator('article button').first().boundingBox();
           const dock = await page.locator('[aria-label="Radio player"]').boundingBox();
-          assert.ok(first.y >= 0 && first.y + first.height <= dock.y + 1, `First station should be usable before scrolling: ${JSON.stringify({ viewport, first, dock })}`);
+          assert.ok(
+            first.y >= 0 && first.y + first.height <= dock.y + 1,
+            `First station should be usable before scrolling: ${JSON.stringify({ viewport, first, dock })}`,
+          );
           await screenshot(page, `${mode}-initial-${viewport.width}`);
         }
         await page.locator('article').last().scrollIntoViewIfNeeded();
@@ -85,7 +159,10 @@ async function main() {
         await screenshot(page, label);
         report.push({ label, dimensions });
       }
-      for (const viewport of [{ width: 844, height: 390 }, { width: 568, height: 320 }]) {
+      for (const viewport of [
+        { width: 844, height: 390 },
+        { width: 568, height: 320 },
+      ]) {
         await page.setViewportSize(viewport);
         await page.goto(`${base}/now-playing`, { waitUntil: 'networkidle' });
         const label = `${mode}-car-${viewport.width}`;
@@ -99,21 +176,46 @@ async function main() {
       await page.goto(base, { waitUntil: 'networkidle' });
       await page.locator('[aria-controls="station-refinements"]').click();
       await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
-      await page.locator('#open-player').evaluate((element) => element.focus({ preventScroll: true }));
+      await page
+        .locator('#open-player')
+        .evaluate((element) => element.focus({ preventScroll: true }));
       const fullListScroll = await page.evaluate(() => scrollY);
-      navigationDiagnostics = { expected: fullListScroll, before: await page.evaluate(() => ({ height: document.documentElement.scrollHeight, y: scrollY, padding: getComputedStyle(document.getElementById('root').firstElementChild).paddingBottom })) };
+      navigationDiagnostics = {
+        expected: fullListScroll,
+        before: await page.evaluate(() => ({
+          height: document.documentElement.scrollHeight,
+          y: scrollY,
+          padding: getComputedStyle(document.getElementById('root').firstElementChild)
+            .paddingBottom,
+        })),
+      };
       assert.ok(fullListScroll > 0, 'The mobile catalog should scroll');
       await page.keyboard.press('Enter');
       await page.waitForURL('**/now-playing');
       await page.locator('[aria-label="Radio player"]').waitFor({ state: 'detached' });
-      navigationDiagnostics.playerState = await page.evaluate(() => window.history.state?.usr?.browse);
+      navigationDiagnostics.playerState = await page.evaluate(
+        () => window.history.state?.usr?.browse,
+      );
       await page.goBack({ waitUntil: 'networkidle' });
       await page.locator('#station-search').waitFor();
-      navigationDiagnostics.after = await page.evaluate(() => ({ height: document.documentElement.scrollHeight, y: scrollY, expanded: document.querySelector('[aria-controls="station-refinements"]').getAttribute('aria-expanded') }));
-      await page.waitForFunction((expected) => Math.abs(scrollY - expected) <= 2, fullListScroll, { timeout: 5000 });
+      navigationDiagnostics.after = await page.evaluate(() => ({
+        height: document.documentElement.scrollHeight,
+        y: scrollY,
+        expanded: document
+          .querySelector('[aria-controls="station-refinements"]')
+          .getAttribute('aria-expanded'),
+      }));
+      await page.waitForFunction((expected) => Math.abs(scrollY - expected) <= 2, fullListScroll, {
+        timeout: 5000,
+      });
       assert.equal(await page.evaluate(() => document.activeElement.id), 'open-player');
-      assert.equal(await page.locator('[aria-controls="station-refinements"]').getAttribute('aria-expanded'), 'true');
-      await page.goto(`${base}/?country=GB&genre=News&language=pl&q=PRL`, { waitUntil: 'networkidle' });
+      assert.equal(
+        await page.locator('[aria-controls="station-refinements"]').getAttribute('aria-expanded'),
+        'true',
+      );
+      await page.goto(`${base}/?country=GB&genre=News&language=pl&q=PRL`, {
+        waitUntil: 'networkidle',
+      });
       assert.equal(await page.locator('article').count(), 1);
       await page.getByRole('button', { name: 'Add PRL to favorites', exact: true }).focus();
       await page.keyboard.press('Enter');
@@ -123,7 +225,9 @@ async function main() {
       assert.equal(await page.locator('article').count(), 1);
       const search = new URL(page.url()).search;
       await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
-      await page.locator('#open-player').evaluate((element) => element.focus({ preventScroll: true }));
+      await page
+        .locator('#open-player')
+        .evaluate((element) => element.focus({ preventScroll: true }));
       const scroll = await page.evaluate(() => scrollY);
       await page.keyboard.press('Enter');
       await page.waitForURL('**/now-playing');
@@ -134,7 +238,9 @@ async function main() {
       await page.locator('#station-search').waitFor();
       assert.equal(await page.locator('#station-search').inputValue(), 'PRL');
       assert.equal(await page.evaluate(() => document.activeElement.id), 'open-player');
-      await page.waitForFunction((expected) => Math.abs(scrollY - expected) <= 2, scroll, { timeout: 5000 });
+      await page.waitForFunction((expected) => Math.abs(scrollY - expected) <= 2, scroll, {
+        timeout: 5000,
+      });
       await page.getByRole('button', { name: 'Remove PRL from favorites', exact: true }).click();
       await page.getByRole('heading', { name: 'Your favorites start here' }).waitFor();
       await page.getByRole('button', { name: 'Browse all stations' }).click();
@@ -147,10 +253,16 @@ async function main() {
       assert.equal(await page.locator('article').count(), 9);
       await page.locator('#appearance').selectOption(mode === 'dark' ? 'light' : 'dark');
       await page.reload({ waitUntil: 'networkidle' });
-      assert.equal(await page.locator('#appearance').inputValue(), mode === 'dark' ? 'light' : 'dark');
+      assert.equal(
+        await page.locator('#appearance').inputValue(),
+        mode === 'dark' ? 'light' : 'dark',
+      );
       // Large text must reflow; scrolling is allowed instead of clipping controls.
       await page.addStyleTag({ content: 'html { font-size: 200%; }' });
-      assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'Large text causes horizontal overflow');
+      assert.ok(
+        await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),
+        'Large text causes horizontal overflow',
+      );
       await screenshot(page, `${mode}-large-text`);
       assert.deepEqual(errors, [], 'Browser runtime errors');
       await context.close();
@@ -174,17 +286,37 @@ async function main() {
       window.Audio.prototype = NativeAudio.prototype;
       Object.setPrototypeOf(window.Audio, NativeAudio);
     });
-    const page = await context.newPage(); activePage = page;
+    const page = await context.newPage();
+    activePage = page;
     await page.goto(base, { waitUntil: 'networkidle' });
     // Inspect the application's native audio object; preview-toolbar videos
     // belong to Netlify and are independent of radio startup behavior.
-    const audioState = await page.evaluate(() => window.__radioStartupAudio.map((audio) => ({ source: audio.getAttribute('src'), paused: audio.paused, playCalls: audio.startupPlayCalls })));
+    const audioState = await page.evaluate(() =>
+      window.__radioStartupAudio.map((audio) => ({
+        source: audio.getAttribute('src'),
+        paused: audio.paused,
+        playCalls: audio.startupPlayCalls,
+      })),
+    );
     assert.deepEqual(audioState, [{ source: null, paused: true, playCalls: 0 }]);
-    assert.equal(await page.locator('[data-player-status]').getAttribute('data-player-status'), 'idle');
+    assert.equal(
+      await page.locator('[data-player-status]').getAttribute('data-player-status'),
+      'idle',
+    );
     await context.close();
     console.log(JSON.stringify({ passed: true, scenarios: report.length, report }, null, 2));
   } catch (error) {
-    if (activePage && !activePage.isClosed()) console.error('Browser state:', { url: activePage.url(), navigationDiagnostics, position: await activePage.evaluate(() => ({ scrollY, height: document.documentElement.scrollHeight, focus: document.activeElement.id })), text: await activePage.locator('body').innerText() });
+    if (activePage && !activePage.isClosed())
+      console.error('Browser state:', {
+        url: activePage.url(),
+        navigationDiagnostics,
+        position: await activePage.evaluate(() => ({
+          scrollY,
+          height: document.documentElement.scrollHeight,
+          focus: document.activeElement.id,
+        })),
+        text: await activePage.locator('body').innerText(),
+      });
     if (activePage && !activePage.isClosed()) await screenshot(activePage, 'failure');
     throw error;
   } finally {
@@ -193,4 +325,7 @@ async function main() {
     await new Promise((resolve) => server.close(resolve));
   }
 }
-main().catch((error) => { console.error(error); process.exitCode = 1; });
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

@@ -2,8 +2,8 @@
 
 ## Scope and structure
 
-- This repository currently uses React 18, Create React App, styled-components,
-  React Router and Context API. Do not assume a Vite or Tailwind setup.
+- This repository currently uses React 18, Vite, styled-components,
+  React Router and Context API. Use Node 24 (`.nvmrc`) and the locked dependencies.
 - Application code lives in `src/`; public deployment files live in `public/`.
 - Netlify builds the source into `build/`. Never edit or commit generated build
   output, dependency directories, credentials or test reports.
@@ -24,8 +24,12 @@
 ## Verification and delivery
 
 - Add meaningful regression tests for behavioral fixes and schema migrations.
-- After the test setup is installed, `npm run check` runs unit tests and a production
-  build. Before that setup, at least run `npm run build`.
+- `npm run check` runs ESLint, Prettier, Jest, worker tests, a production build,
+  build-output checks and the initial JavaScript budget. Run it before delivery.
+- JSX belongs in `.jsx` files. Vite serves development on port 5173; preview the
+  production build on 4173 so its service worker does not control development.
+- Keep `build/asset-manifest.json` compatible with the PWA and performance scripts;
+  count all initial JavaScript chunks when checking the bundle budget.
 - Check direct routes on Netlify deploy previews; a local SPA fallback alone does
   not verify production routing.
 - For this site's current Netlify setup, target `main` to obtain a PR preview.

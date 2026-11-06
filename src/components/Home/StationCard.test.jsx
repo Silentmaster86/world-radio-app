@@ -5,9 +5,11 @@ import { darkTheme } from '../../darkTheme';
 import { render } from '../../test/render';
 
 const station = stations[0];
-const view = (props) => <ThemeProvider theme={darkTheme}>
-  <StationCard station={station} {...props} />
-</ThemeProvider>;
+const view = (props) => (
+  <ThemeProvider theme={darkTheme}>
+    <StationCard station={station} {...props} />
+  </ThemeProvider>
+);
 
 test('station selection is a native focusable button with an independent favorite action', () => {
   const onPlay = jest.fn();
@@ -28,9 +30,17 @@ test('station selection is a native focusable button with an independent favorit
 
 test('favorite state and the selected station are accessible without relying on color', () => {
   const page = render(view({ isFavorite: false, isSelected: true, playbackStatus: 'paused' }));
-  expect(page.container.querySelector('[data-station-id="capital-dance"]').getAttribute('aria-current')).toBe('true');
+  expect(
+    page.container.querySelector('[data-station-id="capital-dance"]').getAttribute('aria-current'),
+  ).toBe('true');
   expect(page.container.textContent).toContain('Paused');
-  page.rerender(view({ isFavorite: true, isSelected: true, isActive: true, playbackStatus: 'playing' }));
-  expect(page.container.querySelector('[aria-label="Remove Capital Dance from favorites"]').getAttribute('aria-pressed')).toBe('true');
+  page.rerender(
+    view({ isFavorite: true, isSelected: true, isActive: true, playbackStatus: 'playing' }),
+  );
+  expect(
+    page.container
+      .querySelector('[aria-label="Remove Capital Dance from favorites"]')
+      .getAttribute('aria-pressed'),
+  ).toBe('true');
   expect(page.container.textContent).toContain('Playing');
 });

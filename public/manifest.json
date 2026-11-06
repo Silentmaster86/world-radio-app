@@ -10,10 +10,7 @@
   "orientation": "any",
   "theme_color": "#0d1220",
   "background_color": "#0d1220",
-  "categories": [
-    "music",
-    "entertainment"
-  ],
+  "categories": ["music", "entertainment"],
   "icons": [
     {
       "src": "/icons/web-app-manifest-192x192.png",

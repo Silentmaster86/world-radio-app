@@ -1,6 +1,6 @@
 # 🌍 World Radio App
 
-A web app that streams selected live internet radio stations. Built with **React**, **styled-components**, and **Context API**.
+A web app that streams selected live internet radio stations. Built with **React**, **Vite**, **styled-components**, and **Context API**.
 
 Supports:
 
@@ -21,50 +21,33 @@ Supports:
 
 ## 📦 Folder Structure
 
-```
+```text
 world-radio-app/
-├── public/
-│   ├── icons/                     # App icons for PWA (512x512, etc.)
-│   ├── manifest.json              # PWA manifest
-│   ├── index.html
-│   ├── offline.html               # In case of error official website
-│   └── service-worker.js
-│
+├── index.html                    # Vite HTML entry
+├── vite.config.mjs               # Development and production build
+├── jest.config.cjs               # Standalone React tests
+├── eslint.config.mjs             # JavaScript, React and hooks checks
+├── public/                       # Copied unchanged into the build
+│   ├── icons/
+│   ├── manifest.json
+│   ├── offline.html
+│   ├── _headers
+│   └── _redirects
+├── scripts/                      # Worker generation, build and browser checks
 ├── src/
-│   ├── assets/                   # Static assets (images, logos)
-│   │   ├── logos/                # radio logos
-│   │   |   └── screenshots/
-│
-│   ├── components/               # Reusable components
-│   │   ├── Layout/
-│   │   │   ├── SoundBar.js
-│   │   │   └── PageTransition.js
-│
-│   ├── context/                  # React Contexts
-│   │   ├── AudioContext.js
-│   │   ├── FavoritesContext.js
-│   │   └── ThemeContext.js
-│
-│   ├── data/                     # Static data (e.g. station list)
-│   │   └── stations.js
-│
-│   ├── pages/                    # Page components (routed views)
-│   │   ├── Home.js
-│   │   └── NowPlaying.js
-│
-│   ├── Globalstyle.js            # Global styled-components
-│   ├── darkTheme.js              # Theme config (dark)
-│   ├── lightTheme.js             # Theme config (light)
-│   ├── App.js                    # Main component with routes
-│   ├── index.js                  # Entry point (with Providers)
-│   ├── service-worker.js         # Custom service worker (optional)
-│   └── serviceWorkerRegistration.js
-│
+│   ├── assets/                   # Radio logos and responsive variants
+│   ├── components/               # Shared UI (.jsx)
+│   ├── context/                  # Shared playback, favorites, theme and PWA
+│   ├── data/                     # Stations and generated logo map
+│   ├── lib/                      # Playback, storage and PWA logic
+│   ├── pages/                    # Home.jsx and NowPlaying.jsx
+│   ├── test/                     # Shared test fixtures
+│   ├── App.jsx                   # Routes
+│   └── main.jsx                  # Entry and providers
+├── docs/
+├── .nvmrc                        # Node 24
 ├── package-lock.json
-├── package.json
-├── .gitignore
-└── README.md
-
+└── package.json
 ```
 
 ---
@@ -83,7 +66,8 @@ npm ci
 npm start
 ```
 
-Run `npm run check` for regression tests and a production build. GitHub Actions
+Open http://localhost:5173. Run `npm run check` for lint, formatting, regression
+tests, a production build and the JavaScript budget. GitHub Actions
 runs the same checks on pull requests. See [AGENTS.md](./AGENTS.md) for contributor
 rules and [foundation notes](./docs/foundation.md) for favorites migration,
 Netlify preview checks and remaining follow-up work.
@@ -115,10 +99,10 @@ Includes:
 
 ```bash
 npm run build
-npx serve -s build
+npm run serve
 ```
 
-Open [http://localhost:3000](http://localhost:3000)  
+Open [http://localhost:4173](http://localhost:4173).
 Use DevTools → Application tab → Check Manifest and Service Worker
 
 ---
@@ -175,3 +159,6 @@ described in [docs/mobile-performance.md](docs/mobile-performance.md).
 Installation, offline behavior, safe updates and PWA verification are documented
 in [docs/pwa.md](docs/pwa.md). Offline access covers the app and saved stations;
 live radio needs an internet connection.
+
+Development commands, editor setup and the build/PWA contract are described in
+[docs/tooling.md](docs/tooling.md).

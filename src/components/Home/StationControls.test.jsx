@@ -5,7 +5,18 @@ import { defaultFilters, getFilterOptions } from '../../hooks/useStationFilters'
 import { stations } from '../../data/stations';
 import { render } from '../../test/render';
 
-const view = (filters, updateFilters = jest.fn()) => <ThemeProvider theme={darkTheme}><StationControls filters={{ ...defaultFilters, ...filters }} options={getFilterOptions(stations)} updateFilters={updateFilters} resetFilters={jest.fn()} total={9} favoriteCount={0} /></ThemeProvider>;
+const view = (filters, updateFilters = jest.fn()) => (
+  <ThemeProvider theme={darkTheme}>
+    <StationControls
+      filters={{ ...defaultFilters, ...filters }}
+      options={getFilterOptions(stations)}
+      updateFilters={updateFilters}
+      resetFilters={jest.fn()}
+      total={9}
+      favoriteCount={0}
+    />
+  </ThemeProvider>
+);
 test('mobile filter disclosure counts active refinements and preserves selections while collapsed', () => {
   const update = jest.fn();
   const page = render(view({ country: 'GB', genre: 'News', language: 'pl' }, update));
