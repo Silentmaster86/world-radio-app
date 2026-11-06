@@ -70,9 +70,13 @@ not changed. Its schedule and manual action become available after merging the
 workflow to `main`.
 
 Dependabot checks npm packages and GitHub Actions on Mondays at 09:00
-Europe/Warsaw. Minor and patch npm updates are grouped separately for runtime
-libraries and development tools; major updates remain individual PRs. Open
-version-update PRs are limited to three for npm and two for Actions. This
+Europe/Warsaw. React/React DOM updates share one group, including major versions. Babel Core
+with its env/React presets shares another group, with major updates temporarily
+held as explained below. These groups keep packages with matching peer
+requirements together. Other minor and patch npm
+updates are grouped separately for runtime libraries and development tools;
+other major updates remain individual PRs. Open version-update PRs are limited
+to three for npm and two for Actions. This
 configuration starts working on the repository's default branch. Immediate
 security-update PRs additionally depend on the repository's Dependabot security
 updates setting.
@@ -82,3 +86,10 @@ checks, then merge it manually. A failed audit appears as a failed check; enforc
 it as a merge requirement additionally requires a branch protection rule or
 ruleset. Review development-tool advisories separately with `npm audit`; the
 runtime check covers only production dependencies.
+
+Babel major-version updates are temporarily held in Dependabot. With Jest 30.5.2,
+`babel-preset-current-node-syntax` 1.2.0 still installs Babel 7-only syntax plugins.
+A Babel 8 trial passed the application tests but produced invalid peer
+dependencies in `npm ls --all`. Revisit the hold when that dependency supports a
+clean Babel 8 dependency tree, then migrate Core and both presets together.
+Vite development/build transforms do not depend on these Jest-only presets.
