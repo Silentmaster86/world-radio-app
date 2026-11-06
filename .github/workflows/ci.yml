@@ -64,12 +64,12 @@ jobs:
           node scripts/check-preview.cjs
           NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-ux.cjs
           NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-pwa.cjs
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: ux-browser-results
           path: test-results/ux
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: pwa-browser-results
@@ -121,7 +121,7 @@ jobs:
           PERFORMANCE_RUNS: 3
           WRA_PRODUCTION_URL: https://worldradioapp.netlify.app/
         run: NODE_PATH="$RUNNER_TEMP/wra-performance/node_modules" node scripts/measure-performance.cjs
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: performance-reports
