@@ -8,7 +8,19 @@ updates:
       time: '09:00'
       timezone: Europe/Warsaw
     open-pull-requests-limit: 3
+    ignore:
+      - dependency-name: '@babel/core'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@babel/preset-env'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@babel/preset-react'
+        update-types: ['version-update:semver-major']
     groups:
+      react:
+        patterns: [react, react-dom]
+      babel:
+        dependency-type: development
+        patterns: ['@babel/core', '@babel/preset-env', '@babel/preset-react']
       runtime:
         dependency-type: production
         update-types: [minor, patch]
