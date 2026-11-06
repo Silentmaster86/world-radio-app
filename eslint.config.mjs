@@ -4,7 +4,16 @@ import react from 'eslint-plugin-react-x';
 import hooks from 'eslint-plugin-react-hooks';
 
 export default [
-  { ignores: ['node_modules/**', 'build/**', 'coverage/**', 'test-results/**', 'playwright-report/**', '.netlify/**'] },
+  {
+    ignores: [
+      'node_modules/**',
+      'build/**',
+      'coverage/**',
+      'test-results/**',
+      'playwright-report/**',
+      '.netlify/**',
+    ],
+  },
   js.configs.recommended,
   {
     files: ['**/*.{js,jsx,cjs,mjs}'],
@@ -13,7 +22,15 @@ export default [
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
     rules: {
-      'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrors: 'none', ignoreRestSiblings: true }],
+      'no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrors: 'none',
+          ignoreRestSiblings: true,
+        },
+      ],
     },
   },
   {

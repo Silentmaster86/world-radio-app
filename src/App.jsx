@@ -9,7 +9,7 @@ import { BrowsingProvider } from './context/BrowsingContext';
 
 const AppWrapper = styled.div`
   min-height: 100dvh;
-  padding-bottom: ${({ $car, $playerHeight }) => $car ? '0' : `calc(${$playerHeight}px + 1.5rem)`};
+  padding-bottom: ${({ $car, $playerHeight }) => ($car ? '0' : `calc(${$playerHeight}px + 1.5rem)`)};
   background: ${({ theme }) => theme.colors.background};
   color: ${({ theme }) => theme.colors.text};
 `;
@@ -17,15 +17,25 @@ function AppShell() {
   const location = useLocation();
   const isCar = location.pathname === '/now-playing';
   const [playerHeight, setPlayerHeight] = useState(176);
-  return <AppWrapper $car={isCar} $playerHeight={playerHeight}>
-    <Routes>
-      <Route path='/' element={<Home />} />
-      <Route path='/now-playing' element={<NowPlaying />} />
-      <Route path='*' element={<Navigate to='/' replace />} />
-    </Routes>
-    {!isCar && <SoundBar onHeightChange={setPlayerHeight} />}
-  </AppWrapper>;
+  return (
+    <AppWrapper $car={isCar} $playerHeight={playerHeight}>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/now-playing" element={<NowPlaying />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      {!isCar && <SoundBar onHeightChange={setPlayerHeight} />}
+    </AppWrapper>
+  );
 }
 export default function App() {
-  return <PwaProvider><Router><BrowsingProvider><AppShell /></BrowsingProvider></Router></PwaProvider>;
+  return (
+    <PwaProvider>
+      <Router>
+        <BrowsingProvider>
+          <AppShell />
+        </BrowsingProvider>
+      </Router>
+    </PwaProvider>
+  );
 }

@@ -21,16 +21,21 @@ export const FavoritesProvider = ({ children }) => {
 
   const toggleFavorite = (id) => {
     if (!findStationById(id)) return;
-    setFavoriteIds((previous) => previous.includes(id)
-      ? previous.filter((item) => item !== id)
-      : [...previous, id]);
+    setFavoriteIds((previous) =>
+      previous.includes(id) ? previous.filter((item) => item !== id) : [...previous, id],
+    );
     setDirty(true);
   };
 
   return (
-    <FavoritesContext.Provider value={{
-      favoriteIds, isFavorite: (id) => favoriteIds.includes(id), toggleFavorite, storageMessage,
-    }}>
+    <FavoritesContext.Provider
+      value={{
+        favoriteIds,
+        isFavorite: (id) => favoriteIds.includes(id),
+        toggleFavorite,
+        storageMessage,
+      }}
+    >
       {children}
     </FavoritesContext.Provider>
   );

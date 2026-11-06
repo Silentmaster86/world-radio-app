@@ -1,5 +1,6 @@
 export function createInitialPlayerState(stations, options = {}) {
-  const selected = stations.find((station) => station.id === options.initialStationId) || stations[0];
+  const selected =
+    stations.find((station) => station.id === options.initialStationId) || stations[0];
   return {
     selectedStationId: selected?.id || null,
     playingStationId: null,
@@ -7,7 +8,9 @@ export function createInitialPlayerState(stations, options = {}) {
     wantsToPlay: false,
     error: null,
     retryAttempt: 0,
-    volume: Number.isFinite(options.initialVolume) ? Math.min(1, Math.max(0, options.initialVolume)) : 1,
+    volume: Number.isFinite(options.initialVolume)
+      ? Math.min(1, Math.max(0, options.initialVolume))
+      : 1,
     muted: options.initialMuted === true,
     canChangeVolume: true,
     online: options.initialOnline !== false,
@@ -16,17 +19,32 @@ export function createInitialPlayerState(stations, options = {}) {
 
 function playbackError(error) {
   if (error?.name === 'NotAllowedError') {
-    return { code: 'blocked', message: 'Playback was blocked. Press Play to start the station.', recoverable: false };
+    return {
+      code: 'blocked',
+      message: 'Playback was blocked. Press Play to start the station.',
+      recoverable: false,
+    };
   }
   if (error?.name === 'NotSupportedError' || error?.code === 4) {
-    return { code: 'unsupported', message: 'This stream is unavailable or its format is not supported.', recoverable: false };
+    return {
+      code: 'unsupported',
+      message: 'This stream is unavailable or its format is not supported.',
+      recoverable: false,
+    };
   }
   if (error?.code === 3) {
-    return { code: 'decode', message: 'This stream could not be decoded. Try another station.', recoverable: false };
+    return {
+      code: 'decode',
+      message: 'This stream could not be decoded. Try another station.',
+      recoverable: false,
+    };
   }
   return {
     code: error?.code === 'timeout' ? 'timeout' : 'network',
-    message: error?.code === 'timeout' ? 'The station took too long to connect.' : 'The connection to the station was interrupted.',
+    message:
+      error?.code === 'timeout'
+        ? 'The station took too long to connect.'
+        : 'The connection to the station was interrupted.',
     recoverable: true,
   };
 }
@@ -105,7 +123,12 @@ export function createAudioPlayer({
     if (problem.recoverable && failures < retryDelays.length) {
       const delay = retryDelays[failures];
       failures += 1;
-      publish({ status: 'connecting', playingStationId: null, retryAttempt: failures, error: null });
+      publish({
+        status: 'connecting',
+        playingStationId: null,
+        retryAttempt: failures,
+        error: null,
+      });
       retryTimer = setTimeout(() => {
         retryTimer = null;
         if (state.wantsToPlay && !disposed) startAttempt();
@@ -134,12 +157,25 @@ export function createAudioPlayer({
     }
 
     let resolve;
-    const result = new Promise((settle) => { resolve = settle; });
-    const attempt = { generation, station, resolve, result, hasPlayed: false, removeListeners: () => {} };
+    const result = new Promise((settle) => {
+      resolve = settle;
+    });
+    const attempt = {
+      generation,
+      station,
+      resolve,
+      result,
+      hasPlayed: false,
+      removeListeners: () => {},
+    };
     active = attempt;
-    const isCurrent = () => !disposed && active === attempt && generation === attempt.generation
-      && state.wantsToPlay && state.selectedStationId === station.id
-      && (!audio.currentSrc || audio.currentSrc === station.url);
+    const isCurrent = () =>
+      !disposed &&
+      active === attempt &&
+      generation === attempt.generation &&
+      state.wantsToPlay &&
+      state.selectedStationId === station.id &&
+      (!audio.currentSrc || audio.currentSrc === station.url);
     const confirmPlaying = () => {
       if (!isCurrent() || audio.paused || audio.ended || audio.readyState < 3) return;
       clearTimeout(timeout);
@@ -157,20 +193,30 @@ export function createAudioPlayer({
       playing: confirmPlaying,
       waiting: waitForData,
       stalled: waitForData,
-      error: () => { if (isCurrent() && audio.error) fail(attempt, audio.error); },
-      ended: () => { if (isCurrent() && audio.ended) fail(attempt, { code: 'ended' }); },
-      pause: () => { if (isCurrent() && attempt.hasPlayed && audio.paused && !audio.ended && !audio.error) pause(); },
+      error: () => {
+        if (isCurrent() && audio.error) fail(attempt, audio.error);
+      },
+      ended: () => {
+        if (isCurrent() && audio.ended) fail(attempt, { code: 'ended' });
+      },
+      pause: () => {
+        if (isCurrent() && attempt.hasPlayed && audio.paused && !audio.ended && !audio.error)
+          pause();
+      },
     };
     Object.entries(events).forEach(([name, handler]) => audio.addEventListener(name, handler));
-    attempt.removeListeners = () => Object.entries(events).forEach(([name, handler]) => audio.removeEventListener(name, handler));
+    attempt.removeListeners = () =>
+      Object.entries(events).forEach(([name, handler]) => audio.removeEventListener(name, handler));
     publish({ status: 'connecting', playingStationId: null, error: null });
     armTimeout(attempt);
     try {
       audio.src = station.url;
       audio.load();
-      Promise.resolve(audio.play()).then(confirmPlaying).catch((error) => {
-        if (active === attempt && generation === attempt.generation) fail(attempt, error);
-      });
+      Promise.resolve(audio.play())
+        .then(confirmPlaying)
+        .catch((error) => {
+          if (active === attempt && generation === attempt.generation) fail(attempt, error);
+        });
     } catch (error) {
       fail(attempt, error);
     }
@@ -189,16 +235,30 @@ export function createAudioPlayer({
   function pause() {
     if (disposed) return;
     invalidate();
-    publish({ wantsToPlay: false, status: 'paused', playingStationId: null, error: null, retryAttempt: 0 });
+    publish({
+      wantsToPlay: false,
+      status: 'paused',
+      playingStationId: null,
+      error: null,
+      retryAttempt: 0,
+    });
     releaseSource();
   }
 
   function selectStation(id) {
     if (disposed || !stations.some((station) => station.id === id)) return Promise.resolve(false);
-    if (id === state.selectedStationId && state.wantsToPlay) return active?.result || Promise.resolve(state.status === 'playing');
+    if (id === state.selectedStationId && state.wantsToPlay)
+      return active?.result || Promise.resolve(state.status === 'playing');
     invalidate();
     failures = 0;
-    publish({ selectedStationId: id, playingStationId: null, status: state.online ? 'connecting' : 'buffering', wantsToPlay: true, retryAttempt: 0, error: null });
+    publish({
+      selectedStationId: id,
+      playingStationId: null,
+      status: state.online ? 'connecting' : 'buffering',
+      wantsToPlay: true,
+      retryAttempt: 0,
+      error: null,
+    });
     return startAttempt();
   }
 
@@ -227,12 +287,20 @@ export function createAudioPlayer({
   return {
     getSnapshot: () => state,
     getStation: () => stations.find((station) => station.id === state.selectedStationId),
-    subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); },
-    play, pause, selectStation,
-    togglePlay: () => state.wantsToPlay ? pause() : play(),
+    subscribe(listener) {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+    play,
+    pause,
+    selectStation,
+    togglePlay: () => (state.wantsToPlay ? pause() : play()),
     nextStation: () => step(1),
     prevStation: () => step(-1),
-    retry() { pause(); return play(); },
+    retry() {
+      pause();
+      return play();
+    },
     setOnline,
     setVolume(value) {
       if (disposed || !Number.isFinite(value) || !state.canChangeVolume) return;
@@ -244,7 +312,12 @@ export function createAudioPlayer({
         publish({ canChangeVolume: false });
       }
     },
-    toggleMute() { if (!disposed) { audio.muted = !audio.muted; syncVolume(); } },
+    toggleMute() {
+      if (!disposed) {
+        audio.muted = !audio.muted;
+        syncVolume();
+      }
+    },
     dispose() {
       if (disposed) return;
       disposed = true;

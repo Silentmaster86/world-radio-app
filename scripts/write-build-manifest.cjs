@@ -27,7 +27,10 @@ function writeBuildManifest(root) {
   }
   collect('static');
   const manifest = { files, entrypoints: [...entrypoints] };
-  fs.writeFileSync(path.join(root, 'asset-manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
+  fs.writeFileSync(
+    path.join(root, 'asset-manifest.json'),
+    JSON.stringify(manifest, null, 2) + '\n',
+  );
   return manifest;
 }
 

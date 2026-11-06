@@ -9,7 +9,9 @@ export function render(element) {
   act(() => root.render(element));
   const instance = {
     container,
-    rerender(next) { act(() => root.render(next)); },
+    rerender(next) {
+      act(() => root.render(next));
+    },
     click(selector) {
       const target = container.querySelector(selector);
       if (!target) throw new Error(`Missing test target: ${selector}`);
@@ -24,4 +26,6 @@ export function render(element) {
   mounted.add(instance);
   return instance;
 }
-afterEach(() => { for (const instance of [...mounted]) instance.unmount(); });
+afterEach(() => {
+  for (const instance of [...mounted]) instance.unmount();
+});

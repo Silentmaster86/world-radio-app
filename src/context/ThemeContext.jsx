@@ -8,15 +8,31 @@ const modes = ['system', 'light', 'dark'];
 const ThemeContext = createContext();
 export const useTheme = () => useContext(ThemeContext);
 function systemQuery() {
-  try { return window.matchMedia?.('(prefers-color-scheme: dark)') || null; } catch { return null; }
+  try {
+    return window.matchMedia?.('(prefers-color-scheme: dark)') || null;
+  } catch {
+    return null;
+  }
 }
 function readPreference() {
-  const result = readStorage(THEME_KEY, null, (value) => value && Number.isInteger(value.version) && value.version >= 1 && (value.version > 1 || modes.includes(value.mode)));
+  const result = readStorage(
+    THEME_KEY,
+    null,
+    (value) =>
+      value &&
+      Number.isInteger(value.version) &&
+      value.version >= 1 &&
+      (value.version > 1 || modes.includes(value.mode)),
+  );
   const future = result.value?.version > 1;
   return {
     mode: result.value?.version === 1 ? result.value.mode : 'system',
     preserve: future,
-    message: future ? 'Newer appearance settings are preserved. Changes apply for this session.' : result.status === 'unavailable' ? 'Appearance changes apply for this session because storage is unavailable.' : '',
+    message: future
+      ? 'Newer appearance settings are preserved. Changes apply for this session.'
+      : result.status === 'unavailable'
+        ? 'Appearance changes apply for this session because storage is unavailable.'
+        : '',
   };
 }
 export function ThemeProviderToggle({ children }) {
@@ -55,7 +71,17 @@ export function ThemeProviderToggle({ children }) {
     if (!modes.includes(next)) return;
     setMode(next);
     if (!initial.preserve)
-      setMessage(writeStorage(THEME_KEY, { version: 1, mode: next }) ? '' : 'Appearance changes apply for this session because storage is unavailable.');
+      setMessage(
+        writeStorage(THEME_KEY, { version: 1, mode: next })
+          ? ''
+          : 'Appearance changes apply for this session because storage is unavailable.',
+      );
   };
-  return <ThemeContext.Provider value={{ mode, setThemeMode, isDarkMode, theme, storageMessage: message }}>{children}</ThemeContext.Provider>;
+  return (
+    <ThemeContext.Provider
+      value={{ mode, setThemeMode, isDarkMode, theme, storageMessage: message }}
+    >
+      {children}
+    </ThemeContext.Provider>
+  );
 }

@@ -4,12 +4,15 @@ module.exports = {
   testEnvironmentOptions: { url: 'http://localhost/' },
   setupFilesAfterEnv: ['<rootDir>/src/setupTests.js'],
   transform: {
-    '^.+\\.[jt]sx?$': ['babel-jest', {
-      presets: [
-        ['@babel/preset-env', { targets: { node: 'current' } }],
-        ['@babel/preset-react', { runtime: 'automatic' }],
-      ],
-    }],
+    '^.+\\.[jt]sx?$': [
+      'babel-jest',
+      {
+        presets: [
+          ['@babel/preset-env', { targets: { node: 'current' } }],
+          ['@babel/preset-react', { runtime: 'automatic' }],
+        ],
+      },
+    ],
   },
   moduleNameMapper: {
     '^react-router-dom$': '<rootDir>/node_modules/react-router-dom/dist/index.js',

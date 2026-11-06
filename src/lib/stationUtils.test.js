@@ -1,5 +1,11 @@
 import { stations } from '../data/stations';
-import { findStationById, resolveLegacyStationId, getCountryFlag, getCountryName, normalizeStationQuery } from './stationUtils';
+import {
+  findStationById,
+  resolveLegacyStationId,
+  getCountryFlag,
+  getCountryName,
+  normalizeStationQuery,
+} from './stationUtils';
 
 test('station IDs are unique and country, language and genres have distinct fields', () => {
   expect(new Set(stations.map((station) => station.id)).size).toBe(9);
@@ -14,8 +20,12 @@ test('station IDs are unique and country, language and genres have distinct fiel
 });
 
 test('legacy resolution never depends on the old URL or logo hash', () => {
-  expect(resolveLegacyStationId({ name: 'Capital Dance', url: 'old', logo: 'old' })).toBe('capital-dance');
-  expect(resolveLegacyStationId({ id: 'capital-dance', name: 'Renamed station' })).toBe('capital-dance');
+  expect(resolveLegacyStationId({ name: 'Capital Dance', url: 'old', logo: 'old' })).toBe(
+    'capital-dance',
+  );
+  expect(resolveLegacyStationId({ id: 'capital-dance', name: 'Renamed station' })).toBe(
+    'capital-dance',
+  );
   expect(resolveLegacyStationId(null)).toBeUndefined();
   expect(resolveLegacyStationId({ name: 'Unknown' })).toBeUndefined();
 });

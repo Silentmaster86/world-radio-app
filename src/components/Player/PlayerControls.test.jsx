@@ -8,10 +8,28 @@ import PlayerControls from './PlayerControls';
 jest.mock('../../context/AudioContext', () => ({ useAudio: jest.fn() }));
 let actions;
 beforeEach(() => {
-  actions = { togglePlay: jest.fn(), nextStation: jest.fn(), prevStation: jest.fn(), changeVolume: jest.fn(), toggleMute: jest.fn() };
-  useAudio.mockReturnValue({ ...actions, status: 'idle', wantsToPlay: false, volume: 0.6, muted: false, canChangeVolume: true });
+  actions = {
+    togglePlay: jest.fn(),
+    nextStation: jest.fn(),
+    prevStation: jest.fn(),
+    changeVolume: jest.fn(),
+    toggleMute: jest.fn(),
+  };
+  useAudio.mockReturnValue({
+    ...actions,
+    status: 'idle',
+    wantsToPlay: false,
+    volume: 0.6,
+    muted: false,
+    canChangeVolume: true,
+  });
 });
-const mount = (props = {}) => render(<ThemeProvider theme={darkTheme}><PlayerControls {...props} /></ThemeProvider>);
+const mount = (props = {}) =>
+  render(
+    <ThemeProvider theme={darkTheme}>
+      <PlayerControls {...props} />
+    </ThemeProvider>,
+  );
 
 test('names all transport buttons and delegates actions to the controller', () => {
   const page = mount();
@@ -23,14 +41,16 @@ test('names all transport buttons and delegates actions to the controller', () =
   expect(actions.nextStation).toHaveBeenCalledTimes(1);
 });
 
-test.each([['playing', 'Pause'], ['buffering', 'Pause'], ['connecting', 'Cancel connection']])(
-  'offers %s cancellation with the label %s', (status, label) => {
-    useAudio.mockReturnValue({ ...actions, wantsToPlay: true, status, volume: 1, muted: false });
-    const page = mount();
-    page.click(`[aria-label="${label}"]`);
-    expect(actions.togglePlay).toHaveBeenCalledTimes(1);
-  },
-);
+test.each([
+  ['playing', 'Pause'],
+  ['buffering', 'Pause'],
+  ['connecting', 'Cancel connection'],
+])('offers %s cancellation with the label %s', (status, label) => {
+  useAudio.mockReturnValue({ ...actions, wantsToPlay: true, status, volume: 1, muted: false });
+  const page = mount();
+  page.click(`[aria-label="${label}"]`);
+  expect(actions.togglePlay).toHaveBeenCalledTimes(1);
+});
 
 test('volume changes are numeric and mute has an accessible state', () => {
   const page = mount();
@@ -43,7 +63,9 @@ test('volume changes are numeric and mute has an accessible state', () => {
   expect(actions.changeVolume).toHaveBeenCalledWith(0.25);
   page.click('[aria-label=Mute]');
   expect(actions.toggleMute).toHaveBeenCalledTimes(1);
-  expect(page.container.querySelector('[aria-label=Mute]').getAttribute('aria-pressed')).toBe('false');
+  expect(page.container.querySelector('[aria-label=Mute]').getAttribute('aria-pressed')).toBe(
+    'false',
+  );
 });
 
 test('showVolume=false hides the volume UI', () => {
@@ -52,9 +74,17 @@ test('showVolume=false hides the volume UI', () => {
 });
 
 test('platforms without volume support receive device guidance instead of a false slider', () => {
-  useAudio.mockReturnValue({ ...actions, status: 'idle', volume: 1, muted: true, canChangeVolume: false });
+  useAudio.mockReturnValue({
+    ...actions,
+    status: 'idle',
+    volume: 1,
+    muted: true,
+    canChangeVolume: false,
+  });
   const page = mount();
   expect(page.container.querySelector('input[type=range]')).toBeNull();
   expect(page.container.textContent).toContain('Use device volume controls');
-  expect(page.container.querySelector('[aria-label=Unmute]').getAttribute('aria-pressed')).toBe('true');
+  expect(page.container.querySelector('[aria-label=Unmute]').getAttribute('aria-pressed')).toBe(
+    'true',
+  );
 });

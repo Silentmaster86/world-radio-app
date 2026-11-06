@@ -28,13 +28,26 @@ export default function PlayerStatus({ announce = true }) {
     paused: 'Paused',
     error: error?.message || 'The station is currently unavailable.',
   };
-  const message = online === false && status !== 'playing'
-    ? wantsToPlay ? 'Offline. Waiting for a connection…' : pwa?.offlineReady ? 'Offline. Saved stations are available; connect to listen.' : 'Offline. Connect to listen.'
-    : labels[status];
+  const message =
+    online === false && status !== 'playing'
+      ? wantsToPlay
+        ? 'Offline. Waiting for a connection…'
+        : pwa?.offlineReady
+          ? 'Offline. Saved stations are available; connect to listen.'
+          : 'Offline. Connect to listen.'
+      : labels[status];
   return (
-    <Status role={announce ? 'status' : undefined} aria-live={announce ? 'polite' : undefined} data-player-status={status}>
+    <Status
+      role={announce ? 'status' : undefined}
+      aria-live={announce ? 'polite' : undefined}
+      data-player-status={status}
+    >
       {message}
-      {status === 'error' && <button type="button" onClick={retry} aria-label="Retry current station">Try again</button>}
+      {status === 'error' && (
+        <button type="button" onClick={retry} aria-label="Retry current station">
+          Try again
+        </button>
+      )}
       {preferenceMessage && <small style={{ display: 'block' }}>{preferenceMessage}</small>}
     </Status>
   );

@@ -3,17 +3,17 @@
 Use Node 24 (see `.nvmrc`) and `npm ci`. Vite runs the application; Jest runs the
 existing React and library tests independently of the bundler.
 
-| Command | Purpose |
-| --- | --- |
-| `npm start` | Development server at http://localhost:5173 with React Fast Refresh |
-| `npm test` | Run the Jest suite once |
-| `npm run test:watch` | Rerun relevant Jest tests while editing |
-| `npm run lint` | Check JavaScript, JSX and React hooks |
-| `npm run format` | Format the repository with Prettier |
-| `npm run format:check` | Check formatting without changing files |
-| `npm run build` | Build to `build/`, write asset metadata, generate the PWA worker |
-| `npm run serve` | Preview the production build at http://localhost:4173 |
-| `npm run check` | Run formatting, lint, all unit tests, build and bundle checks |
+| Command                | Purpose                                                             |
+| ---------------------- | ------------------------------------------------------------------- |
+| `npm start`            | Development server at http://localhost:5173 with React Fast Refresh |
+| `npm test`             | Run the Jest suite once                                             |
+| `npm run test:watch`   | Rerun relevant Jest tests while editing                             |
+| `npm run lint`         | Check JavaScript, JSX and React hooks                               |
+| `npm run format`       | Format the repository with Prettier                                 |
+| `npm run format:check` | Check formatting without changing files                             |
+| `npm run build`        | Build to `build/`, write asset metadata, generate the PWA worker    |
+| `npm run serve`        | Preview the production build at http://localhost:4173               |
+| `npm run check`        | Run formatting, lint, all unit tests, build and bundle checks       |
 
 Use ESLint and Prettier editor integrations with the repository configurations.
 The `.editorconfig` sets UTF-8, LF and two-space indentation. Generated logo

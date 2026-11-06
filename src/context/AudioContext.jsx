@@ -2,7 +2,11 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { stations } from '../data/stations';
 import { createAudioPlayer, createInitialPlayerState } from '../lib/audioPlayer';
 import { bindMediaSession } from '../lib/mediaSession';
-import { loadPlayerPreferences, savePlayerPreferences, PLAYER_SESSION_MESSAGE } from '../lib/playerPreferences';
+import {
+  loadPlayerPreferences,
+  savePlayerPreferences,
+  PLAYER_SESSION_MESSAGE,
+} from '../lib/playerPreferences';
 
 const AudioContext = createContext();
 export const useAudio = () => useContext(AudioContext);
@@ -11,15 +15,28 @@ export function AudioProvider({ children }) {
   const playerRef = useRef(null);
   const [settings] = useState(() => loadPlayerPreferences(stations));
   const [preferenceMessage, setPreferenceMessage] = useState(settings.message);
-  const lastSaved = useRef(JSON.stringify({ stationId: settings.stationId, volume: settings.volume, muted: settings.muted }));
-  const [snapshot, setSnapshot] = useState(() => createInitialPlayerState(stations, {
-    initialStationId: settings.stationId, initialVolume: settings.volume, initialMuted: settings.muted,
-  }));
+  const lastSaved = useRef(
+    JSON.stringify({
+      stationId: settings.stationId,
+      volume: settings.volume,
+      muted: settings.muted,
+    }),
+  );
+  const [snapshot, setSnapshot] = useState(() =>
+    createInitialPlayerState(stations, {
+      initialStationId: settings.stationId,
+      initialVolume: settings.volume,
+      initialMuted: settings.muted,
+    }),
+  );
 
   useEffect(() => {
     const player = createAudioPlayer({
-      stations, initialOnline: navigator.onLine,
-      initialStationId: settings.stationId, initialVolume: settings.volume, initialMuted: settings.muted,
+      stations,
+      initialOnline: navigator.onLine,
+      initialStationId: settings.stationId,
+      initialVolume: settings.volume,
+      initialMuted: settings.muted,
     });
     playerRef.current = player;
     const unsubscribe = player.subscribe(setSnapshot);
@@ -41,7 +58,11 @@ export function AudioProvider({ children }) {
 
   useEffect(() => {
     if (!settings.canPersist) return;
-    const value = { stationId: snapshot.selectedStationId, volume: snapshot.volume, muted: snapshot.muted };
+    const value = {
+      stationId: snapshot.selectedStationId,
+      volume: snapshot.volume,
+      muted: snapshot.muted,
+    };
     const serialized = JSON.stringify(value);
     if (serialized === lastSaved.current) return;
     if (savePlayerPreferences(value)) {
@@ -54,21 +75,28 @@ export function AudioProvider({ children }) {
 
   const invoke = (name, ...args) => playerRef.current?.[name](...args);
   const currentStation = stations.find((station) => station.id === snapshot.selectedStationId);
-  return <AudioContext.Provider value={{
-    ...snapshot,
-    preferenceMessage,
-    currentStation,
-    playingStation: stations.find((station) => station.id === snapshot.playingStationId) || null,
-    isPlaying: snapshot.status === 'playing',
-    selectStation: (id) => invoke('selectStation', id),
-    setStation: (station) => invoke('selectStation', station?.id),
-    play: () => invoke('play'),
-    pause: () => invoke('pause'),
-    retry: () => invoke('retry'),
-    togglePlay: () => invoke('togglePlay'),
-    nextStation: () => invoke('nextStation'),
-    prevStation: () => invoke('prevStation'),
-    changeVolume: (volume) => invoke('setVolume', volume),
-    toggleMute: () => invoke('toggleMute'),
-  }}>{children}</AudioContext.Provider>;
+  return (
+    <AudioContext.Provider
+      value={{
+        ...snapshot,
+        preferenceMessage,
+        currentStation,
+        playingStation:
+          stations.find((station) => station.id === snapshot.playingStationId) || null,
+        isPlaying: snapshot.status === 'playing',
+        selectStation: (id) => invoke('selectStation', id),
+        setStation: (station) => invoke('selectStation', station?.id),
+        play: () => invoke('play'),
+        pause: () => invoke('pause'),
+        retry: () => invoke('retry'),
+        togglePlay: () => invoke('togglePlay'),
+        nextStation: () => invoke('nextStation'),
+        prevStation: () => invoke('prevStation'),
+        changeVolume: (volume) => invoke('setVolume', volume),
+        toggleMute: () => invoke('toggleMute'),
+      }}
+    >
+      {children}
+    </AudioContext.Provider>
+  );
 }
