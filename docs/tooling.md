@@ -31,7 +31,7 @@ inline JavaScript strings. Source maps are emitted for performance diagnostics.
 
 `scripts/write-build-manifest.cjs` converts Vite's `.vite/manifest.json` into the
 project's `asset-manifest.json`. The PWA generator reads this file to precache
-generated assets with revision hashes. Both the 100 KiB gzip budget and
+generated assets with revision hashes. Both the 125 KiB gzip budget and
 Lighthouse comparison sum **all initial JavaScript chunks**, while deferred
 chunks are excluded from that startup total. Build-output regression tests check
 the manifest contract and the generated HTML entry.

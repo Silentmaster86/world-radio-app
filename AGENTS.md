@@ -2,7 +2,7 @@
 
 ## Scope and structure
 
-- This repository currently uses React 18, Vite, styled-components,
+- This repository currently uses React 19, Vite, styled-components,
   React Router and Context API. Use Node 24 (`.nvmrc`) and the locked dependencies.
 - Application code lives in `src/`; public deployment files live in `public/`.
 - Netlify builds the source into `build/`. Never edit or commit generated build

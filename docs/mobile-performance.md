@@ -27,7 +27,7 @@ layout shift alongside the overall score.
 
 ## Verification
 
-`npm run check` runs unit tests, the production build and a 100 KiB gzip budget
+`npm run check` runs unit tests, the production build and a 125 KiB gzip budget
 for the initial main JavaScript file. `npm run check:bundle` checks an existing
 build. A new large dependency must fit that budget or be deferred deliberately.
 
@@ -64,3 +64,12 @@ remain covered.
 On a real device, check keyboard behavior, iOS safe areas, streaming and volume
 controls. Save the mobile Lighthouse JSON when comparing with local DevTools;
 keep the same URL, device/throttling profile and cold-cache conditions.
+
+## React 19 runtime budget
+
+React and React DOM are upgraded together to 19.3.1. The measured initial gzip
+JavaScript grows from 88,885 bytes on React 18 to 111,607 bytes on React 19,
+using the same Vite build configuration. The budget is 125 KiB to account for
+this runtime increase and retain room for maintenance updates. All initial
+chunks still count toward the limit. Review the baseline/candidate Lighthouse
+reports alongside this explicit bundle-size tradeoff.

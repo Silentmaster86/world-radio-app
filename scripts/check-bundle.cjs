@@ -1,7 +1,7 @@
 const assert = require('node:assert/strict');
 const { initialJavaScript } = require('./build-assets.cjs');
 const bytes = initialJavaScript('build').gzipBytes;
-const limit = 100 * 1024;
+const limit = 125 * 1024;
 assert.ok(
   bytes <= limit,
   `Initial JavaScript is ${bytes} gzip bytes, above the ${limit}-byte budget. Review new dependencies or split deferred features.`,
