@@ -86,8 +86,8 @@ against the production build using Chromium. It checks:
 - No media request or autoplay at startup. It does not fake a successful real
   stream and does not use stream availability as a layout-test dependency.
 
-Local Chromium cannot start under the execution sandbox (`sandbox_host_linux`
-operation not permitted), so browser checks run on the GitHub-hosted runner.
+Browser checks run on the GitHub-hosted runner and can also run locally where
+Chromium and its required system libraries are available.
 Automated Chromium/axe results do not replace physical-device and visual review.
 
 On the Netlify preview, also open `/now-playing` directly and refresh it; verify
@@ -100,3 +100,9 @@ Netlify status on the exact head commit, verifies HTTP/HTML/script responses on
 `/` and `/now-playing`, then repeats the browser checks on that preview. Build
 and preview reports use separate directories in the workflow artifact. The
 built-in server alone does not establish that Netlify's route fallback works.
+
+Preview browser fixtures block Netlify's injected `/.netlify/scripts/cdp` loader.
+Its collaboration drawer can cover mobile controls; it is host review UI rather
+than part of the application. Application documents, assets and service workers
+are still fetched from the real preview. This exclusion changes only the test
+browser, not the deployed app or collaboration settings.

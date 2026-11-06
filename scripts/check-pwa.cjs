@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const http = require('node:http');
 const { chromium } = require('playwright');
+const { createAppContext } = require('./browser-context.cjs');
 const output = path.resolve('test-results/pwa', process.env.WRA_BASE_URL ? 'preview' : 'build');
 fs.mkdirSync(output, { recursive: true });
 const root = path.resolve('build');
@@ -72,7 +73,7 @@ async function main() {
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
   const base = process.env.WRA_BASE_URL || `http://127.0.0.1:${server.address().port}`;
   const browser = await chromium.launch();
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const context = await createAppContext(browser, { viewport: { width: 390, height: 844 } });
   await context.addInitScript(() => {
     window.addEventListener('beforeinstallprompt', (event) => {
       event.preventDefault();

@@ -48,9 +48,8 @@ that ignore volume writes, the UI directs the user to device volume controls.
 
 ## Verification
 
-This stage depends on foundation PR #1. Review/merge that foundation first, then
-playback PR #2. Both drafts target `main` so the current Netlify configuration can
-create previews; until #1 merges, #2 also contains its prerequisite commits.
+The foundation and playback stages are merged. Current PRs target `main` for
+Netlify previews; see [tooling.md](tooling.md) for the delivery checks.
 
 Run `npm run check`. Regression tests use a controllable audio element for controlled
 event ordering, deferred play promises, retry timers, offline/online, cancellation,
@@ -63,5 +62,6 @@ station selection with Tab/Enter/Space, and media keys on a physical device.
 Unit/DOM checks do not certify native codecs, lock-screen integration or iOS
 volume behavior.
 
-The persistent mini player, combined filters, full theme/contrast work, landscape
-car layout, PWA offline updates and build-tool migration are later stages.
+The persistent mini player, combined filters, themes, car layout, PWA updates and
+Vite migration are implemented. The [sleep timer](sleep-timer.md) pauses this same
+controller. See [roadmap.md](roadmap.md) for remaining product work.

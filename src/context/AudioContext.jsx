@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { stations } from '../data/stations';
 import { createAudioPlayer, createInitialPlayerState } from '../lib/audioPlayer';
 import { bindMediaSession } from '../lib/mediaSession';
+import { createSleepTimer } from '../lib/sleepTimer';
 import {
   loadPlayerPreferences,
   savePlayerPreferences,
@@ -13,6 +14,8 @@ export const useAudio = () => useContext(AudioContext);
 
 export function AudioProvider({ children }) {
   const playerRef = useRef(null);
+  const timerRef = useRef(null);
+  const [sleepTimerDeadline, setSleepTimerDeadline] = useState(null);
   const [settings] = useState(() => loadPlayerPreferences(stations));
   const [preferenceMessage, setPreferenceMessage] = useState(settings.message);
   const lastSaved = useRef(
@@ -39,17 +42,34 @@ export function AudioProvider({ children }) {
       initialMuted: settings.muted,
     });
     playerRef.current = player;
-    const unsubscribe = player.subscribe(setSnapshot);
+    const timer = createSleepTimer({ onExpire: () => player.pause() });
+    timerRef.current = timer;
+    const unsubscribeTimer = timer.subscribe(setSleepTimerDeadline);
+    let wantedPlayback = player.getSnapshot().wantsToPlay;
+    const unsubscribe = player.subscribe((state) => {
+      if (wantedPlayback && !state.wantsToPlay) timer.cancel();
+      wantedPlayback = state.wantsToPlay;
+      setSnapshot(state);
+    });
     setSnapshot(player.getSnapshot());
     const unbindMediaSession = bindMediaSession(player);
     const online = () => player.setOnline(true);
     const offline = () => player.setOnline(false);
     window.addEventListener('online', online);
     window.addEventListener('offline', offline);
+    window.addEventListener('focus', timer.check);
+    window.addEventListener('pageshow', timer.check);
+    document.addEventListener('visibilitychange', timer.check);
     return () => {
       unsubscribe();
+      unsubscribeTimer();
+      timer.dispose();
+      timerRef.current = null;
       window.removeEventListener('online', online);
       window.removeEventListener('offline', offline);
+      window.removeEventListener('focus', timer.check);
+      window.removeEventListener('pageshow', timer.check);
+      document.removeEventListener('visibilitychange', timer.check);
       unbindMediaSession();
       player.dispose();
       playerRef.current = null;
@@ -84,10 +104,16 @@ export function AudioProvider({ children }) {
         playingStation:
           stations.find((station) => station.id === snapshot.playingStationId) || null,
         isPlaying: snapshot.status === 'playing',
+        sleepTimerDeadline,
+        setSleepTimer: (minutes) => timerRef.current?.start(minutes),
+        cancelSleepTimer: () => timerRef.current?.cancel(),
         selectStation: (id) => invoke('selectStation', id),
         setStation: (station) => invoke('selectStation', station?.id),
         play: () => invoke('play'),
-        pause: () => invoke('pause'),
+        pause: () => {
+          timerRef.current?.cancel();
+          return invoke('pause');
+        },
         retry: () => invoke('retry'),
         togglePlay: () => invoke('togglePlay'),
         nextStation: () => invoke('nextStation'),

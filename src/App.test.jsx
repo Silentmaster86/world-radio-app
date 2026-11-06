@@ -194,6 +194,30 @@ test('direct entry to car mode can return to the catalog without autoplay', () =
   expect(page.container.querySelectorAll('[data-station-title]')).toHaveLength(9);
 });
 
+test('sleep timer survives navigation to car mode and pauses the same audio element', async () => {
+  jest.useFakeTimers();
+  const page = mount();
+  try {
+    await act(async () => page.container.querySelector('[aria-label="Play"]').click());
+    const audio = window.Audio.mock.results[0].value;
+    page.click('[data-sleep-timer]');
+    page.click('[data-sleep-minutes="15"]');
+    page.click('#open-player');
+    expect(page.container.querySelector('[data-sleep-timer]').getAttribute('aria-pressed')).toBe(
+      'true',
+    );
+    act(() => jest.advanceTimersByTime(15 * 60_000));
+    expect(
+      page.container.querySelector('[data-player-status]').getAttribute('data-player-status'),
+    ).toBe('paused');
+    expect(audio.src).toBe('');
+    expect(window.Audio).toHaveBeenCalledTimes(1);
+  } finally {
+    page.unmount();
+    jest.useRealTimers();
+  }
+});
+
 test('rapid edits preserve every filter before the router finishes rendering', () => {
   const page = mount();
   const country = page.container.querySelector('#station-country');

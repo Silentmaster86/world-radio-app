@@ -5,6 +5,7 @@ import { useAudio } from '../../context/AudioContext';
 import { usePlayerNavigation } from '../../context/BrowsingContext';
 import PlayerControls from '../Player/PlayerControls';
 import PlayerStatus from '../Player/PlayerStatus';
+import SleepTimer from '../Player/SleepTimer';
 import InstallApp from '../Pwa/InstallApp';
 import UpdateNotice from '../Pwa/UpdateNotice';
 import StationLogo from '../StationLogo';
@@ -18,6 +19,10 @@ const Dock = styled.aside`
   background: ${({ theme }) => theme.colors.surface || theme.colors.background};
   border-top: 1px solid ${({ theme }) => theme.colors.muted};
   box-shadow: 0 -4px 24px #0002;
+  @media (max-width: 640px) {
+    padding-top: 0.375rem;
+    padding-bottom: calc(0.375rem + env(safe-area-inset-bottom));
+  }
 `;
 const Content = styled.div`
   max-width: 1200px;
@@ -27,7 +32,7 @@ const Content = styled.div`
   align-items: center;
   gap: 0.6rem 1rem;
   @media (max-width: 640px) {
-    gap: 0.5rem;
+    gap: 0.25rem 0.5rem;
   }
 `;
 const Info = styled.div`
@@ -59,6 +64,13 @@ const Info = styled.div`
 `;
 const StatusRow = styled.div`
   grid-column: 1 / -1;
+`;
+const StatusLine = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 `;
 const OpenButton = styled.button`
   display: grid;
@@ -116,7 +128,10 @@ export default function SoundBar({ onHeightChange }) {
         </OpenButton>
         <InstallApp />
         <StatusRow>
-          <PlayerStatus />
+          <StatusLine>
+            <PlayerStatus />
+            <SleepTimer />
+          </StatusLine>
           <UpdateNotice />
         </StatusRow>
       </Content>

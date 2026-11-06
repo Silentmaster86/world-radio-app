@@ -6,6 +6,7 @@ import { useAudio } from '../context/AudioContext';
 import { getCountryFlag, getCountryName } from '../lib/stationUtils';
 import PlayerStatus from '../components/Player/PlayerStatus';
 import PlayerControls from '../components/Player/PlayerControls';
+import SleepTimer from '../components/Player/SleepTimer';
 import StationLogo from '../components/StationLogo';
 
 const Wrapper = styled.main`
@@ -123,6 +124,7 @@ export default function NowPlaying() {
           <HomeButton type="button" onClick={returnToStations} aria-label="Back to stations">
             <FaHome aria-hidden="true" />
           </HomeButton>
+          <SleepTimer compact />
           <CarBadge>
             <FaCarSide aria-hidden="true" /> Car Mode
           </CarBadge>
