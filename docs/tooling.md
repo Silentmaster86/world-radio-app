@@ -52,3 +52,33 @@ layouts, accessibility and PWA behavior on the build and Netlify preview, then
 compares baseline/candidate Lighthouse reports. Keep browser tools isolated from
 the application dependencies. Review their artifacts alongside the checks.
 Target `main` for Netlify previews; do not merge a failing deployment.
+
+## Dependency maintenance
+
+`npm run check:security` audits the locked production dependencies against the
+npm advisory registry. It requires network access and fails for high or critical
+findings, or if the audit cannot complete. Lower-severity findings are reported
+without failing the command. The regular `npm run check` remains independent of
+the registry audit.
+
+The `Runtime dependency audit` workflow runs this command for every pull request,
+push to `main`, and on Mondays at 07:23 UTC. It can also be started from GitHub
+Actions with **Run workflow**. The audit reads `package-lock.json` directly, so
+this job does not need to install dependencies or execute package install scripts.
+The scheduled run can detect newly published advisories even when the code has
+not changed. Its schedule and manual action become available after merging the
+workflow to `main`.
+
+Dependabot checks npm packages and GitHub Actions on Mondays at 09:00
+Europe/Warsaw. Minor and patch npm updates are grouped separately for runtime
+libraries and development tools; major updates remain individual PRs. Open
+version-update PRs are limited to three for npm and two for Actions. This
+configuration starts working on the repository's default branch. Immediate
+security-update PRs additionally depend on the repository's Dependabot security
+updates setting.
+
+Review each dependency PR with the existing unit, browser, PWA and performance
+checks, then merge it manually. A failed audit appears as a failed check; enforcing
+it as a merge requirement additionally requires a branch protection rule or
+ruleset. Review development-tool advisories separately with `npm audit`; the
+runtime check covers only production dependencies.
