@@ -5,6 +5,7 @@ const http = require('node:http');
 const path = require('node:path');
 const { chromium } = require('playwright');
 const { AxeBuilder } = require('@axe-core/playwright');
+const { createAppContext } = require('./browser-context.cjs');
 const reportDir = path.resolve('test-results/ux', process.env.WRA_BASE_URL ? 'preview' : 'build');
 fs.mkdirSync(reportDir, { recursive: true });
 const root = path.resolve('build');
@@ -118,7 +119,7 @@ async function main() {
   let navigationDiagnostics;
   try {
     for (const mode of ['light', 'dark']) {
-      const context = await browser.newContext({
+      const context = await createAppContext(browser, {
         colorScheme: mode,
         reducedMotion: 'reduce',
         deviceScaleFactor: mode === 'dark' ? 2 : 1,
@@ -291,7 +292,7 @@ async function main() {
       await context.close();
     }
     // Use real Audio here: startup must not request a stream or autoplay.
-    const context = await browser.newContext();
+    const context = await createAppContext(browser);
     await context.addInitScript(() => {
       const NativeAudio = window.Audio;
       window.__radioStartupAudio = [];
