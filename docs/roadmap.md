@@ -13,10 +13,12 @@ history; their original follow-up lists are no longer the current backlog.
 - Vite, React/React DOM 19, standalone Jest, ESLint/Prettier and build/browser CI.
 - Runtime advisory checks and grouped Dependabot updates. Babel 8 is deliberately held.
 
-## Current product feature
+## Recent product features
 
 - Sleep timer: selectable duration, shared countdown, cancellation and automatic pause.
   See [sleep-timer.md](sleep-timer.md) for behavior and background-timing limits.
+- Recent stations: a bounded local list of confirmed playback, recency ordering,
+  filtering and independent clearing. See [recent-stations.md](recent-stations.md).
 
 ## Next work, in priority order
 
@@ -25,11 +27,9 @@ history; their original follow-up lists are no longer the current backlog.
    stream reachability and Chromium fixtures do not establish those behaviors.
    PR Chicago's publisher source has been verified and its current endpoint is
    documented in [station-sources.md](station-sources.md).
-2. **Recent stations.** Add a bounded list of stations actually listened to.
-   The last selected station already restores today; history would add a list.
-3. **Expanded catalog.** Evaluate a station-directory source, search/pagination,
+2. **Expanded catalog.** Evaluate a station-directory source, search/pagination,
    caching/fallback and verification of station identities and stream formats.
-4. **Interface and language refinement.** Apply findings from phone testing;
+3. **Interface and language refinement.** Apply findings from phone testing;
    consider Polish/English UI and direct station sharing.
 
 These are product improvements and verification tasks, not a list of confirmed
