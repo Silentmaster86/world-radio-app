@@ -19,6 +19,9 @@ history; their original follow-up lists are no longer the current backlog.
   See [sleep-timer.md](sleep-timer.md) for behavior and background-timing limits.
 - Recent stations: a bounded local list of confirmed playback, recency ordering,
   filtering and independent clearing. See [recent-stations.md](recent-stations.md).
+- Expanded curated catalog: 18 stations, nine publisher-sourced additions,
+  keyword search and paged reveal with offline/return continuity. See
+  [catalog.md](catalog.md) for behavior and the directory evaluation.
 
 ## Next work, in priority order
 
@@ -27,8 +30,9 @@ history; their original follow-up lists are no longer the current backlog.
    stream reachability and Chromium fixtures do not establish those behaviors.
    PR Chicago's publisher source has been verified and its current endpoint is
    documented in [station-sources.md](station-sources.md).
-2. **Expanded catalog.** Evaluate a station-directory source, search/pagination,
-   caching/fallback and verification of station identities and stream formats.
+2. **Worldwide directory discovery.** Build on the Radio Browser evaluation in
+   [catalog.md](catalog.md): mirror discovery, result normalization, persistent
+   added stations, bounded caching/offline fallback and identity verification.
 3. **Interface and language refinement.** Apply findings from phone testing;
    consider Polish/English UI and direct station sharing.
 
