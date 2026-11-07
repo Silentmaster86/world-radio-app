@@ -26,18 +26,6 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      # Temporary format capture, removed before review.
-      - name: Capture Prettier output for new diagnostics
-        run: |
-          npx prettier --write scripts/check-streams.cjs scripts/check-streams.test.cjs
-          echo "WRA_FORMAT_SCRIPT_BEGIN"
-          base64 -w0 scripts/check-streams.cjs
-          echo
-          echo "WRA_FORMAT_SCRIPT_END"
-          echo "WRA_FORMAT_TEST_BEGIN"
-          base64 -w0 scripts/check-streams.test.cjs
-          echo
-          echo "WRA_FORMAT_TEST_END"
       - run: npm run check
 
   ux-browser:
