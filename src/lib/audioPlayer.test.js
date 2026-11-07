@@ -63,6 +63,37 @@ test('confirms playback from the real audio state and releases the stream on pau
   expect(audio.play).toHaveBeenCalledTimes(2);
 });
 
+test('retained-source pause keeps one paused media resource for system resume', async () => {
+  const { audio, player } = setup();
+  await player.play();
+  const loads = audio.load.mock.calls.length;
+  player.pause({ retainSource: true });
+  expect(player.getSnapshot()).toMatchObject({
+    status: 'paused',
+    wantsToPlay: false,
+    playingStationId: null,
+  });
+  expect(audio.paused).toBe(true);
+  expect(audio.src).toBe(stations[0].url);
+  expect(audio.load).toHaveBeenCalledTimes(loads);
+  await player.play();
+  expect(player.getSnapshot().status).toBe('playing');
+  expect(audio.play).toHaveBeenCalledTimes(2);
+});
+
+test('retained-source pause still releases an unconfirmed connection', async () => {
+  const { audio, player } = setup();
+  const pending = deferred();
+  audio.play.mockImplementation(() => pending.promise);
+  const outcome = player.play();
+  player.pause({ retainSource: true });
+  expect(await outcome).toBe(false);
+  expect(audio.src).toBe('');
+  pending.resolve();
+  await flush();
+  expect(player.getSnapshot().wantsToPlay).toBe(false);
+});
+
 test('rapid next actions use the latest selection before play promises settle', async () => {
   const { audio, player, createAudio } = setup();
   const pending = [deferred(), deferred(), deferred()];
