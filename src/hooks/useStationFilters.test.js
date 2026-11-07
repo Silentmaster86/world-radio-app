@@ -35,3 +35,23 @@ test('valid URLs restore all refinements; invalid parameters safely fall back', 
     readFilters(new URLSearchParams('section=oops&country=XX&genre=unknown&language=xx'), options),
   ).toEqual({ section: 'all', country: '', genre: '', language: '', q: '' });
 });
+
+test('recent results keep listening order, omit missing IDs and intersect refinements', () => {
+  const recent = ['pr-chicago', 'missing-station', 'prl', 'heart-uk', 'prl'];
+  expect(filterStations(stations, [], { section: 'recent' }, recent).map((s) => s.id)).toEqual([
+    'pr-chicago',
+    'prl',
+    'heart-uk',
+  ]);
+  expect(
+    filterStations(
+      stations,
+      [],
+      { section: 'recent', country: 'GB', language: 'pl', genre: 'News', q: 'PRL' },
+      recent,
+    ).map((s) => s.id),
+  ).toEqual(['prl']);
+  expect(
+    readFilters(new URLSearchParams('section=recent'), getFilterOptions(stations)).section,
+  ).toBe('recent');
+});

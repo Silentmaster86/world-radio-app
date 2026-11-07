@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { stations } from '../data/stations';
 import { useAudio } from '../context/AudioContext';
 import { useFavorites } from '../context/FavoritesContext';
+import { useRecentStations } from '../context/RecentStationsContext';
 
 import HomeHeader from '../components/Home/HomeHeader';
 import { useBrowseRestoration } from '../context/BrowsingContext';
@@ -43,33 +44,76 @@ const StationGrid = styled.section`
   }
 `;
 
-const ResultCount = styled.p`
+const Results = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   margin: 0 0 0.75rem;
+  p {
+    margin: 0;
+  }
+  button {
+    min-height: 44px;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid currentColor;
+    border-radius: 0.65rem;
+    background: transparent;
+    font: inherit;
+  }
 `;
 
 export default function Home() {
   useBrowseRestoration();
   const { setStation, currentStation, playingStationId, status } = useAudio();
   const { favoriteIds, isFavorite, toggleFavorite, storageMessage } = useFavorites();
-  const browsing = useStationFilters(stations, favoriteIds);
+  const { recentIds, historyMessage, clearHistory } = useRecentStations();
+  const browsing = useStationFilters(stations, favoriteIds, recentIds);
   const { filters, searchedStations } = browsing;
   const favoriteCount = stations.filter((station) => favoriteIds.includes(station.id)).length;
+  const recentCount = stations.filter((station) => recentIds.includes(station.id)).length;
+  const collectionCount =
+    filters.section === 'favorites'
+      ? favoriteCount
+      : filters.section === 'recent'
+        ? recentCount
+        : stations.length;
 
   return (
     <PageWrapper>
       <HomeHeader />
 
-      <StationControls {...browsing} total={stations.length} favoriteCount={favoriteCount} />
+      <StationControls
+        {...browsing}
+        total={stations.length}
+        favoriteCount={favoriteCount}
+        recentCount={recentCount}
+      />
 
       {storageMessage && <p role="status">{storageMessage}</p>}
 
-      <ResultCount role="status" aria-live="polite">
-        {searchedStations.length} of{' '}
-        {filters.section === 'favorites' ? favoriteCount : stations.length} stations
-      </ResultCount>
+      {filters.section === 'recent' && historyMessage && <p role="status">{historyMessage}</p>}
+      <Results>
+        <p role="status" aria-live="polite">
+          {searchedStations.length} of {collectionCount} stations
+        </p>
+        {filters.section === 'recent' && recentIds.length > 0 && (
+          <button
+            type="button"
+            onClick={() => {
+              clearHistory();
+              document.getElementById('recent-collection')?.focus({ preventScroll: true });
+            }}
+          >
+            Clear history
+          </button>
+        )}
+      </Results>
       {searchedStations.length === 0 && (
         <EmptyState
           emptyFavorites={filters.section === 'favorites' && favoriteCount === 0}
+          emptyRecent={filters.section === 'recent' && recentCount === 0}
           onClear={browsing.clearRefinements}
           onBrowse={browsing.resetFilters}
         />

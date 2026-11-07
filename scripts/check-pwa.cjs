@@ -165,6 +165,16 @@ async function main() {
     );
     await page.getByRole('button', { name: 'Add Capital Dance to favorites', exact: true }).click();
     await page.locator('#appearance').selectOption('dark');
+    // Confirmed playback uses the controlled fixture, never a real network stream.
+    await page.locator('[data-station-id="heart-uk"]').click();
+    await page.locator('[data-player-status="playing"]').waitFor();
+    await page.locator('[data-station-id="capital-dance"]').click();
+    await page.waitForFunction(
+      () =>
+        JSON.parse(localStorage.getItem('wra:recent:v1') || '{}').stationIds?.[0] ===
+        'capital-dance',
+    );
+    await page.getByRole('button', { name: 'Pause', exact: true }).click();
     await context.setOffline(true);
     await page.goto(`${base}/?section=favorites`, { waitUntil: 'domcontentloaded' });
     await page.locator('[data-station-id="capital-dance"]').waitFor();
@@ -177,6 +187,14 @@ async function main() {
     );
     assert.equal(await page.evaluate(() => window.__pwaAudio[0].playCalls), 0);
     await page.screenshot({ path: path.join(output, 'offline-favorites.png'), fullPage: true });
+    await page.goto(`${base}/?section=recent`, { waitUntil: 'domcontentloaded' });
+    await page.getByRole('button', { name: 'Recent (2)', exact: true }).waitFor();
+    assert.deepEqual(await page.locator('[data-station-title]').allTextContents(), [
+      'Capital Dance',
+      'Heart UK',
+    ]);
+    assert.equal(await page.evaluate(() => window.__pwaAudio[0].playCalls), 0);
+    await page.screenshot({ path: path.join(output, 'offline-recent.png'), fullPage: true });
     await page.goto(`${base}/now-playing`, { waitUntil: 'domcontentloaded' });
     await page.getByRole('heading', { name: 'Capital Dance', exact: true }).waitFor();
     assert.equal(await page.evaluate(() => window.__pwaAudio[0].playCalls), 0);
@@ -193,6 +211,7 @@ async function main() {
     assert.ok(cacheReport.urls.every((url) => !new URL(url).search && !/\.mp3/.test(url)));
     report.manifest = true;
     report.offlineFavorites = true;
+    report.offlineRecent = true;
     report.offlineDirectCar = true;
     report.noAutoplay = true;
     report.cache = cacheReport;
@@ -260,6 +279,10 @@ async function main() {
       );
       assert.equal(await page.locator('#appearance').inputValue(), 'dark');
       assert.equal(await page.evaluate(() => window.__pwaAudio[0].playCalls), 0);
+      assert.deepEqual(
+        await page.evaluate(() => JSON.parse(localStorage.getItem('wra:recent:v1')).stationIds),
+        ['capital-dance', 'heart-uk'],
+      );
       const names = await page.evaluate(() => caches.keys());
       assert.ok(names.includes('unrelated-app-data'));
       assert.equal(names.filter((name) => name.startsWith('wra-shell-')).length, 1);

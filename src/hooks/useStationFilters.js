@@ -14,17 +14,24 @@ export function getFilterOptions(stations) {
 export function readFilters(params, options) {
   const valid = (key, values) => (values.includes(params.get(key)) ? params.get(key) : '');
   return {
-    section: params.get('section') === 'favorites' ? 'favorites' : 'all',
+    section: ['favorites', 'recent'].includes(params.get('section'))
+      ? params.get('section')
+      : 'all',
     country: valid('country', options.countries),
     genre: valid('genre', options.genres),
     language: valid('language', options.languages),
     q: params.get('q') || '',
   };
 }
-export function filterStations(stations, favoriteIds, filters = defaultFilters) {
+export function filterStations(stations, favoriteIds, filters = defaultFilters, recentIds = []) {
   const { section, country, genre, language, q } = { ...defaultFilters, ...filters };
   const query = normalizeStationQuery(q);
-  return stations.filter(
+  const byId = new Map(stations.map((station) => [station.id, station]));
+  const collection =
+    section === 'recent'
+      ? [...new Set(recentIds)].map((id) => byId.get(id)).filter(Boolean)
+      : stations;
+  return collection.filter(
     (station) =>
       (section !== 'favorites' || favoriteIds.includes(station.id)) &&
       (!country || station.countryCode === country) &&
@@ -33,7 +40,7 @@ export function filterStations(stations, favoriteIds, filters = defaultFilters) 
       normalizeStationQuery(station.name).includes(query),
   );
 }
-export default function useStationFilters(stations, favoriteIds) {
+export default function useStationFilters(stations, favoriteIds, recentIds = []) {
   const [params, setParams] = useSearchParams();
   const renderedSearch = params.toString();
   const latest = useRef({ renderedSearch, params });
@@ -60,6 +67,6 @@ export default function useStationFilters(stations, favoriteIds) {
     updateFilters,
     resetFilters: () => updateFilters(defaultFilters),
     clearRefinements: () => updateFilters({ country: '', genre: '', language: '', q: '' }),
-    searchedStations: filterStations(stations, favoriteIds, filters),
+    searchedStations: filterStations(stations, favoriteIds, filters, recentIds),
   };
 }

@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import NowPlaying from './pages/NowPlaying';
 import { PwaProvider } from './context/PwaContext';
 import { BrowsingProvider } from './context/BrowsingContext';
+import { RecentStationsProvider } from './context/RecentStationsContext';
 
 const AppWrapper = styled.div`
   min-height: 100dvh;
@@ -31,11 +32,13 @@ function AppShell() {
 export default function App() {
   return (
     <PwaProvider>
-      <Router>
-        <BrowsingProvider>
-          <AppShell />
-        </BrowsingProvider>
-      </Router>
+      <RecentStationsProvider>
+        <Router>
+          <BrowsingProvider>
+            <AppShell />
+          </BrowsingProvider>
+        </Router>
+      </RecentStationsProvider>
     </PwaProvider>
   );
 }

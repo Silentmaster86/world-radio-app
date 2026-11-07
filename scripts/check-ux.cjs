@@ -275,6 +275,51 @@ async function main() {
       await page.locator('[data-sleep-timer][aria-pressed="false"]').waitFor();
       await page.getByRole('button', { name: 'Back to stations', exact: true }).click();
       await page.locator('#station-search').waitFor();
+      // Recent data can arrive from another app window; reload/filter/clear keep it usable.
+      await page.getByRole('button', { name: 'Recent (0)', exact: true }).click();
+      await page
+        .getByRole('heading', { name: 'No recent stations to show', exact: true })
+        .waitFor();
+      const other = await context.newPage();
+      await other.goto(base, { waitUntil: 'networkidle' });
+      await other.evaluate(() =>
+        localStorage.setItem(
+          'wra:recent:v1',
+          JSON.stringify({
+            version: 1,
+            stationIds: ['heart-uk', 'missing-station', 'capital-dance'],
+          }),
+        ),
+      );
+      await page.getByRole('button', { name: 'Recent (2)', exact: true }).waitFor();
+      await other.close();
+      await page.reload({ waitUntil: 'networkidle' });
+      assert.equal(new URL(page.url()).searchParams.get('section'), 'recent');
+      assert.deepEqual(await page.locator('[data-station-title]').allTextContents(), [
+        'Heart UK',
+        'Capital Dance',
+      ]);
+      await accessible(page, `${mode}-recent`);
+      await screenshot(page, `${mode}-recent`);
+      await page.locator('#station-search').fill('Heart');
+      await page.waitForFunction(() => document.querySelectorAll('article').length === 1);
+      await page.locator('#station-search').fill('');
+      await page.waitForFunction(() => document.querySelectorAll('article').length === 2);
+      await page.getByRole('button', { name: 'Add Heart UK to favorites', exact: true }).click();
+      await page.getByRole('button', { name: 'Clear history', exact: true }).click();
+      await page
+        .getByRole('heading', { name: 'No recent stations to show', exact: true })
+        .waitFor();
+      assert.equal(await page.evaluate(() => document.activeElement.id), 'recent-collection');
+      assert.deepEqual(
+        await page.evaluate(() => JSON.parse(localStorage.getItem('wra:recent:v1')).stationIds),
+        [],
+      );
+      await page.getByRole('button', { name: 'Favorites (1)', exact: true }).click();
+      await page
+        .getByRole('button', { name: 'Remove Heart UK from favorites', exact: true })
+        .click();
+      await page.getByRole('button', { name: 'All stations (9)', exact: true }).click();
       await page.locator('#appearance').selectOption(mode === 'dark' ? 'light' : 'dark');
       await page.reload({ waitUntil: 'networkidle' });
       assert.equal(
