@@ -1,13 +1,22 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { loadCuratedStations, looksLikeAudio, checkStream, checkAll } = require('./check-streams.cjs');
+const {
+  loadCuratedStations,
+  looksLikeAudio,
+  checkStream,
+  checkAll,
+} = require('./check-streams.cjs');
 
 const station = (url = 'https://radio.example/live') => ({
-  id: 'example', name: 'Example Radio', url,
+  id: 'example',
+  name: 'Example Radio',
+  url,
 });
-const audio = () => new Response(Buffer.from([0xff, 0xfb, 0x90, 0x64, 0, 1]), {
-  status: 200, headers: { 'content-type': 'audio/mpeg' },
-});
+const audio = () =>
+  new Response(Buffer.from([0xff, 0xfb, 0x90, 0x64, 0, 1]), {
+    status: 200,
+    headers: { 'content-type': 'audio/mpeg' },
+  });
 
 test('loads curated URLs from the existing station source', () => {
   const stations = loadCuratedStations();
@@ -18,9 +27,10 @@ test('loads curated URLs from the existing station source', () => {
 
 test('reports bounded audio sample without downloading the stream', async () => {
   const result = await checkStream(station(), {
-    fetchImpl: async () => new Response(Buffer.alloc(10000, 0xff), {
-      headers: { 'content-type': 'audio/mpeg' },
-    }),
+    fetchImpl: async () =>
+      new Response(Buffer.alloc(10000, 0xff), {
+        headers: { 'content-type': 'audio/mpeg' },
+      }),
     maxBytes: 128,
   });
   assert.equal(result.status, 200);
@@ -42,17 +52,20 @@ test('follows relative HTTPS redirects and records final address', async () => {
   assert.equal(result.redirects, 1);
   assert.equal(result.finalUrl, 'https://radio.example/live');
   assert.equal(result.likelyAudio, true);
-  assert.deepEqual(visited.map(([url]) => url), [
-    'https://radio.example/listen', 'https://radio.example/live',
-  ]);
+  assert.deepEqual(
+    visited.map(([url]) => url),
+    ['https://radio.example/listen', 'https://radio.example/live'],
+  );
   assert.ok(visited.every(([, redirect]) => redirect === 'manual'));
 });
 
 test('rejects insecure redirect destinations', async () => {
   const result = await checkStream(station(), {
-    fetchImpl: async () => new Response(null, {
-      status: 302, headers: { location: 'http://radio.example/live' },
-    }),
+    fetchImpl: async () =>
+      new Response(null, {
+        status: 302,
+        headers: { location: 'http://radio.example/live' },
+      }),
   });
   assert.equal(result.likelyAudio, false);
   assert.match(result.error, /HTTPS/);
@@ -60,9 +73,11 @@ test('rejects insecure redirect destinations', async () => {
 
 test('rejects redirect loops after the configured limit', async () => {
   const result = await checkStream(station(), {
-    fetchImpl: async () => new Response(null, {
-      status: 302, headers: { location: '/again' },
-    }),
+    fetchImpl: async () =>
+      new Response(null, {
+        status: 302,
+        headers: { location: '/again' },
+      }),
     maxRedirects: 1,
   });
   assert.equal(result.redirects, 1);
@@ -71,9 +86,10 @@ test('rejects redirect loops after the configured limit', async () => {
 
 test('distinguishes an HTML response from audio', async () => {
   const result = await checkStream(station(), {
-    fetchImpl: async () => new Response('<html>not a stream</html>', {
-      headers: { 'content-type': 'text/html' },
-    }),
+    fetchImpl: async () =>
+      new Response('<html>not a stream</html>', {
+        headers: { 'content-type': 'text/html' },
+      }),
   });
   assert.equal(result.status, 200);
   assert.equal(result.likelyAudio, false);
@@ -90,9 +106,10 @@ test('records HTTP errors without stopping the remaining checks', async () => {
   const entries = [station('https://radio.example/down'), station('https://radio.example/up')];
   const results = await checkAll(entries, {
     concurrency: 1,
-    fetchImpl: async (url) => url.endsWith('/down')
-      ? new Response('Unavailable', { status: 503, headers: { 'content-type': 'text/plain' } })
-      : audio(),
+    fetchImpl: async (url) =>
+      url.endsWith('/down')
+        ? new Response('Unavailable', { status: 503, headers: { 'content-type': 'text/plain' } })
+        : audio(),
   });
   assert.equal(results.length, 2);
   assert.equal(results[0].status, 503);
@@ -121,9 +138,10 @@ test('bounds concurrent requests', async () => {
 test('times out a stalled station', async () => {
   const result = await checkStream(station(), {
     timeoutMs: 20,
-    fetchImpl: async (_, { signal }) => new Promise((_, reject) => {
-      signal.addEventListener('abort', () => reject(new Error('aborted')), { once: true });
-    }),
+    fetchImpl: async (_, { signal }) =>
+      new Promise((_, reject) => {
+        signal.addEventListener('abort', () => reject(new Error('aborted')), { once: true });
+      }),
   });
   assert.equal(result.likelyAudio, false);
   assert.equal(result.error, 'Timed out');
