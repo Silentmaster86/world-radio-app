@@ -24,11 +24,22 @@ the lock screen itself.
 
 ## Follow-up on system pause
 
+### PR #19 physical-device recheck — reported pass
+
+On 7 November 2026, the same user retested the
+[PR #19 preview](https://deploy-preview-19--worldradioapp.netlify.app/)
+after the Android media-pause change and reported **"Tak. Działa"**
+("Yes. It works") in response to the Pause/Play control test. This
+supports that the previously disappearing media controls now work
+in the preview on their device. The precise device/software versions
+and extended battery/mobile-data effects remain unverified.
+
 An experimental branch retains the existing audio source when a system media
 pause action occurs after playback has been confirmed. Ordinary in-app pause,
 an unconfirmed connection and sleep timer expiry still unload the source. The
 browser or operating system may nevertheless remove the paused media card.
-Real-device testing is necessary before merging the experimental behavior.
+Further real-device checks of ordinary in-app Pause, timer expiry, Bluetooth,
+and paused network/battery use are still useful before merging.
 
 Compare the production app with the PR deploy preview:
 
