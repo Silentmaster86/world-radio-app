@@ -17,8 +17,13 @@ first instance before creating the next one.
 - Every start has a generation. Replaced requests and their late results cannot
   overwrite a later selection. Re-selecting the current active station does not
   restart its stream.
-- Pause releases the live source and pending work. Resume reconnects to the live
-  stream; it does not promise time-shifted listening at the paused position.
+- Ordinary app pause, sleep-timer expiry and disposal release the live source
+  and pending work. A pause initiated by Android/system media controls retains
+  an already confirmed, paused audio resource so the system may keep a resumable
+  notification. This is a platform-dependent experiment, not a promise of a
+  persistent lock-screen card. Paused live media may retain network resources
+  until resumed, switched, or closed. Resume reconnects to the live stream;
+  it does not promise time-shifted listening at the paused position.
 
 ## Recovery
 
