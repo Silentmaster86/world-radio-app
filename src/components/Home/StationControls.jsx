@@ -96,7 +96,7 @@ export default function StationControls({
 }) {
   const [expanded, setExpanded] = useFilterDisclosure();
   const activeCount = [filters.country, filters.genre, filters.language].filter(Boolean).length;
-  const languages = { en: 'English', pl: 'Polish' };
+  const languages = { en: 'English', pl: 'Polish', de: 'German' };
   return (
     <Controls aria-label="Find stations">
       <CollectionRow role="group" aria-label="Station collection">
@@ -131,7 +131,7 @@ export default function StationControls({
         <input
           id="station-search"
           type="search"
-          placeholder="Station name…"
+          placeholder="Name, genre or keyword…"
           value={filters.q}
           onChange={(event) => updateFilters({ q: event.target.value })}
         />

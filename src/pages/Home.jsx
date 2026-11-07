@@ -1,5 +1,6 @@
 // src/pages/Home.js
 import styled from 'styled-components';
+import { useLayoutEffect, useRef } from 'react';
 
 import { stations } from '../data/stations';
 import { useAudio } from '../context/AudioContext';
@@ -63,6 +64,16 @@ const Results = styled.div`
     font: inherit;
   }
 `;
+const More = styled.button`
+  display: block;
+  min-height: 44px;
+  margin: 1rem auto 0;
+  padding: 0.65rem 1rem;
+  border: 1px solid ${({ theme }) => theme.colors.muted};
+  border-radius: 0.65rem;
+  background: ${({ theme }) => theme.colors.surface};
+  font: inherit;
+`;
 
 export default function Home() {
   useBrowseRestoration();
@@ -70,7 +81,16 @@ export default function Home() {
   const { favoriteIds, isFavorite, toggleFavorite, storageMessage } = useFavorites();
   const { recentIds, historyMessage, clearHistory } = useRecentStations();
   const browsing = useStationFilters(stations, favoriteIds, recentIds);
-  const { filters, searchedStations } = browsing;
+  const { filters, searchedStations, visibleStations } = browsing;
+  const nextPageFocus = useRef(null);
+  useLayoutEffect(() => {
+    if (!nextPageFocus.current) return;
+    const button = document.querySelector(`[data-station-id="${nextPageFocus.current}"]`);
+    if (button) {
+      button.focus();
+      nextPageFocus.current = null;
+    }
+  }, [visibleStations]);
   const favoriteCount = stations.filter((station) => favoriteIds.includes(station.id)).length;
   const recentCount = stations.filter((station) => recentIds.includes(station.id)).length;
   const collectionCount =
@@ -96,7 +116,8 @@ export default function Home() {
       {filters.section === 'recent' && historyMessage && <p role="status">{historyMessage}</p>}
       <Results>
         <p role="status" aria-live="polite">
-          {searchedStations.length} of {collectionCount} stations
+          {visibleStations.length} of {searchedStations.length} stations
+          {searchedStations.length !== collectionCount && ` · ${collectionCount} in collection`}
         </p>
         {filters.section === 'recent' && recentIds.length > 0 && (
           <button
@@ -119,7 +140,7 @@ export default function Home() {
         />
       )}
       <StationGrid aria-label="Stations">
-        {searchedStations.map((station) => (
+        {visibleStations.map((station) => (
           <StationCard
             key={station.id}
             station={station}
@@ -132,6 +153,17 @@ export default function Home() {
           />
         ))}
       </StationGrid>
+      {visibleStations.length < searchedStations.length && (
+        <More
+          type="button"
+          onClick={() => {
+            nextPageFocus.current = searchedStations[visibleStations.length].id;
+            browsing.updateFilters({ page: filters.page + 1 });
+          }}
+        >
+          Show more stations ({searchedStations.length - visibleStations.length} remaining)
+        </More>
+      )}
     </PageWrapper>
   );
 }

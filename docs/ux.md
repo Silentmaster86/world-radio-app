@@ -7,14 +7,18 @@ none of the draft branches changes production until merged.
 ## Behavior and files
 
 - `src/hooks/useStationFilters.js` intersects collection, country, genre, language
-  and normalized station-name search. `section=favorites` or `section=recent`, `country`, `genre`,
-  `language` and `q` are URL parameters. Editing replaces the current history
+  and normalized keyword search over station names, genres and descriptions.
+  `section=favorites` or `section=recent`, `country`, `genre`, `language`, `q` and
+  accumulated `page` are URL parameters. Editing replaces the current history
   entry, so typing does not create a Back entry per character. Invalid option
   values fall back safely. Reset removes app filters and preserves unrelated
   parameters. Collection counts use known catalog IDs; favorite IDs outside the
   catalog remain preserved in storage. Recent station IDs follow the same rule;
   their bounded recency order and playback confirmation are described in
   [recent-stations.md](recent-stations.md).
+- The catalog reveals matching stations in groups of 12, preserves the expanded
+  list through reload and car-mode return, and resets paging when filters change.
+  Keyboard focus moves to the first new station. See [catalog.md](catalog.md).
 - `StationControls` provides visible labels and native selects. `EmptyState`
   distinguishes empty favorites/recent collections from refinements with no matches.
   Clearing refinements keeps the selected collection; browsing all resets it.

@@ -40,7 +40,7 @@ const Info = styled.div`
   align-items: center;
   gap: 0.75rem;
   min-width: 0;
-  img {
+  > [data-station-logo] {
     width: 48px;
     height: 48px;
     flex-shrink: 0;
@@ -57,7 +57,7 @@ const Info = styled.div`
     margin: 0.2rem 0 0;
   }
   @media (max-width: 360px) {
-    img {
+    > [data-station-logo] {
       display: none;
     }
   }
