@@ -1,45 +1,44 @@
 # Real-device playback verification
 
-Results below were reported on 7 November 2026 from a Samsung Android device;
-the precise model and Android/One UI version were not confirmed. These are
-manual observations, not automated tests or universal compatibility claims.
+These results were reported on 7 November 2026 from a Samsung Android device.
+The exact model and Android/One UI version have not been confirmed. The observations
+are manual, not automated or universal compatibility claims.
 
-## Android
+## Android results
 
-| Scenario | Result |
-| --- | --- |
-| Play a station for at least one minute | Pass |
-| Switch station while playing | Pass |
-| Keep audio playing after locking the phone | Pass |
-| System media controls | Partial: media card with Capital FM, previous/pause/next is visible in Samsung quick settings while playing; card disappears immediately when Pause is tapped |
-| Bluetooth headset media controls | Not tested |
-| Switch Wi-Fi to cellular network | Pass |
-| Return after several minutes in background | Pass |
-| Sleep timer after 15 minutes with locked screen | Pass in one reported trial |
-| Rotate phone and use search | Pass |
+- Play a station for at least one minute: **Pass**
+- Switch station during playback: **Pass**
+- Keep audio playing after locking the phone: **Pass**
+- System media controls: **Partial**. The Capital FM media card, with
+  Previous/Pause/Next buttons, appears in Samsung quick settings during playback.
+  The card disappears immediately after tapping Pause.
+- Bluetooth headset media controls: **Not tested**
+- Switch Wi-Fi to cellular network: **Pass**
+- Return after several minutes in the background: **Pass**
+- Sleep timer after 15 minutes with the screen locked: **Pass** in one reported trial
+- Rotate the phone and use search: **Pass**
 
-The reporter observed disappearing paused controls both in Chrome and the
-installed PWA. The screenshots establish media controls in the expanded
-**quick settings** panel, not their appearance on the lock screen itself.
+The reporter saw the disappearing paused controls in Chrome and the installed PWA.
+The screenshots establish a card in the expanded **quick settings** panel, not on
+the lock screen itself.
 
 ## Follow-up on system pause
 
-An experimental branch keeps the existing audio element's source attached
-when the system Media Session pause action fires after confirmed playback.
-Ordinary in-app pause, a pending connection, and timer expiry still unload
-the source. The browser/OS can nevertheless remove a paused media card;
-only retesting on a physical device can establish a change.
+An experimental branch retains the existing audio source when a system media
+pause action occurs after playback has been confirmed. Ordinary in-app pause,
+an unconfirmed connection and sleep timer expiry still unload the source. The
+browser or operating system may nevertheless remove the paused media card.
+Real-device testing is necessary before merging the experimental behavior.
 
-Compare the production app with the PR deploy preview for:
+Compare the production app with the PR deploy preview:
 
-1. Does the expanded quick-settings media card remain after tapping Pause?
-2. Is Play available, and does it resume a **live** radio stream correctly?
+1. Does the quick-settings card remain after tapping Pause?
+2. Can Play resume a **live** stream?
 3. Does a paused live stream consume unexpected mobile data or battery?
-4. Do Next/Previous and in-app Pause continue working?
-5. Does timer expiry still fully release the source?
-6. Does media playback continue properly after lock/unlock, reconnect and
-   switching between Chrome and installed PWA?
+4. Do Next/Previous and in-app Pause continue to work?
+5. Does sleep timer expiry still unload the source?
+6. Does playback survive lock/unlock, reconnect and app switching?
 
-Do not merge this experiment solely on the basis of unit tests. Document
-the phone model, Android/One UI version, Chrome version, installed/PWA mode,
-and any actual physical-device findings. iOS Safari remains untested.
+Do not merge the experiment solely because unit tests pass. Capture the exact
+phone model, Android/One UI version, Chrome version, Chrome/PWA mode and results.
+iOS Safari remains untested.
