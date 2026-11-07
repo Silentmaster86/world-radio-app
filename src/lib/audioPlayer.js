@@ -201,7 +201,7 @@ export function createAudioPlayer({
       },
       pause: () => {
         if (isCurrent() && attempt.hasPlayed && audio.paused && !audio.ended && !audio.error)
-          pause();
+          pause({ retainSource: true });
       },
     };
     Object.entries(events).forEach(([name, handler]) => audio.addEventListener(name, handler));
@@ -232,8 +232,9 @@ export function createAudioPlayer({
     return startAttempt();
   }
 
-  function pause() {
+  function pause({ retainSource = false } = {}) {
     if (disposed) return;
+    const hadPlayingSource = state.playingStationId !== null;
     invalidate();
     publish({
       wantsToPlay: false,
@@ -242,7 +243,14 @@ export function createAudioPlayer({
       error: null,
       retryAttempt: 0,
     });
-    releaseSource();
+    // System media controls need the paused audio resource to stay available
+    // for Android to potentially keep a resumable media notification.
+    // An unconfirmed connection or ordinary app/timer pause still unloads it.
+    if (retainSource && hadPlayingSource && audio.getAttribute('src') !== null) {
+      audio.pause();
+    } else {
+      releaseSource();
+    }
   }
 
   function selectStation(id) {

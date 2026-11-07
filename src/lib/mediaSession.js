@@ -60,7 +60,7 @@ export function bindMediaSession(player, options = {}) {
   };
   const actions = {
     play: player.play,
-    pause: player.pause,
+    pause: () => player.pause({ retainSource: true }),
     nexttrack: player.nextStation,
     previoustrack: player.prevStation,
   };
