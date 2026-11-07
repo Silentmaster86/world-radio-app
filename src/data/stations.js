@@ -56,7 +56,8 @@ export const stations = [
     languageCodes: ['pl'],
     genres: ['News'],
     ...stationLogos['pr_chicago'],
-    url: 'https://s1.reliastream.com/proxy/polskieradio?mp=/stream',
+    // Current official player: https://polskieradio.com/ (see docs/station-sources.md).
+    url: 'https://usa13.fastcast4u.com/proxy/andkog01?mp=/1',
     color: '#E50914',
 
     description: 'Polish Radio Chicago • News • Community • Polish News',
