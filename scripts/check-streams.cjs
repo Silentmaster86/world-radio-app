@@ -21,15 +21,22 @@ function loadCuratedStations(filename = path.join(__dirname, '../src/data/statio
   }
   const expression = withoutImport.replace('export const stations =', 'const stations =');
   const logos = new Proxy({}, { get: () => ({}) });
-  const stations = vm.runInNewContext(expression + '\nstations', { stationLogos: logos }, {
-    timeout: 1000,
-  });
+  const stations = vm.runInNewContext(
+    expression + '\nstations',
+    { stationLogos: logos },
+    {
+      timeout: 1000,
+    },
+  );
   if (!Array.isArray(stations) || !stations.length) {
     throw new Error('No curated stations found.');
   }
   return Array.from(stations, (station) => {
-    if (typeof station.id !== 'string' || typeof station.name !== 'string' ||
-        typeof station.url !== 'string') {
+    if (
+      typeof station.id !== 'string' ||
+      typeof station.name !== 'string' ||
+      typeof station.url !== 'string'
+    ) {
       throw new Error('Invalid curated station record.');
     }
     return { id: station.id, name: station.name, url: station.url };
@@ -40,14 +47,21 @@ function looksLikeAudio(contentType, sample) {
   if (!sample.length) return false;
   const mime = contentType.split(';')[0].trim().toLowerCase();
   const prefix = sample.subarray(0, 100).toString('utf8').trimStart().toLowerCase();
-  if (prefix.startsWith('<!doctype') || prefix.startsWith('<html') ||
-      prefix.startsWith('#extm3u') || prefix.startsWith('[playlist]')) return false;
+  if (
+    prefix.startsWith('<!doctype') ||
+    prefix.startsWith('<html') ||
+    prefix.startsWith('#extm3u') ||
+    prefix.startsWith('[playlist]')
+  )
+    return false;
   const signature = sample.subarray(0, 4).toString('latin1');
-  const magic = signature.startsWith('ID3') || signature === 'OggS' ||
-    signature === 'fLaC' || (sample.length > 1 &&
-    sample[0] === 0xff && (sample[1] & 0xe0) === 0xe0);
-  const mimeAudio = (mime.startsWith('audio/') &&
-    !mime.includes('mpegurl') && !mime.includes('playlist')) ||
+  const magic =
+    signature.startsWith('ID3') ||
+    signature === 'OggS' ||
+    signature === 'fLaC' ||
+    (sample.length > 1 && sample[0] === 0xff && (sample[1] & 0xe0) === 0xe0);
+  const mimeAudio =
+    (mime.startsWith('audio/') && !mime.includes('mpegurl') && !mime.includes('playlist')) ||
     mime === 'application/ogg';
   return magic || mimeAudio;
 }
@@ -76,12 +90,15 @@ async function readBoundedSample(response, maxBytes) {
   return Buffer.concat(parts, bytes);
 }
 
-async function checkStream(station, {
-  fetchImpl = globalThis.fetch,
-  timeoutMs = TIMEOUT_MS,
-  maxBytes = MAX_BYTES,
-  maxRedirects = MAX_REDIRECTS,
-} = {}) {
+async function checkStream(
+  station,
+  {
+    fetchImpl = globalThis.fetch,
+    timeoutMs = TIMEOUT_MS,
+    maxBytes = MAX_BYTES,
+    maxRedirects = MAX_REDIRECTS,
+  } = {},
+) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
   let currentUrl = station.url;
@@ -158,21 +175,45 @@ async function checkAll(stations, { concurrency = CONCURRENCY, ...options } = {}
 
 async function main() {
   const stations = loadCuratedStations();
-  console.log('Checking ' + stations.length + ' curated streams (max ' +
-    TIMEOUT_MS + ' ms each, ' + MAX_BYTES + ' sampled bytes, ' +
-    CONCURRENCY + ' concurrent requests).');
+  console.log(
+    'Checking ' +
+      stations.length +
+      ' curated streams (max ' +
+      TIMEOUT_MS +
+      ' ms each, ' +
+      MAX_BYTES +
+      ' sampled bytes, ' +
+      CONCURRENCY +
+      ' concurrent requests).',
+  );
   const results = await checkAll(stations);
   for (const result of results) {
     const label = result.likelyAudio ? 'OK' : 'CHECK';
-    console.log('[' + label + '] ' + result.name + ' | HTTP ' +
-      (result.status ?? '-') + ' | ' + (result.contentType || '-') +
-      ' | bytes ' + result.bytes + ' | redirects ' + result.redirects);
+    console.log(
+      '[' +
+        label +
+        '] ' +
+        result.name +
+        ' | HTTP ' +
+        (result.status ?? '-') +
+        ' | ' +
+        (result.contentType || '-') +
+        ' | bytes ' +
+        result.bytes +
+        ' | redirects ' +
+        result.redirects,
+    );
     if (result.redirects) console.log('  Final URL: ' + result.finalUrl);
     if (result.error) console.log('  Error: ' + result.error);
   }
   const ok = results.filter((result) => result.likelyAudio).length;
-  console.log('Summary: ' + ok + '/' + results.length +
-    ' returned likely audio data. Recheck any CHECK results manually.');
+  console.log(
+    'Summary: ' +
+      ok +
+      '/' +
+      results.length +
+      ' returned likely audio data. Recheck any CHECK results manually.',
+  );
   if (ok !== results.length) process.exitCode = 1;
 }
 
