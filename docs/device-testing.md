@@ -34,12 +34,17 @@ supports that the previously disappearing media controls now work
 in the preview on their device. The precise device/software versions
 and extended battery/mobile-data effects remain unverified.
 
+The user subsequently confirmed that the two follow-up checks also work in
+the preview: **in-app SoundBar Pause followed by Play**, and **15-minute Sleep
+Timer with the screen locked**. Both are reported passes on this Android
+device; they are not a guarantee for other phones or longer background use.
+
 An experimental branch retains the existing audio source when a system media
 pause action occurs after playback has been confirmed. Ordinary in-app pause,
 an unconfirmed connection and sleep timer expiry still unload the source. The
 browser or operating system may nevertheless remove the paused media card.
-Further real-device checks of ordinary in-app Pause, timer expiry, Bluetooth,
-and paused network/battery use are still useful before merging.
+Bluetooth controls, prolonged paused network/battery use and other Android/iOS
+versions remain unverified.
 
 Compare the production app with the PR deploy preview:
 
