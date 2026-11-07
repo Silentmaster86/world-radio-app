@@ -60,3 +60,28 @@ Each check read at most 2,048 audio bytes and then closed the response. These
 results establish reachability and source agreement at review time. They do not
 prove regional access, native device decoding or background playback. No live
 stream is contacted by the deterministic regression suite.
+
+## Manual stream diagnostics
+
+Use `npm run check:streams` from the project root to check the current
+`src/data/stations.js` curated URLs. This tool makes **real network requests**,
+unlike the deterministic application regression suite. It is intentionally **not**
+included in `npm run check` or required CI checks.
+
+Each station receives a bounded HTTPS GET with an 8-second total timeout,
+up to four HTTPS redirects, a 2,048-byte sample, and at most three concurrent
+checks. Output shows HTTP status, response content type, redirect count,
+resolved final URL when redirected, bytes received, and whether the response
+looks like audio. Failures do not prevent the remaining stations from being
+checked. Non-audio or failed responses result in a nonzero exit code.
+
+For offline deterministic coverage of the diagnostic itself, run
+`npm run test:streams`. Tests use local mocked HTTP responses and do not
+contact broadcasters.
+
+A successful result is **not** a guarantee of broadcaster identity, regional
+availability, browser codec support, sustained playback, phone background
+behavior, or rights to redistribute logos or streams. Confirm suspicious
+results against the official publisher player and on real devices. Streaming
+servers may treat command-line clients differently from browsers. This
+checker samples data and cancels rather than recording audio.
