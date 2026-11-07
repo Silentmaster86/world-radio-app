@@ -35,7 +35,7 @@ afterEach(() => {
 });
 
 test('initial metadata and playback state follow actual first play and pause', async () => {
-  const { session, handlers, Metadata } = setup();
+  const { session, handlers, Metadata, audio } = setup();
   expect(session.playbackState).toBe('none');
   expect(Metadata).not.toHaveBeenCalled();
   handlers.play();
@@ -46,6 +46,9 @@ test('initial metadata and playback state follow actual first play and pause', a
   expect(session.metadata.artwork[0].sizes).toBeUndefined();
   handlers.pause();
   expect(session.playbackState).toBe('paused');
+  expect(audio.src).toBe(stations[0].url);
+  await handlers.play();
+  expect(session.playbackState).toBe('playing');
 });
 
 test('system station controls use the shared catalog and update artwork type', () => {
