@@ -70,7 +70,7 @@ const CarBadge = styled.span`
 const LogoWrapper = styled.div`
   grid-area: art;
   align-self: center;
-  img {
+  [data-station-logo] {
     display: block;
     width: 168px;
     height: 168px;
@@ -79,7 +79,7 @@ const LogoWrapper = styled.div`
     object-fit: contain;
   }
   @media (min-width: 520px) and (max-height: 600px) {
-    img {
+    [data-station-logo] {
       width: clamp(96px, 35dvh, 168px);
       height: clamp(96px, 35dvh, 168px);
     }

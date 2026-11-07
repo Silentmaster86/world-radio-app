@@ -4,6 +4,7 @@ const countries = {
   GB: { name: 'United Kingdom', flag: '🇬🇧' },
   PL: { name: 'Poland', flag: '🇵🇱' },
   US: { name: 'United States', flag: '🇺🇸' },
+  DE: { name: 'Germany', flag: '🇩🇪' },
 };
 
 export function findStationById(id) {
@@ -29,5 +30,7 @@ export function normalizeStationQuery(value) {
     .trim()
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/ł/g, 'l')
+    .replace(/\s+/g, ' ');
 }

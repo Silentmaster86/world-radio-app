@@ -175,6 +175,17 @@ async function main() {
       // Direct routes, keyboard favorites, combined filters, reload and return navigation.
       await page.setViewportSize({ width: 390, height: 844 });
       await page.goto(base, { waitUntil: 'networkidle' });
+      await page
+        .getByRole('button', { name: 'Show more stations (6 remaining)', exact: true })
+        .click();
+      await page.waitForFunction(() => document.querySelectorAll('article').length === 18);
+      assert.equal(new URL(page.url()).searchParams.get('page'), '2');
+      assert.equal(
+        await page.evaluate(() => document.activeElement.dataset.stationId),
+        'somafm-indie-pop-rocks',
+      );
+      await page.reload({ waitUntil: 'networkidle' });
+      assert.equal(await page.locator('article').count(), 18);
       await page.locator('[aria-controls="station-refinements"]').click();
       await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
       await page
@@ -250,8 +261,26 @@ async function main() {
       await page.locator('#station-genre').selectOption('Pop');
       await page.getByRole('heading', { name: 'No matching stations' }).waitFor();
       await page.getByRole('button', { name: 'Clear search and filters' }).click();
-      await page.waitForFunction(() => document.querySelectorAll('article').length === 9);
-      assert.equal(await page.locator('article').count(), 9);
+      await page.waitForFunction(() => document.querySelectorAll('article').length === 12);
+      assert.equal(await page.locator('article').count(), 12);
+      await page.locator('#station-search').fill('jazz somafm');
+      await page.waitForFunction(() => document.querySelectorAll('article').length === 1);
+      assert.equal(
+        await page.locator('[data-station-title]').innerText(),
+        'SomaFM · Sonic Universe',
+      );
+      await screenshot(page, `${mode}-keyword-search`);
+      await page.locator('#station-search').fill('');
+      await page.locator('#station-country').selectOption('DE');
+      await page.locator('#station-language').selectOption('de');
+      await page.waitForFunction(() => document.querySelectorAll('article').length === 3);
+      await accessible(page, `${mode}-german-stations`);
+      await screenshot(page, `${mode}-german-stations`);
+      await page
+        .locator('button:visible')
+        .filter({ hasText: /^Reset filters$/ })
+        .click();
+      await page.waitForFunction(() => document.querySelectorAll('article').length === 12);
       // Timer dialog works with a keyboard and stays active across routes.
       await page.getByRole('button', { name: 'Sleep timer', exact: true }).click();
       const timerDialog = page.getByRole('dialog', { name: 'Sleep timer', exact: true });
@@ -319,7 +348,7 @@ async function main() {
       await page
         .getByRole('button', { name: 'Remove Heart UK from favorites', exact: true })
         .click();
-      await page.getByRole('button', { name: 'All stations (9)', exact: true }).click();
+      await page.getByRole('button', { name: 'All stations (18)', exact: true }).click();
       await page.locator('#appearance').selectOption(mode === 'dark' ? 'light' : 'dark');
       await page.reload({ waitUntil: 'networkidle' });
       assert.equal(
@@ -371,6 +400,33 @@ async function main() {
     assert.equal(
       await page.locator('[data-player-status]').getAttribute('data-player-status'),
       'idle',
+    );
+    // A saved station without artwork uses the same responsive dock/car sizing.
+    await page.evaluate(() =>
+      localStorage.setItem(
+        'wra:player:v1',
+        JSON.stringify({
+          version: 1,
+          stationId: 'deutschlandfunk-nova',
+          volume: 1,
+          muted: false,
+        }),
+      ),
+    );
+    await page.setViewportSize({ width: 320, height: 568 });
+    await page.reload({ waitUntil: 'networkidle' });
+    await page.getByRole('heading', { name: 'Deutschlandfunk Nova', exact: true }).waitFor();
+    await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+    await geometry(page);
+    await screenshot(page, 'monogram-dock-320');
+    await page.setViewportSize({ width: 568, height: 320 });
+    await page.goto(`${base}/now-playing`, { waitUntil: 'networkidle' });
+    await geometry(page, true);
+    await accessible(page, 'monogram-car');
+    await screenshot(page, 'monogram-car-568');
+    assert.deepEqual(
+      await page.evaluate(() => window.__radioStartupAudio.map((audio) => audio.startupPlayCalls)),
+      [0],
     );
     const timedPage = await context.newPage();
     activePage = timedPage;

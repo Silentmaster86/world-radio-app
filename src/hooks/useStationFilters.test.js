@@ -30,10 +30,17 @@ test('valid URLs restore all refinements; invalid parameters safely fall back', 
       new URLSearchParams('section=favorites&country=GB&genre=News&language=pl&q=PRL'),
       options,
     ),
-  ).toEqual({ section: 'favorites', country: 'GB', genre: 'News', language: 'pl', q: 'PRL' });
+  ).toEqual({
+    section: 'favorites',
+    country: 'GB',
+    genre: 'News',
+    language: 'pl',
+    q: 'PRL',
+    page: 1,
+  });
   expect(
     readFilters(new URLSearchParams('section=oops&country=XX&genre=unknown&language=xx'), options),
-  ).toEqual({ section: 'all', country: '', genre: '', language: '', q: '' });
+  ).toEqual({ section: 'all', country: '', genre: '', language: '', q: '', page: 1 });
 });
 
 test('recent results keep listening order, omit missing IDs and intersect refinements', () => {
@@ -54,4 +61,21 @@ test('recent results keep listening order, omit missing IDs and intersect refine
   expect(
     readFilters(new URLSearchParams('section=recent'), getFilterOptions(stations)).section,
   ).toBe('recent');
+});
+
+test('search matches all words across names, genres and descriptions with normalized accents', () => {
+  expect(ids({ q: '  JAZZ   SoMaFM ' })).toEqual(['somafm-sonic-universe']);
+  expect(ids({ q: 'late-night house' })).toEqual(['somafm-beat-blender']);
+  expect(ids({ country: 'DE', language: 'de', q: 'culture' })).toEqual(['deutschlandfunk-kultur']);
+  expect(ids({ q: 'jazz nonexisting' })).toEqual([]);
+  const sample = [{ id: 'lodz', name: 'Radio Łódź', genres: ['Talk'], description: '' }];
+  expect(filterStations(sample, [], { q: 'lodz' })).toEqual(sample);
+});
+
+test('bounded whole-number page URLs restore more results; invalid pages use the first page', () => {
+  const options = getFilterOptions(stations);
+  expect(readFilters(new URLSearchParams('page=2'), options).page).toBe(2);
+  for (const value of ['0', '-1', '2.5', '1e0', 'Infinity', '999999999999999999999']) {
+    expect(readFilters(new URLSearchParams(`page=${value}`), options).page).toBe(1);
+  }
 });

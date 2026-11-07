@@ -8,7 +8,7 @@ import {
 } from './stationUtils';
 
 test('station IDs are unique and country, language and genres have distinct fields', () => {
-  expect(new Set(stations.map((station) => station.id)).size).toBe(9);
+  expect(new Set(stations.map((station) => station.id)).size).toBe(stations.length);
   for (const station of stations) {
     expect(station.id).toMatch(/^[a-z0-9-]+$/);
     expect(station.countryCode).toMatch(/^[A-Z]{2}$/);
@@ -33,11 +33,13 @@ test('legacy resolution never depends on the old URL or logo hash', () => {
 test('country formatting includes Chicago and handles missing codes', () => {
   expect(getCountryFlag('US')).toBe('🇺🇸');
   expect(getCountryName('GB')).toBe('United Kingdom');
+  expect(getCountryFlag('DE')).toBe('🇩🇪');
+  expect(getCountryName('DE')).toBe('Germany');
   expect(getCountryFlag(undefined)).toBe('🌍');
   expect(getCountryName('XX')).toBe('Unknown country');
 });
 
 test('normalizes casing, surrounding whitespace and accented search text', () => {
   expect(normalizeStationQuery('  CAPiTAL  ')).toBe('capital');
-  expect(normalizeStationQuery('Łódź')).toBe('łodz');
+  expect(normalizeStationQuery('Łódź')).toBe('lodz');
 });

@@ -6,6 +6,7 @@ import { AudioProvider } from './context/AudioContext';
 import { FavoritesProvider } from './context/FavoritesContext';
 import { ThemeProviderToggle, useTheme } from './context/ThemeContext';
 import { stations } from './data/stations';
+import { STATION_PAGE_SIZE } from './hooks/useStationFilters';
 import { FAVORITES_KEY } from './lib/favoritesStorage';
 import { RECENT_KEY } from './lib/recentStorage';
 import { render } from './test/render';
@@ -44,10 +45,61 @@ beforeEach(() => {
 });
 afterEach(() => jest.restoreAllMocks());
 
+test('show more preserves audio, restores page/scroll navigation and reload, and resets on a search edit', async () => {
+  window.history.replaceState({}, '', '/?campaign=demo');
+  let page = mount();
+  const more = () =>
+    [...page.container.querySelectorAll('button')].find((b) =>
+      b.textContent.startsWith('Show more stations'),
+    );
+  expect(page.container.querySelectorAll('article')).toHaveLength(STATION_PAGE_SIZE);
+  act(() => more().click());
+  expect(page.container.querySelectorAll('article')).toHaveLength(stations.length);
+  expect(document.activeElement.dataset.stationId).toBe(stations[STATION_PAGE_SIZE].id);
+  expect(window.location.search).toBe('?campaign=demo&page=2');
+  const audio = window.Audio.mock.results[0].value;
+  expect(audio.play).not.toHaveBeenCalled();
+  await act(async () =>
+    page.container.querySelector('[data-station-id="deutschlandfunk-nova"]').click(),
+  );
+  page.click('[aria-label="Add Deutschlandfunk Nova to favorites"]');
+  expect(JSON.parse(localStorage.getItem(RECENT_KEY)).stationIds[0]).toBe('deutschlandfunk-nova');
+  const pauses = audio.pause.mock.calls.length;
+  page.click('#open-player');
+  page.click('[aria-label="Back to stations"]');
+  expect(page.container.querySelectorAll('article')).toHaveLength(stations.length);
+  expect(window.location.search).toBe('?campaign=demo&page=2');
+  expect(audio.pause).toHaveBeenCalledTimes(pauses);
+  expect(window.Audio).toHaveBeenCalledTimes(1);
+  page.unmount();
+  page = mount();
+  expect(page.container.querySelectorAll('article')).toHaveLength(stations.length);
+  expect(window.Audio.mock.results[1].value.play).not.toHaveBeenCalled();
+  expect(
+    page.container.querySelector('[aria-label="Remove Deutschlandfunk Nova from favorites"]'),
+  ).not.toBeNull();
+  const search = page.container.querySelector('#station-search');
+  act(() => {
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(
+      search,
+      'jazz somafm',
+    );
+    search.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  expect(window.location.search).not.toContain('page=');
+  expect(window.location.search).toContain('campaign=demo');
+  expect(page.container.querySelectorAll('article')).toHaveLength(1);
+  expect(page.container.querySelector('[data-station-title]').textContent).toBe(
+    'SomaFM · Sonic Universe',
+  );
+});
+
 test('the full app migrates old favorites and plays current catalog data', async () => {
   localStorage.setItem('favorites', '[{"name":"Heart UK","url":"https://old.example/removed"}]');
   const page = mount();
-  expect(page.container.querySelectorAll('[data-station-title]').length).toBe(9);
+  expect(page.container.querySelectorAll('[data-station-title]').length).toBe(
+    Math.min(STATION_PAGE_SIZE, stations.length),
+  );
   expect(
     page.container.querySelector('[aria-label="Remove Heart UK from favorites"]').textContent,
   ).toBe('♥');
@@ -73,7 +125,9 @@ test('the full app uses US data for Chicago and keeps a usable catalog after inv
   localStorage.setItem('favorites', '{');
   const page = mount();
   expect(page.container.querySelector('h1').textContent).toContain('World Radio App');
-  expect(page.container.querySelectorAll('[data-station-title]').length).toBe(9);
+  expect(page.container.querySelectorAll('[data-station-title]').length).toBe(
+    Math.min(STATION_PAGE_SIZE, stations.length),
+  );
   const us = page.container.querySelector('#station-country');
   act(() => {
     us.value = 'US';
@@ -81,7 +135,9 @@ test('the full app uses US data for Chicago and keeps a usable catalog after inv
   });
   expect(
     [...page.container.querySelectorAll('[data-station-title]')].map((item) => item.textContent),
-  ).toEqual(['PR Chicago']);
+  ).toEqual(
+    stations.filter((station) => station.countryCode === 'US').map((station) => station.name),
+  );
   expect(page.container.querySelector('[aria-label="United States"]')).not.toBeNull();
   expect(page.container.querySelector('[role=alert]')).toBeNull();
 });
@@ -177,7 +233,9 @@ test('combined URL filters survive reload and reset without removing unrelated p
     (item) => item.textContent === 'Reset filters',
   );
   act(() => reset.click());
-  expect(page.container.querySelectorAll('[data-station-title]')).toHaveLength(9);
+  expect(page.container.querySelectorAll('[data-station-title]')).toHaveLength(
+    Math.min(STATION_PAGE_SIZE, stations.length),
+  );
   expect(window.location.search).toBe('?campaign=demo');
 });
 
@@ -190,7 +248,9 @@ test('empty favorites guide the user to stations; unmatched refinements can be c
       .find((item) => item.textContent === 'Browse all stations')
       .click(),
   );
-  expect(page.container.querySelectorAll('[data-station-title]')).toHaveLength(9);
+  expect(page.container.querySelectorAll('[data-station-title]')).toHaveLength(
+    Math.min(STATION_PAGE_SIZE, stations.length),
+  );
   const country = page.container.querySelector('#station-country');
   const genre = page.container.querySelector('#station-genre');
   act(() => {
@@ -207,7 +267,9 @@ test('empty favorites guide the user to stations; unmatched refinements can be c
       .find((item) => item.textContent === 'Clear search and filters')
       .click(),
   );
-  expect(page.container.querySelectorAll('[data-station-title]')).toHaveLength(9);
+  expect(page.container.querySelectorAll('[data-station-title]')).toHaveLength(
+    Math.min(STATION_PAGE_SIZE, stations.length),
+  );
 });
 
 test('the shared player survives route changes and restores the list, scroll and keyboard focus', async () => {
@@ -248,7 +310,9 @@ test('direct entry to car mode can return to the catalog without autoplay', () =
   const page = mount();
   expect(window.Audio.mock.results[0].value.play).not.toHaveBeenCalled();
   page.click('[aria-label="Back to stations"]');
-  expect(page.container.querySelectorAll('[data-station-title]')).toHaveLength(9);
+  expect(page.container.querySelectorAll('[data-station-title]')).toHaveLength(
+    Math.min(STATION_PAGE_SIZE, stations.length),
+  );
 });
 
 test('sleep timer survives navigation to car mode and pauses the same audio element', async () => {
