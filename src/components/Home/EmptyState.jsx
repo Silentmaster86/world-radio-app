@@ -17,17 +17,26 @@ const Panel = styled.div`
     background: transparent;
   }
 `;
-export default function EmptyState({ emptyFavorites, onClear, onBrowse }) {
+export default function EmptyState({ emptyFavorites, emptyRecent = false, onClear, onBrowse }) {
+  const emptyCollection = emptyFavorites || emptyRecent;
   return (
     <Panel>
-      <h2>{emptyFavorites ? 'Your favorites start here' : 'No matching stations'}</h2>
+      <h2>
+        {emptyFavorites
+          ? 'Your favorites start here'
+          : emptyRecent
+            ? 'No recent stations to show'
+            : 'No matching stations'}
+      </h2>
       <p>
         {emptyFavorites
           ? 'Use the heart button on a station to save it here.'
-          : 'Try another station name or clear the country, genre and language filters.'}
+          : emptyRecent
+            ? 'Stations appear here after playback starts. History stays on this device.'
+            : 'Try another station name or clear the country, genre and language filters.'}
       </p>
-      <button type="button" onClick={emptyFavorites ? onBrowse : onClear}>
-        {emptyFavorites ? 'Browse all stations' : 'Clear search and filters'}
+      <button type="button" onClick={emptyCollection ? onBrowse : onClear}>
+        {emptyCollection ? 'Browse all stations' : 'Clear search and filters'}
       </button>
     </Panel>
   );

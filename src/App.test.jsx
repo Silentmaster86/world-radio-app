@@ -7,6 +7,7 @@ import { FavoritesProvider } from './context/FavoritesContext';
 import { ThemeProviderToggle, useTheme } from './context/ThemeContext';
 import { stations } from './data/stations';
 import { FAVORITES_KEY } from './lib/favoritesStorage';
+import { RECENT_KEY } from './lib/recentStorage';
 import { render } from './test/render';
 import { FakeAudio } from './test/FakeAudio';
 
@@ -83,6 +84,62 @@ test('the full app uses US data for Chicago and keeps a usable catalog after inv
   ).toEqual(['PR Chicago']);
   expect(page.container.querySelector('[aria-label="United States"]')).not.toBeNull();
   expect(page.container.querySelector('[role=alert]')).toBeNull();
+});
+
+test('recent stations record confirmed playback, survive reload and clear without stopping audio or favorites', async () => {
+  let page = mount();
+  expect(localStorage.getItem(RECENT_KEY)).toBeNull();
+  await act(async () => page.container.querySelector('[data-station-id="heart-uk"]').click());
+  await act(async () => page.container.querySelector('[data-station-id="capital-dance"]').click());
+  await act(async () => page.container.querySelector('[data-station-id="heart-uk"]').click());
+  page.click('#recent-collection');
+  expect(window.location.search).toContain('section=recent');
+  expect(
+    [...page.container.querySelectorAll('[data-station-title]')].map((s) => s.textContent),
+  ).toEqual(['Heart UK', 'Capital Dance']);
+  const firstAudio = window.Audio.mock.results[0].value;
+  const firstPauses = firstAudio.pause.mock.calls.length;
+  page.click('#open-player');
+  page.click('[aria-label="Back to stations"]');
+  expect(window.location.search).toContain('section=recent');
+  expect(firstAudio.pause).toHaveBeenCalledTimes(firstPauses);
+  expect(window.Audio).toHaveBeenCalledTimes(1);
+  page.unmount();
+  page = mount();
+  const audio = window.Audio.mock.results[1].value;
+  expect(audio.play).not.toHaveBeenCalled();
+  expect(
+    [...page.container.querySelectorAll('[data-station-title]')].map((s) => s.textContent),
+  ).toEqual(['Heart UK', 'Capital Dance']);
+  page.click('[aria-label="Add Heart UK to favorites"]');
+  await act(async () => page.container.querySelector('[data-station-id="heart-uk"]').click());
+  const pauses = audio.pause.mock.calls.length;
+  act(() =>
+    [...page.container.querySelectorAll('button')]
+      .find((b) => b.textContent === 'Clear history')
+      .click(),
+  );
+  expect(page.container.textContent).toContain('No recent stations to show');
+  expect(document.activeElement.id).toBe('recent-collection');
+  expect(audio.pause).toHaveBeenCalledTimes(pauses);
+  expect(
+    page.container.querySelector('[data-player-status]').getAttribute('data-player-status'),
+  ).toBe('playing');
+  expect(JSON.parse(localStorage.getItem(FAVORITES_KEY)).stationIds).toContain('heart-uk');
+  act(() => audio.emit('waiting', { readyState: 1 }));
+  act(() => audio.emit('playing', { paused: false, readyState: 4 }));
+  expect(JSON.parse(localStorage.getItem(RECENT_KEY)).stationIds).toEqual([]);
+  expect(window.Audio).toHaveBeenCalledTimes(2);
+});
+
+test('a failed start stays out of recent stations', async () => {
+  const page = mount();
+  const audio = window.Audio.mock.results[0].value;
+  audio.play.mockRejectedValueOnce(new DOMException('Blocked', 'NotAllowedError'));
+  await act(async () => page.container.querySelector('[aria-label="Play"]').click());
+  page.click('#recent-collection');
+  expect(page.container.textContent).toContain('No recent stations to show');
+  expect(localStorage.getItem(RECENT_KEY)).toBeNull();
 });
 
 test('the rendered player reports a failed start, retries and returns to paused', async () => {

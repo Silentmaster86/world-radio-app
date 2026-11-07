@@ -7,14 +7,16 @@ none of the draft branches changes production until merged.
 ## Behavior and files
 
 - `src/hooks/useStationFilters.js` intersects collection, country, genre, language
-  and normalized station-name search. `section=favorites`, `country`, `genre`,
+  and normalized station-name search. `section=favorites` or `section=recent`, `country`, `genre`,
   `language` and `q` are URL parameters. Editing replaces the current history
   entry, so typing does not create a Back entry per character. Invalid option
   values fall back safely. Reset removes app filters and preserves unrelated
   parameters. Collection counts use known catalog IDs; favorite IDs outside the
-  catalog remain preserved in storage.
+  catalog remain preserved in storage. Recent station IDs follow the same rule;
+  their bounded recency order and playback confirmation are described in
+  [recent-stations.md](recent-stations.md).
 - `StationControls` provides visible labels and native selects. `EmptyState`
-  distinguishes an empty favorites collection from refinements with no matches.
+  distinguishes empty favorites/recent collections from refinements with no matches.
   Clearing refinements keeps the selected collection; browsing all resets it.
 - `src/components/Layout/SoundBar.jsx` mounts outside the routed page. It shares
   the existing audio provider. Its measured height reserves space below the list

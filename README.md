@@ -7,6 +7,7 @@ Supports:
 - ✅ Live streaming with station switching
 - ✅ Favorites (saved locally)
 - ✅ Sleep timer with selectable duration and cancellation
+- ✅ Recent stations from confirmed playback, stored locally
 - ✅ Search and category filtering
 - ✅ Responsive mobile/desktop layout
 - ✅ Installable as a PWA (Android, desktop)
@@ -167,3 +168,6 @@ Development commands, editor setup and the build/PWA contract are described in
 The [current roadmap](docs/roadmap.md) separates completed work from product
 improvements. See [sleep-timer.md](docs/sleep-timer.md) for the timer's behavior
 and browser background limitations.
+
+The [Recent collection](docs/recent-stations.md) records up to 20 distinct played
+stations and supports filtering, reload/offline access and independent clearing.

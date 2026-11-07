@@ -23,8 +23,9 @@ const CollectionRow = styled(Row)`
     > button {
       flex: 1;
       min-width: 0;
-      padding: 0.5rem 0.6rem;
+      padding: 0.25rem;
       font-size: 0.875rem;
+      line-height: 1.2;
       overflow-wrap: anywhere;
     }
   }
@@ -91,6 +92,7 @@ export default function StationControls({
   resetFilters,
   total,
   favoriteCount,
+  recentCount = 0,
 }) {
   const [expanded, setExpanded] = useFilterDisclosure();
   const activeCount = [filters.country, filters.genre, filters.language].filter(Boolean).length;
@@ -113,6 +115,15 @@ export default function StationControls({
           onClick={() => updateFilters({ section: 'favorites' })}
         >
           Favorites ({favoriteCount})
+        </SectionButton>
+        <SectionButton
+          id="recent-collection"
+          type="button"
+          $active={filters.section === 'recent'}
+          aria-pressed={filters.section === 'recent'}
+          onClick={() => updateFilters({ section: 'recent' })}
+        >
+          Recent ({recentCount})
         </SectionButton>
       </CollectionRow>
       <Field htmlFor="station-search">
