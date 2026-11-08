@@ -8,8 +8,8 @@ Supports:
 - ✅ Favorites (saved locally)
 - ✅ Sleep timer with selectable duration and cancellation
 - ✅ Recent stations from confirmed playback, stored locally
-- ✅ Curated 18-station catalog, keyword search and filters
-- ✅ Show more stations with reload and player-return continuity
+- ✅ Curated 12-station catalog, keyword search and filters
+- ✅ Progressive station reveal for larger catalogs, with reload and player-return continuity
 - ✅ Responsive mobile/desktop layout
 - ✅ Installable as a PWA (Android, desktop)
 - ✅ Deployable to Google Play Store via Trusted Web Activity (TWA)
@@ -173,6 +173,6 @@ and browser background limitations.
 The [Recent collection](docs/recent-stations.md) records up to 20 distinct played
 stations and supports filtering, reload/offline access and independent clearing.
 
-The [curated catalog](docs/catalog.md) ships 18 stations with keyword search,
+The [curated catalog](docs/catalog.md) ships 12 stations with keyword search,
 country/genre/language filters and groups of 12 results. Publisher sources and
 live reachability checks are recorded in [station-sources.md](docs/station-sources.md).
