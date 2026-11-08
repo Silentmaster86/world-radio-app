@@ -26,22 +26,6 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      # Temporary formatter capture; restored before review.
-      - name: Capture formatted fallback files
-        run: |
-          npx prettier --write scripts/check-streams.test.cjs src/components/Player/PlayerStatus.jsx src/lib/audioPlayer.test.js
-          echo WRA_FMT_ONE_BEGIN
-          base64 -w0 scripts/check-streams.test.cjs
-          echo
-          echo WRA_FMT_ONE_END
-          echo WRA_FMT_TWO_BEGIN
-          base64 -w0 src/components/Player/PlayerStatus.jsx
-          echo
-          echo WRA_FMT_TWO_END
-          echo WRA_FMT_THREE_BEGIN
-          base64 -w0 src/lib/audioPlayer.test.js
-          echo
-          echo WRA_FMT_THREE_END
       - run: npm run check
 
   ux-browser:
