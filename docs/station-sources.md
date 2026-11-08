@@ -24,7 +24,16 @@ decoding, regional availability, background playback and physical media controls
 still require browser/device review. Keep live network checks separate from the
 deterministic player and storage regression tests.
 
-## Catalog expansion: SomaFM and Deutschlandradio
+## Historical catalog expansion: SomaFM and Deutschlandradio
+
+**Current status (8 November 2026):** The six SomaFM channels documented
+below have been **temporarily removed** from the active station catalog.
+A real-device report found that these streams stayed on "Connecting" in
+World Radio App while the broadcaster's official website player worked.
+That observation does not determine the technical root cause. PR Chicago
+continues to work and remains included. Do not restore SomaFM streams
+without confirming both reliable playback and third-party usage permission.
+Historical publisher links and previous checks are retained for traceability.
 
 Publisher sources checked on 7 November 2026. The six SomaFM channel pages have
 an **Other Ways to Listen** section expressly offering open-protocol links for
@@ -107,7 +116,7 @@ their intended use to individual/personal listening. Do not automatically add
 further SomaFM mirror endpoints to a public third-party app without clarifying
 the broadcaster's permission. See the [Groove Salad server-link terms](https://somafm.com/groovesalad/directstreamlinks.html).
 
-The stream diagnostic checks all 18 primary URLs **plus** each configured backup
-independently (21 endpoints with these three AAC backups). A successful bounded
+The stream diagnostic checks all 12 currently active primary URLs **plus**
+each configured backup independently (15 endpoints with three AAC backups). A successful bounded
 check does not prove continuous listening, native decoding, station identity or
 permission to retransmit.
