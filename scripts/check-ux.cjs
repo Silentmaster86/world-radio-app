@@ -408,7 +408,9 @@ async function main() {
     );
     await page.setViewportSize({ width: 320, height: 568 });
     await page.reload({ waitUntil: 'networkidle' });
-    await page.locator('[aria-label="Radio player"] h2').getByText('Deutschlandfunk Nova').waitFor();
+    const playerHeading = page.locator('[aria-label="Radio player"] h2');
+    await playerHeading.waitFor();
+    assert.equal(await playerHeading.innerText(), 'Deutschlandfunk Nova');
     await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
     await geometry(page);
     await screenshot(page, 'monogram-dock-320');
