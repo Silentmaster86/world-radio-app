@@ -175,17 +175,13 @@ async function main() {
       // Direct routes, keyboard favorites, combined filters, reload and return navigation.
       await page.setViewportSize({ width: 390, height: 844 });
       await page.goto(base, { waitUntil: 'networkidle' });
-      await page
-        .getByRole('button', { name: 'Show more stations (6 remaining)', exact: true })
-        .click();
-      await page.waitForFunction(() => document.querySelectorAll('article').length === 18);
-      assert.equal(new URL(page.url()).searchParams.get('page'), '2');
+      await page.waitForFunction(() => document.querySelectorAll('article').length === 12);
       assert.equal(
-        await page.evaluate(() => document.activeElement.dataset.stationId),
-        'somafm-indie-pop-rocks',
+        await page.getByRole('button', { name: /Show more stations/ }).count(),
+        0,
       );
       await page.reload({ waitUntil: 'networkidle' });
-      assert.equal(await page.locator('article').count(), 18);
+      assert.equal(await page.locator('article').count(), 12);
       await page.locator('[aria-controls="station-refinements"]').click();
       await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
       await page
@@ -263,11 +259,11 @@ async function main() {
       await page.getByRole('button', { name: 'Clear search and filters' }).click();
       await page.waitForFunction(() => document.querySelectorAll('article').length === 12);
       assert.equal(await page.locator('article').count(), 12);
-      await page.locator('#station-search').fill('jazz somafm');
+      await page.locator('#station-search').fill('german culture');
       await page.waitForFunction(() => document.querySelectorAll('article').length === 1);
       assert.equal(
         await page.locator('[data-station-title]').innerText(),
-        'SomaFM · Sonic Universe',
+        'Deutschlandfunk Kultur',
       );
       await screenshot(page, `${mode}-keyword-search`);
       await page.locator('#station-search').fill('');
@@ -348,7 +344,7 @@ async function main() {
       await page
         .getByRole('button', { name: 'Remove Heart UK from favorites', exact: true })
         .click();
-      await page.getByRole('button', { name: 'All stations (18)', exact: true }).click();
+      await page.getByRole('button', { name: 'All stations (12)', exact: true }).click();
       await page.locator('#appearance').selectOption(mode === 'dark' ? 'light' : 'dark');
       await page.reload({ waitUntil: 'networkidle' });
       assert.equal(
