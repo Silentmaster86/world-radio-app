@@ -196,7 +196,7 @@ async function main() {
     assert.equal(await page.evaluate(() => window.__pwaAudio[0].playCalls), 0);
     await page.screenshot({ path: path.join(output, 'offline-recent.png'), fullPage: true });
     await page.goto(`${base}/?page=2`, { waitUntil: 'domcontentloaded' });
-    assert.equal(await page.locator('article').count(), 18);
+    assert.equal(await page.locator('article').count(), 12);
     await page.locator('[aria-controls="station-refinements"]').click();
     await page.locator('#station-country').selectOption('DE');
     await page.locator('#station-language').selectOption('de');
@@ -221,7 +221,7 @@ async function main() {
     report.manifest = true;
     report.offlineFavorites = true;
     report.offlineRecent = true;
-    report.offlineExpandedCatalog = true;
+    report.offlineCuratedCatalog = true;
     report.offlineDirectCar = true;
     report.noAutoplay = true;
     report.cache = cacheReport;
