@@ -19,9 +19,11 @@ history; their original follow-up lists are no longer the current backlog.
   See [sleep-timer.md](sleep-timer.md) for behavior and background-timing limits.
 - Recent stations: a bounded local list of confirmed playback, recency ordering,
   filtering and independent clearing. See [recent-stations.md](recent-stations.md).
-- Expanded curated catalog: 18 stations, nine publisher-sourced additions,
-  keyword search and paged reveal with offline/return continuity. See
-  [catalog.md](catalog.md) for behavior and the directory evaluation.
+- Curated catalog: currently 12 stations, including three Deutschlandradio
+  programmes and PR Chicago. Six SomaFM channels were temporarily removed after
+  Android connection failures, while preserving saved favorites/history IDs.
+  Keyword search and progressive reveal remain in place for larger catalogs.
+  See [catalog.md](catalog.md) for details and directory evaluation.
 
 ## Next work, in priority order
 
