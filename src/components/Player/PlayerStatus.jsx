@@ -18,12 +18,12 @@ const Status = styled.div`
 `;
 
 export default function PlayerStatus({ announce = true }) {
-  const { status, wantsToPlay, online, retryAttempt, error, retry, preferenceMessage } = useAudio();
+  const { status, wantsToPlay, online, retryAttempt, streamSourceIndex = 0, error, retry, preferenceMessage } = useAudio();
   const pwa = usePwa();
   const labels = {
     idle: 'Ready to play',
-    connecting: retryAttempt ? 'Reconnecting…' : 'Connecting…',
-    playing: 'Playing live',
+    connecting: streamSourceIndex ? 'Connecting to backup stream…' : retryAttempt ? 'Reconnecting…' : 'Connecting…',
+    playing: streamSourceIndex ? 'Playing live (backup stream)' : 'Playing live',
     buffering: 'Buffering…',
     paused: 'Paused',
     error: error?.message || 'The station is currently unavailable.',
