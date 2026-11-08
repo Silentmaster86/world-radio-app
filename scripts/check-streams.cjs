@@ -39,7 +39,12 @@ function loadCuratedStations(filename = path.join(__dirname, '../src/data/statio
     ) {
       throw new Error('Invalid curated station record.');
     }
-    return { id: station.id, name: station.name, url: station.url };
+    return {
+      id: station.id,
+      name: station.name,
+      url: station.url,
+      fallbackUrls: Array.isArray(station.fallbackUrls) ? Array.from(station.fallbackUrls) : [],
+    };
   });
 }
 
@@ -175,10 +180,18 @@ async function checkAll(stations, { concurrency = CONCURRENCY, ...options } = {}
 
 async function main() {
   const stations = loadCuratedStations();
+  const entries = stations.flatMap((station) => [
+    { id: station.id, name: station.name + ' (main)', url: station.url },
+    ...station.fallbackUrls.map((url, i) => ({
+      id: station.id,
+      name: station.name + ' (backup ' + (i + 1) + ')',
+      url,
+    })),
+  ]);
   console.log(
     'Checking ' +
-      stations.length +
-      ' curated streams (max ' +
+      entries.length +
+      ' curated stream endpoints (max ' +
       TIMEOUT_MS +
       ' ms each, ' +
       MAX_BYTES +
@@ -186,7 +199,7 @@ async function main() {
       CONCURRENCY +
       ' concurrent requests).',
   );
-  const results = await checkAll(stations);
+  const results = await checkAll(entries);
   for (const result of results) {
     const label = result.likelyAudio ? 'OK' : 'CHECK';
     console.log(

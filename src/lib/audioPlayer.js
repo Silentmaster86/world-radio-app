@@ -1,3 +1,23 @@
+// A station keeps its existing public ID and primary URL. Optional publisher-verified
+// backup URLs are tried only after recoverable failures, never as extra players.
+export function getStationStreamUrls(station) {
+  if (!station?.url) return [];
+  const backups = Array.isArray(station.fallbackUrls) ? station.fallbackUrls : [];
+  const unique = [station.url];
+  for (const value of backups) {
+    if (typeof value !== 'string' || unique.includes(value)) continue;
+    try {
+      const url = new URL(value);
+      if (url.protocol !== 'https:' || url.username || url.password) continue;
+    } catch {
+      continue;
+    }
+    unique.push(value);
+    if (unique.length === 4) break;
+  }
+  return unique;
+}
+
 export function createInitialPlayerState(stations, options = {}) {
   const selected =
     stations.find((station) => station.id === options.initialStationId) || stations[0];
@@ -8,6 +28,7 @@ export function createInitialPlayerState(stations, options = {}) {
     wantsToPlay: false,
     error: null,
     retryAttempt: 0,
+    streamSourceIndex: 0,
     volume: Number.isFinite(options.initialVolume)
       ? Math.min(1, Math.max(0, options.initialVolume))
       : 1,
@@ -65,6 +86,7 @@ export function createAudioPlayer({
   let timeout = null;
   let retryTimer = null;
   let failures = 0;
+  let sourceIndex = 0;
   const listeners = new Set();
 
   function publish(patch) {
@@ -123,10 +145,13 @@ export function createAudioPlayer({
     if (problem.recoverable && failures < retryDelays.length) {
       const delay = retryDelays[failures];
       failures += 1;
+      const urls = getStationStreamUrls(attempt.station);
+      sourceIndex = Math.min(sourceIndex + 1, urls.length - 1);
       publish({
         status: 'connecting',
         playingStationId: null,
         retryAttempt: failures,
+        streamSourceIndex: sourceIndex,
         error: null,
       });
       retryTimer = setTimeout(() => {
@@ -151,6 +176,8 @@ export function createAudioPlayer({
     releaseSource();
     const station = stations.find((item) => item.id === state.selectedStationId);
     if (!station || disposed || !state.wantsToPlay) return Promise.resolve(false);
+    const streamUrl = getStationStreamUrls(station)[sourceIndex];
+    if (!streamUrl) return Promise.resolve(false);
     if (!state.online) {
       publish({ status: 'buffering', playingStationId: null });
       return Promise.resolve(false);
@@ -175,7 +202,7 @@ export function createAudioPlayer({
       generation === attempt.generation &&
       state.wantsToPlay &&
       state.selectedStationId === station.id &&
-      (!audio.currentSrc || audio.currentSrc === station.url);
+      (!audio.currentSrc || audio.currentSrc === streamUrl);
     const confirmPlaying = () => {
       if (!isCurrent() || audio.paused || audio.ended || audio.readyState < 3) return;
       clearTimeout(timeout);
@@ -210,7 +237,7 @@ export function createAudioPlayer({
     publish({ status: 'connecting', playingStationId: null, error: null });
     armTimeout(attempt);
     try {
-      audio.src = station.url;
+      audio.src = streamUrl;
       audio.load();
       Promise.resolve(audio.play())
         .then(confirmPlaying)
@@ -228,7 +255,8 @@ export function createAudioPlayer({
     if (state.wantsToPlay) return active?.result || Promise.resolve(state.status === 'playing');
     if (!state.selectedStationId) return Promise.resolve(false);
     failures = 0;
-    publish({ wantsToPlay: true, retryAttempt: 0, error: null });
+    sourceIndex = 0;
+    publish({ wantsToPlay: true, retryAttempt: 0, streamSourceIndex: 0, error: null });
     return startAttempt();
   }
 
@@ -236,12 +264,14 @@ export function createAudioPlayer({
     if (disposed) return;
     const hadPlayingSource = state.playingStationId !== null;
     invalidate();
+    sourceIndex = 0;
     publish({
       wantsToPlay: false,
       status: 'paused',
       playingStationId: null,
       error: null,
       retryAttempt: 0,
+      streamSourceIndex: 0,
     });
     // System media controls need the paused audio resource to stay available
     // for Android to potentially keep a resumable media notification.
@@ -259,12 +289,14 @@ export function createAudioPlayer({
       return active?.result || Promise.resolve(state.status === 'playing');
     invalidate();
     failures = 0;
+    sourceIndex = 0;
     publish({
       selectedStationId: id,
       playingStationId: null,
       status: state.online ? 'connecting' : 'buffering',
       wantsToPlay: true,
       retryAttempt: 0,
+      streamSourceIndex: 0,
       error: null,
     });
     return startAttempt();

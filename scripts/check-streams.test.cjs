@@ -23,6 +23,8 @@ test('loads curated URLs from the existing station source', () => {
   assert.equal(stations.length, 18);
   assert.ok(stations.every((s) => s.id && s.name && s.url.startsWith('https://')));
   assert.equal(new Set(stations.map((s) => s.id)).size, stations.length);
+  assert.equal(stations.filter((s) => s.fallbackUrls.length > 0).length, 3);
+  assert.ok(stations.every((s) => s.fallbackUrls.every((url) => url.startsWith('https://'))));
 });
 
 test('reports bounded audio sample without downloading the stream', async () => {

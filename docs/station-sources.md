@@ -85,3 +85,29 @@ behavior, or rights to redistribute logos or streams. Confirm suspicious
 results against the official publisher player and on real devices. Streaming
 servers may treat command-line clients differently from browsers. This
 checker samples data and cancels rather than recording audio.
+
+## Publisher-sourced backup streams
+
+Deutschlandradio lists a 96 kbit/s AAC live stream for each of its three
+programmes alongside the existing 128 kbit/s MP3 stream:
+
+- Deutschlandfunk: `https://st01.sslstream.dlf.de/dlf/01/mid/aac/stream.aac?aggregator=web`
+- Deutschlandfunk Kultur: `https://st02.sslstream.dlf.de/dlf/02/mid/aac/stream.aac?aggregator=web`
+- Deutschlandfunk Nova: `https://st03.sslstream.dlf.de/dlf/03/mid/aac/stream.aac?aggregator=web`
+
+Source: [official Deutschlandradio streaming service list](https://www.deutschlandradio.de/streamingdienste-100.html),
+reviewed on 8 November 2026. These are the broadcaster's stable published URLs,
+not temporary CDN redirect destinations. Their format is different from the
+primary MP3 stream, so native AAC playback on Android and Safari requires
+real-device verification. **Publisher listing is not a live availability test**;
+check each endpoint with `npm run check:streams` before merging.
+
+The SomaFM channel pages publish direct MP3 mirror URLs, but explicitly restrict
+their intended use to individual/personal listening. Do not automatically add
+further SomaFM mirror endpoints to a public third-party app without clarifying
+the broadcaster's permission. See the [Groove Salad server-link terms](https://somafm.com/groovesalad/directstreamlinks.html).
+
+The stream diagnostic checks all 18 primary URLs **plus** each configured backup
+independently (21 endpoints with these three AAC backups). A successful bounded
+check does not prove continuous listening, native decoding, station identity or
+permission to retransmit.

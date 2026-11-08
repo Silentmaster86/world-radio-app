@@ -1,4 +1,4 @@
-import { createAudioPlayer } from './audioPlayer';
+import { createAudioPlayer, getStationStreamUrls } from './audioPlayer';
 import { FakeAudio, deferred } from '../test/FakeAudio';
 
 const stations = ['first', 'second', 'third'].map((id) => ({
@@ -92,6 +92,103 @@ test('retained-source pause still releases an unconfirmed connection', async () 
   pending.resolve();
   await flush();
   expect(player.getSnapshot().wantsToPlay).toBe(false);
+});
+
+test('accepts only unique secure backup URLs while preserving the primary URL', () => {
+  const source = {
+    url: 'https://radio.example/main',
+    fallbackUrls: [
+      'https://radio.example/backup',
+      'https://radio.example/backup',
+      'http://radio.example/insecure',
+      'https://user:pass@radio.example/private',
+      'not a URL',
+    ],
+  };
+  expect(getStationStreamUrls(source)).toEqual([
+    'https://radio.example/main',
+    'https://radio.example/backup',
+  ]);
+});
+
+test('switches to a backup URL after a recoverable failure without changing station', async () => {
+  const audio = new FakeAudio();
+  audio.play.mockRejectedValueOnce(new Error('Network unavailable'));
+  const backupStation = {
+    ...stations[0],
+    fallbackUrls: ['https://radio.example/first-backup'],
+  };
+  const { player, createAudio } = setup({ audio, stations: [backupStation] });
+  expect(await player.play()).toBe(false);
+  expect(player.getSnapshot()).toMatchObject({
+    status: 'connecting',
+    selectedStationId: 'first',
+    streamSourceIndex: 1,
+    retryAttempt: 1,
+    wantsToPlay: true,
+  });
+  jest.advanceTimersByTime(10);
+  await flush();
+  expect(player.getSnapshot()).toMatchObject({
+    status: 'playing',
+    playingStationId: 'first',
+    streamSourceIndex: 1,
+  });
+  expect(audio.src).toBe('https://radio.example/first-backup');
+  expect(createAudio).toHaveBeenCalledTimes(1);
+});
+
+test('does not switch on unrecoverable codec or autoplay errors', async () => {
+  const audio = new FakeAudio();
+  audio.play.mockRejectedValueOnce(new DOMException('Unsupported', 'NotSupportedError'));
+  const { player } = setup({
+    audio,
+    stations: [{ ...stations[0], fallbackUrls: ['https://radio.example/backup'] }],
+  });
+  expect(await player.play()).toBe(false);
+  jest.runAllTimers();
+  expect(player.getSnapshot()).toMatchObject({
+    status: 'error',
+    streamSourceIndex: 0,
+  });
+  expect(audio.play).toHaveBeenCalledTimes(1);
+});
+
+test('pause during failover backoff cancels the backup and later retries', async () => {
+  const audio = new FakeAudio();
+  audio.play.mockRejectedValueOnce(new Error('Network unavailable'));
+  const { player } = setup({
+    audio,
+    stations: [{ ...stations[0], fallbackUrls: ['https://radio.example/backup'] }],
+  });
+  expect(await player.play()).toBe(false);
+  player.pause();
+  jest.runAllTimers();
+  expect(audio.play).toHaveBeenCalledTimes(1);
+  expect(audio.src).toBe('');
+  expect(player.getSnapshot()).toMatchObject({
+    wantsToPlay: false,
+    streamSourceIndex: 0,
+  });
+});
+
+test('changing station while a backup is pending never starts the old backup', async () => {
+  const audio = new FakeAudio();
+  audio.play.mockRejectedValueOnce(new Error('Network unavailable'));
+  const { player } = setup({
+    audio,
+    stations: [{ ...stations[0], fallbackUrls: ['https://radio.example/backup'] }, stations[1]],
+  });
+  expect(await player.play()).toBe(false);
+  await player.selectStation('second');
+  jest.runAllTimers();
+  expect(player.getSnapshot()).toMatchObject({
+    selectedStationId: 'second',
+    playingStationId: 'second',
+    streamSourceIndex: 0,
+  });
+  expect(audio.src).toBe(stations[1].url);
+  expect(audio.play).toHaveBeenCalledTimes(2);
 });
 
 test('rapid next actions use the latest selection before play promises settle', async () => {

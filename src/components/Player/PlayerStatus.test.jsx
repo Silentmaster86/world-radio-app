@@ -22,6 +22,20 @@ test.each([
   expect(page.container.querySelector('[role=status]').textContent).toContain(label);
 });
 
+test('labels active backup playback without exposing server URLs', () => {
+  useAudio.mockReturnValue({
+    status: 'playing',
+    online: true,
+    streamSourceIndex: 1,
+  });
+  const page = render(
+    <ThemeProvider theme={darkTheme}>
+      <PlayerStatus />
+    </ThemeProvider>,
+  );
+  expect(page.container.textContent).toContain('backup stream');
+});
+
 test('explains a failure and retries through the shared controller', () => {
   const retry = jest.fn();
   useAudio.mockReturnValue({

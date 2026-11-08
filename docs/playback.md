@@ -29,7 +29,14 @@ first instance before creating the next one.
 
 The connection/buffering deadline is 15 seconds. Recoverable failures use at most
 three automatic retries with delays of 1, 2 and 4 seconds during a requested
-playback session. A manual play/retry or a different selection resets the budget.
+playback session. Stations may optionally provide a small set of broadcaster-sourced
+`fallbackUrls`. After a recoverable failure, the next configured endpoint is tried
+using the **same** audio element and the existing total retry budget. The status
+indicates backup playback without exposing a server URL. A manual play/retry or
+a different selection starts again from the primary endpoint and resets the budget.
+Autoplay and codec errors remain terminal, and Pause, sleep timer expiry,
+station changes and disposal cancel queued fallback attempts. A 200 response
+alone does not establish identity or device playback support.
 Blocked autoplay, unsupported formats and decoding failures need user action.
 Offline waits preserve intent; explicit pause and disposal cancel that wait.
 Stalled events with enough buffered data do not incorrectly stop playback.
