@@ -176,10 +176,7 @@ async function main() {
       await page.setViewportSize({ width: 390, height: 844 });
       await page.goto(base, { waitUntil: 'networkidle' });
       await page.waitForFunction(() => document.querySelectorAll('article').length === 12);
-      assert.equal(
-        await page.getByRole('button', { name: /Show more stations/ }).count(),
-        0,
-      );
+      assert.equal(await page.getByRole('button', { name: /Show more stations/ }).count(), 0);
       await page.reload({ waitUntil: 'networkidle' });
       assert.equal(await page.locator('article').count(), 12);
       await page.locator('[aria-controls="station-refinements"]').click();
