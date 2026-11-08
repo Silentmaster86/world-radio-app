@@ -94,7 +94,6 @@ test('retained-source pause still releases an unconfirmed connection', async () 
   expect(player.getSnapshot().wantsToPlay).toBe(false);
 });
 
-
 test('accepts only unique secure backup URLs while preserving the primary URL', () => {
   const source = {
     url: 'https://radio.example/main',
@@ -178,10 +177,7 @@ test('changing station while a backup is pending never starts the old backup', a
   audio.play.mockRejectedValueOnce(new Error('Network unavailable'));
   const { player } = setup({
     audio,
-    stations: [
-      { ...stations[0], fallbackUrls: ['https://radio.example/backup'] },
-      stations[1],
-    ],
+    stations: [{ ...stations[0], fallbackUrls: ['https://radio.example/backup'] }, stations[1]],
   });
   expect(await player.play()).toBe(false);
   await player.selectStation('second');
