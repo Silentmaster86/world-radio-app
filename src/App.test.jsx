@@ -45,18 +45,12 @@ beforeEach(() => {
 });
 afterEach(() => jest.restoreAllMocks());
 
-test('show more preserves audio, restores page/scroll navigation and reload, and resets on a search edit', async () => {
+test('compact catalog preserves audio, navigation, reload and current search results', async () => {
   window.history.replaceState({}, '', '/?campaign=demo');
   let page = mount();
-  const more = () =>
-    [...page.container.querySelectorAll('button')].find((b) =>
-      b.textContent.startsWith('Show more stations'),
-    );
-  expect(page.container.querySelectorAll('article')).toHaveLength(STATION_PAGE_SIZE);
-  act(() => more().click());
   expect(page.container.querySelectorAll('article')).toHaveLength(stations.length);
-  expect(document.activeElement.dataset.stationId).toBe(stations[STATION_PAGE_SIZE].id);
-  expect(window.location.search).toBe('?campaign=demo&page=2');
+  expect(stations).toHaveLength(12);
+  expect(page.container.textContent).not.toContain('Show more stations');
   const audio = window.Audio.mock.results[0].value;
   expect(audio.play).not.toHaveBeenCalled();
   await act(async () =>
@@ -68,7 +62,7 @@ test('show more preserves audio, restores page/scroll navigation and reload, and
   page.click('#open-player');
   page.click('[aria-label="Back to stations"]');
   expect(page.container.querySelectorAll('article')).toHaveLength(stations.length);
-  expect(window.location.search).toBe('?campaign=demo&page=2');
+  expect(window.location.search).toBe('?campaign=demo');
   expect(audio.pause).toHaveBeenCalledTimes(pauses);
   expect(window.Audio).toHaveBeenCalledTimes(1);
   page.unmount();
@@ -82,16 +76,38 @@ test('show more preserves audio, restores page/scroll navigation and reload, and
   act(() => {
     Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(
       search,
-      'jazz somafm',
+      'culture deutschlandfunk',
     );
     search.dispatchEvent(new Event('input', { bubbles: true }));
   });
-  expect(window.location.search).not.toContain('page=');
   expect(window.location.search).toContain('campaign=demo');
   expect(page.container.querySelectorAll('article')).toHaveLength(1);
   expect(page.container.querySelector('[data-station-title]').textContent).toBe(
-    'SomaFM · Sonic Universe',
+    'Deutschlandfunk Kultur',
   );
+});
+
+test('removed stations disappear from collections without erasing saved IDs', () => {
+  const removedId = 'somafm-groove-salad';
+  localStorage.setItem(
+    FAVORITES_KEY,
+    JSON.stringify({ version: 1, stationIds: [removedId, 'pr-chicago'] }),
+  );
+  localStorage.setItem(
+    RECENT_KEY,
+    JSON.stringify({ version: 1, stationIds: [removedId, 'pr-chicago'] }),
+  );
+  const page = mount();
+  page.click('[aria-label="Favorites (1)"]');
+  expect(
+    [...page.container.querySelectorAll('[data-station-title]')].map((item) => item.textContent),
+  ).toEqual(['PR Chicago']);
+  expect(JSON.parse(localStorage.getItem(FAVORITES_KEY)).stationIds).toContain(removedId);
+  page.click('#recent-collection');
+  expect(
+    [...page.container.querySelectorAll('[data-station-title]')].map((item) => item.textContent),
+  ).toEqual(['PR Chicago']);
+  expect(JSON.parse(localStorage.getItem(RECENT_KEY)).stationIds).toContain(removedId);
 });
 
 test('the full app migrates old favorites and plays current catalog data', async () => {
