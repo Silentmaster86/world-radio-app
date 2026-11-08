@@ -98,7 +98,11 @@ test('removed stations disappear from collections without erasing saved IDs', ()
     JSON.stringify({ version: 1, stationIds: [removedId, 'pr-chicago'] }),
   );
   const page = mount();
-  page.click('[aria-label="Favorites (1)"]');
+  act(() =>
+    [...page.container.querySelectorAll('button')]
+      .find((button) => button.textContent.startsWith('Favorites ('))
+      .click(),
+  );
   expect(
     [...page.container.querySelectorAll('[data-station-title]')].map((item) => item.textContent),
   ).toEqual(['PR Chicago']);
