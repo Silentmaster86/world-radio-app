@@ -17,8 +17,7 @@ export function translate(language, key, params = {}, fallback) {
 const storedMessageKeys = {
   'Favorites are available for this session only. Changes could not be saved.':
     'storage.favoritesSession',
-  'Saved favorites could not be read. You can continue listening.':
-    'storage.favoritesRecovery',
+  'Saved favorites could not be read. You can continue listening.': 'storage.favoritesRecovery',
   'Some previous favorites could not be matched. Their original data has been kept.':
     'storage.favoritesPreserved',
   'Saved favorites use a newer format. The original data is preserved; changes will stay in this session.':
