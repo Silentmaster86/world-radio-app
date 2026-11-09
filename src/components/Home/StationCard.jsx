@@ -122,7 +122,14 @@ export default function StationCard({
         <Info>
           <Name data-station-title>{station.name}</Name>
           <Meta>
-            <span role="img" aria-label={t(`country.${station.countryCode}`, {}, getCountryName(station.countryCode))}>
+            <span
+              role="img"
+              aria-label={t(
+                `country.${station.countryCode}`,
+                {},
+                getCountryName(station.countryCode),
+              )}
+            >
               {getCountryFlag(station.countryCode)}
             </span>{' '}
             · {station.genres.map((genre) => t(`genre.${genre}`, {}, genre)).join(', ')}
