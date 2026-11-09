@@ -118,6 +118,52 @@ async function main() {
   let activePage;
   let navigationDiagnostics;
   try {
+    // Both translated headers must leave the first station clear of the fixed dock.
+    for (const language of ['en', 'pl']) {
+      for (const mode of ['light', 'dark']) {
+        const context = await createAppContext(browser, { colorScheme: mode });
+        await context.addInitScript((language) => {
+          localStorage.setItem('wra:language:v1', JSON.stringify({ version: 1, language }));
+        }, language);
+        const page = await context.newPage();
+        activePage = page;
+        for (const viewport of [
+          { width: 320, height: 568 },
+          { width: 390, height: 844 },
+          { width: 1440, height: 900 },
+        ]) {
+          await page.setViewportSize(viewport);
+          await page.goto(base, { waitUntil: 'networkidle' });
+          assert.equal(await page.locator('#language').inputValue(), language);
+          const first = await page.locator('article button').first().boundingBox();
+          const dock = await page
+            .locator('[data-player-status]')
+            .evaluate((el) => el.closest('aside').getBoundingClientRect().top);
+          assert.ok(
+            first.y >= 0 && first.y + first.height <= dock + 1,
+            `${language}/${mode}: first station hidden: ${JSON.stringify({ viewport, first, dock })}`,
+          );
+          for (const selector of ['#language', '#appearance', 'article button']) {
+            const control = page.locator(selector).first();
+            assert.equal(await control.isVisible(), true);
+            const box = await control.boundingBox();
+            assert.ok(
+              box.width >= 44 &&
+                box.height >= 44 &&
+                box.x >= 0 &&
+                box.x + box.width <= viewport.width,
+              `${language}/${mode}: invalid touch target ${selector}`,
+            );
+          }
+          assert.ok(
+            await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),
+          );
+          await accessible(page, `${language}-${mode}-header-${viewport.width}`);
+          await screenshot(page, `${language}-${mode}-header-${viewport.width}`);
+        }
+        await context.close();
+      }
+    }
     for (const mode of ['light', 'dark']) {
       const context = await createAppContext(browser, {
         colorScheme: mode,

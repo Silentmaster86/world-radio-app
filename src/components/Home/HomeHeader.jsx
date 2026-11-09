@@ -42,16 +42,28 @@ const Header = styled.header`
     color: ${({ theme }) => theme.colors.text};
   }
   @media (max-width: 640px) {
-    padding: 0.5rem 0;
-    grid-template-columns: minmax(0, 1fr) auto auto;
+    padding: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.35rem 0.75rem;
     h1 {
       grid-column: 1 / -1;
     }
     label {
       grid-row: 2;
+      min-width: 0;
+      gap: 0.2rem;
+    }
+    select {
+      width: 100%;
+      min-width: 0;
     }
     p {
       font-size: 0.875rem;
+    }
+  }
+  @media (max-width: 640px) and (max-height: 640px) {
+    p:not([role='status']) {
+      display: none;
     }
   }
 `;

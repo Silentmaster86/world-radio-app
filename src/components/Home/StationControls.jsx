@@ -8,8 +8,8 @@ const Controls = styled.section`
   display: grid;
   gap: 1rem;
   @media (max-width: 640px) {
-    margin: 0.75rem 0;
-    gap: 0.65rem;
+    margin: 0.5rem 0;
+    gap: 0.5rem;
   }
 `;
 const Row = styled.div`
