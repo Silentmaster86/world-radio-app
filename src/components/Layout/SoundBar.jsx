@@ -125,7 +125,12 @@ export default function SoundBar({ onHeightChange }) {
           </div>
         </Info>
         <PlayerControls compact mobileMini />
-        <OpenButton id="open-player" type="button" onClick={openPlayer} aria-label={t('player.openCar')}>
+        <OpenButton
+          id="open-player"
+          type="button"
+          onClick={openPlayer}
+          aria-label={t('player.openCar')}
+        >
           <FaCarSide aria-hidden="true" />
         </OpenButton>
         <InstallApp />
