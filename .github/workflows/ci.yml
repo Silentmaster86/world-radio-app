@@ -26,16 +26,6 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      # Temporary formatter capture for this draft. Revert before PR review.
-      - name: Capture i18n formatted files
-        run: |
-          npx prettier --write src/App.test.jsx src/components/Home/StationCard.jsx src/components/Home/StationControls.jsx src/components/Layout/SoundBar.jsx src/components/Player/PlayerControls.jsx src/components/Player/PlayerStatus.jsx src/components/Player/SleepTimer.jsx src/components/Pwa/InstallApp.jsx src/context/LanguageContext.test.jsx src/hooks/useStationFilters.test.js src/i18n/en.js src/i18n/index.js src/i18n/pl.js src/main.jsx src/pages/NowPlaying.jsx > /dev/null
-          for file in src/App.test.jsx src/components/Home/StationCard.jsx src/components/Home/StationControls.jsx src/components/Layout/SoundBar.jsx src/components/Player/PlayerControls.jsx src/components/Player/PlayerStatus.jsx src/components/Player/SleepTimer.jsx src/components/Pwa/InstallApp.jsx src/context/LanguageContext.test.jsx src/hooks/useStationFilters.test.js src/i18n/en.js src/i18n/index.js src/i18n/pl.js src/main.jsx src/pages/NowPlaying.jsx; do
-            echo "WRA_FMT_BEGIN $file"
-            base64 -w0 "$file"
-            echo
-            echo "WRA_FMT_END $file"
-          done
       - run: npm run check
 
   ux-browser:
