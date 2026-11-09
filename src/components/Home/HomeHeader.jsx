@@ -1,9 +1,10 @@
 import styled from 'styled-components';
 import { FaGlobeEurope } from 'react-icons/fa';
 import { useTheme } from '../../context/ThemeContext';
+import { useLanguage } from '../../context/LanguageContext';
 const Header = styled.header`
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: start;
   gap: 0.5rem 1rem;
   padding: 1rem 0;
@@ -26,7 +27,6 @@ const Header = styled.header`
     margin: 0;
   }
   label {
-    grid-column: 2;
     grid-row: 1;
     display: grid;
     gap: 0.35rem;
@@ -42,6 +42,13 @@ const Header = styled.header`
   }
   @media (max-width: 640px) {
     padding: 0.5rem 0;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    h1 {
+      grid-column: 1 / -1;
+    }
+    label {
+      grid-row: 2;
+    }
     p {
       font-size: 0.875rem;
     }
@@ -49,21 +56,33 @@ const Header = styled.header`
 `;
 export default function HomeHeader() {
   const { mode, setThemeMode, storageMessage } = useTheme();
+  const { language, setLanguage, t } = useLanguage();
   return (
     <Header>
       <h1>
         <FaGlobeEurope aria-hidden="true" />
         <span>World Radio App</span>
       </h1>
-      <label htmlFor="appearance">
-        Appearance
-        <select id="appearance" value={mode} onChange={(event) => setThemeMode(event.target.value)}>
-          <option value="system">System</option>
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
+      <label htmlFor="language">
+        {t('header.language')}
+        <select
+          id="language"
+          value={language}
+          onChange={(event) => setLanguage(event.target.value)}
+        >
+          <option value="en">English</option>
+          <option value="pl">Polski</option>
         </select>
       </label>
-      <p>Your stations. One place to listen.</p>
+      <label htmlFor="appearance">
+        {t('header.appearance')}
+        <select id="appearance" value={mode} onChange={(event) => setThemeMode(event.target.value)}>
+          <option value="system">{t('header.system')}</option>
+          <option value="light">{t('header.light')}</option>
+          <option value="dark">{t('header.dark')}</option>
+        </select>
+      </label>
+      <p>{t('header.tagline')}</p>
       {storageMessage && <p role="status">{storageMessage}</p>}
     </Header>
   );
