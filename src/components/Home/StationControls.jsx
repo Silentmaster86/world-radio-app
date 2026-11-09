@@ -175,7 +175,9 @@ export default function StationControls({
           >
             <option value="">{t('filters.allGenres')}</option>
             {options.genres.map((genre) => (
-              <option key={genre} value={genre}>{t(`genre.${genre}`, {}, genre)}</option>
+              <option key={genre} value={genre}>
+                {t(`genre.${genre}`, {}, genre)}
+              </option>
             ))}
           </select>
         </Field>
