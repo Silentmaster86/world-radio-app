@@ -6,6 +6,7 @@ import { ThemeProvider } from 'styled-components';
 import { GlobalStyle } from './Globalstyle.js';
 import { ThemeProviderToggle, useTheme } from './context/ThemeContext';
 import ErrorBoundary from './components/ErrorBoundary';
+import { LanguageProvider } from './context/LanguageContext';
 
 const AppWithTheme = () => {
   const { theme } = useTheme();
@@ -20,12 +21,14 @@ const AppWithTheme = () => {
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <ErrorBoundary>
-    <FavoritesProvider>
+    <LanguageProvider>
+      <FavoritesProvider>
       <AudioProvider>
         <ThemeProviderToggle>
           <AppWithTheme />
         </ThemeProviderToggle>
       </AudioProvider>
-    </FavoritesProvider>
+      </FavoritesProvider>
+    </LanguageProvider>
   </ErrorBoundary>,
 );
