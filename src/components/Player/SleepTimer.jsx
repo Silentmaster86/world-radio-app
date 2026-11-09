@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { FaMoon } from 'react-icons/fa';
 import { useAudio } from '../../context/AudioContext';
 import { SLEEP_TIMER_MINUTES } from '../../lib/sleepTimer';
+import { useLanguage } from '../../context/LanguageContext';
 
 const Button = styled.button`
   min-width: 44px;
@@ -75,6 +76,7 @@ export function formatRemaining(deadline, now) {
 
 export default function SleepTimer({ compact = false }) {
   const { sleepTimerDeadline = null, setSleepTimer, cancelSleepTimer } = useAudio();
+  const { t } = useLanguage();
   const [now, setNow] = useState(Date.now);
   const [open, setOpen] = useState(false);
   const dialog = useRef(null);
@@ -105,7 +107,7 @@ export default function SleepTimer({ compact = false }) {
         ref={opener}
         type="button"
         data-sleep-timer
-        aria-label={active ? 'Sleep timer, active' : 'Sleep timer'}
+        aria-label={t(active ? 'timer.active' : 'timer.title')}
         aria-haspopup="dialog"
         aria-pressed={active}
         $active={active}
@@ -116,7 +118,7 @@ export default function SleepTimer({ compact = false }) {
         ) : (
           <>
             <FaMoon aria-hidden="true" />
-            {!compact && <span>Sleep timer</span>}
+            {!compact && <span>{t('timer.title')}</span>}
           </>
         )}
       </Button>
@@ -130,11 +132,11 @@ export default function SleepTimer({ compact = false }) {
         }}
         onClose={() => setOpen(false)}
       >
-        <h2 id={`${id}-title`}>Sleep timer</h2>
-        <p id={`${id}-description`}>Pause the radio automatically after a chosen time.</p>
+        <h2 id={`${id}-title`}>{t('timer.title')}</h2>
+        <p id={`${id}-description`}>{t('timer.description')}</p>
         {active && (
           <p role="timer" aria-live="off">
-            Pauses in {formatRemaining(sleepTimerDeadline, now)}.
+            {t('timer.pausesIn', { remaining: formatRemaining(sleepTimerDeadline, now) })}
           </p>
         )}
         <Options>
@@ -148,12 +150,12 @@ export default function SleepTimer({ compact = false }) {
                 close();
               }}
             >
-              {minutes} min
+              {t('timer.option', { minutes })}
             </button>
           ))}
         </Options>
         <p>
-          Pausing playback cancels the timer. Your browser may delay it while the app is suspended.
+          {t('timer.warning')}
         </p>
         <footer>
           {active && (
@@ -164,11 +166,11 @@ export default function SleepTimer({ compact = false }) {
                 close();
               }}
             >
-              Cancel timer
+              {t('timer.cancel')}
             </button>
           )}
           <button type="button" onClick={close}>
-            Close
+            {t('timer.close')}
           </button>
         </footer>
       </Dialog>
