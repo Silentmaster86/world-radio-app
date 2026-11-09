@@ -15,6 +15,7 @@ import EmptyState from '../components/Home/EmptyState';
 
 import useStationFilters from '../hooks/useStationFilters';
 import { useLanguage } from '../context/LanguageContext';
+import { localizeStoredMessage } from '../i18n';
 
 const PageWrapper = styled.main`
   width: 100%;
@@ -113,9 +114,11 @@ export default function Home() {
         recentCount={recentCount}
       />
 
-      {storageMessage && <p role="status">{storageMessage}</p>}
+      {storageMessage && <p role="status">{localizeStoredMessage(t, storageMessage)}</p>}
 
-      {filters.section === 'recent' && historyMessage && <p role="status">{historyMessage}</p>}
+      {filters.section === 'recent' && historyMessage && (
+        <p role="status">{localizeStoredMessage(t, historyMessage)}</p>
+      )}
       <Results>
         <p role="status" aria-live="polite">
           {t('home.results', { visible: visibleStations.length, total: searchedStations.length })}
