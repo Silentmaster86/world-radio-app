@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import StationLogo from '../StationLogo';
 import { getCountryFlag, getCountryName } from '../../lib/stationUtils';
+import { useLanguage } from '../../context/LanguageContext';
 
 const Card = styled.article`
   background: ${({ theme }) => theme.colors.surface};
@@ -97,15 +98,16 @@ export default function StationCard({
   onPlay,
   onFavorite,
 }) {
+  const { t } = useLanguage();
   const status = isActive
-    ? 'Playing'
+    ? t('station.playing')
     : {
-        idle: 'Selected',
-        connecting: 'Connecting…',
-        playing: 'Playing',
-        buffering: 'Buffering…',
-        paused: 'Paused',
-        error: 'Unavailable',
+        idle: t('station.selected'),
+        connecting: t('station.connecting'),
+        playing: t('station.playing'),
+        buffering: t('station.buffering'),
+        paused: t('station.paused'),
+        error: t('station.unavailable'),
       }[playbackStatus];
   return (
     <Card $selected={isSelected}>
@@ -115,15 +117,15 @@ export default function StationCard({
         data-station-id={station.id}
         aria-current={isSelected ? 'true' : undefined}
       >
-        <ActionText>Play </ActionText>
+        <ActionText>{t('station.play')} </ActionText>
         <Logo station={station} sizes="(max-width: 640px) 54px, 80px" />
         <Info>
           <Name data-station-title>{station.name}</Name>
           <Meta>
-            <span role="img" aria-label={getCountryName(station.countryCode)}>
+            <span role="img" aria-label={t(`country.${station.countryCode}`, {}, getCountryName(station.countryCode))}>
               {getCountryFlag(station.countryCode)}
             </span>{' '}
-            · {station.genres.join(', ')}
+            · {station.genres.map((genre) => t(`genre.${genre}`, {}, genre)).join(', ')}
           </Meta>
           {isSelected && <Meta>{status}</Meta>}
         </Info>
@@ -131,7 +133,9 @@ export default function StationCard({
       <FavoriteButton
         type="button"
         onClick={onFavorite}
-        aria-label={`${isFavorite ? 'Remove' : 'Add'} ${station.name} ${isFavorite ? 'from' : 'to'} favorites`}
+        aria-label={t(isFavorite ? 'station.removeFavorite' : 'station.addFavorite', {
+          station: station.name,
+        })}
         aria-pressed={isFavorite}
       >
         {isFavorite ? '♥' : '♡'}
