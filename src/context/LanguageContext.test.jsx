@@ -47,7 +47,10 @@ test('English remains the default; choosing Polish updates UI, lang and storage'
 
 test('saved Polish is restored without changing playback-related storage', () => {
   localStorage.setItem(LANGUAGE_KEY, JSON.stringify({ version: 1, language: 'pl' }));
-  localStorage.setItem('wra:favorites:v1', JSON.stringify({ version: 1, stationIds: ['pr-chicago'] }));
+  localStorage.setItem(
+    'wra:favorites:v1',
+    JSON.stringify({ version: 1, stationIds: ['pr-chicago'] }),
+  );
   const page = render(
     <LanguageProvider>
       <LanguagePreview />
