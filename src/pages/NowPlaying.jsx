@@ -8,6 +8,7 @@ import PlayerStatus from '../components/Player/PlayerStatus';
 import PlayerControls from '../components/Player/PlayerControls';
 import SleepTimer from '../components/Player/SleepTimer';
 import StationLogo from '../components/StationLogo';
+import { useLanguage } from '../context/LanguageContext';
 
 const Wrapper = styled.main`
   min-height: 100dvh;
@@ -112,6 +113,7 @@ const Description = styled.p`
 export default function NowPlaying() {
   const { returnToStations } = usePlayerNavigation();
   const { currentStation } = useAudio();
+  const { t } = useLanguage();
   const heading = useRef(null);
   useLayoutEffect(() => {
     heading.current?.focus({ preventScroll: true });
@@ -119,14 +121,14 @@ export default function NowPlaying() {
   }, []);
   return (
     <Wrapper>
-      <PlayerCard aria-label="Car mode player">
+      <PlayerCard aria-label={t('player.carLabel')}>
         <TopBar>
-          <HomeButton type="button" onClick={returnToStations} aria-label="Back to stations">
+          <HomeButton type="button" onClick={returnToStations} aria-label={t('player.back')}>
             <FaHome aria-hidden="true" />
           </HomeButton>
           <SleepTimer compact />
           <CarBadge>
-            <FaCarSide aria-hidden="true" /> Car Mode
+            <FaCarSide aria-hidden="true" /> {t('player.car')}
           </CarBadge>
         </TopBar>
         <LogoWrapper>
@@ -137,17 +139,19 @@ export default function NowPlaying() {
             {currentStation.name}
           </h1>
           <p>
-            <span role="img" aria-label={getCountryName(currentStation.countryCode)}>
+            <span role="img" aria-label={t(`country.${currentStation.countryCode}`, {}, getCountryName(currentStation.countryCode))}>
               {getCountryFlag(currentStation.countryCode)}
             </span>{' '}
-            · {currentStation.genres.join(', ')}
+            · {currentStation.genres.map((genre) => t(`genre.${genre}`, {}, genre)).join(', ')}
           </p>
           <PlayerStatus />
         </Details>
         <div data-area="controls">
           <PlayerControls variant="car" />
         </div>
-        <Description data-area="description">{currentStation.description}</Description>
+        <Description data-area="description">
+          {t(`description.${currentStation.id}`, {}, currentStation.description)}
+        </Description>
       </PlayerCard>
     </Wrapper>
   );
