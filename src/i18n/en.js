@@ -10,6 +10,7 @@ export const en = {
   "home.more": "Show more stations ({count} remaining)",
   "home.clearHistory": "Clear history",
   "filters.find": "Find stations",
+  "filters.collection": "Station collection",
   "filters.all": "All stations ({count})",
   "filters.favorites": "Favorites ({count})",
   "filters.recent": "Recent ({count})",
