@@ -28,11 +28,11 @@ function mount() {
     <ErrorBoundary>
       <LanguageProvider>
         <FavoritesProvider>
-        <AudioProvider>
-          <ThemeProviderToggle>
-            <ThemedApp />
-          </ThemeProviderToggle>
-        </AudioProvider>
+          <AudioProvider>
+            <ThemeProviderToggle>
+              <ThemedApp />
+            </ThemeProviderToggle>
+          </AudioProvider>
         </FavoritesProvider>
       </LanguageProvider>
     </ErrorBoundary>,
@@ -132,7 +132,9 @@ test('switching to Polish changes the UI without restarting radio or clearing fa
   expect(document.documentElement.lang).toBe('pl');
   expect(page.container.textContent).toContain('Wszystkie stacje (12)');
   expect(page.container.textContent).toContain('Szukaj stacji');
-  expect(page.container.querySelector('[aria-label="Usuń PR Chicago z ulubionych"]')).not.toBeNull();
+  expect(
+    page.container.querySelector('[aria-label="Usuń PR Chicago z ulubionych"]'),
+  ).not.toBeNull();
   expect(window.Audio).toHaveBeenCalledTimes(1);
   expect(audio.play).toHaveBeenCalledTimes(playCount);
   expect(JSON.parse(localStorage.getItem(FAVORITES_KEY)).stationIds).toContain('pr-chicago');
