@@ -25,6 +25,9 @@ history; their original follow-up lists are no longer the current backlog.
   Keyword search and progressive reveal remain in place for larger catalogs.
   See [catalog.md](catalog.md) for details and directory evaluation.
 
+- Polish and English interface with persistent preference, translated station
+  descriptions and bilingual catalog search. See [language.md](language.md).
+
 ## Next work, in priority order
 
 1. **Real-device playback review.** Check iOS Safari/Android native MP3/AAC,
@@ -35,8 +38,8 @@ history; their original follow-up lists are no longer the current backlog.
 2. **Worldwide directory discovery.** Build on the Radio Browser evaluation in
    [catalog.md](catalog.md): mirror discovery, result normalization, persistent
    added stations, bounded caching/offline fallback and identity verification.
-3. **Interface and language refinement.** Apply findings from phone testing;
-   consider Polish/English UI and direct station sharing.
+3. **Interface and sharing refinements.** Apply findings from phone testing
+   and consider direct station sharing and richer artwork.
 
 These are product improvements and verification tasks, not a list of confirmed
 application defects. Monitoring tool advisories and reconsidering Babel 8 remain
