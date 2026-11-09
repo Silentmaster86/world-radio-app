@@ -157,7 +157,11 @@ export default function PlayerControls({
         type="button"
         onClick={togglePlay}
         aria-label={
-          wantsToPlay ? (status === 'connecting' ? t('player.cancel') : t('player.pause')) : t('player.play')
+          wantsToPlay
+            ? status === 'connecting'
+              ? t('player.cancel')
+              : t('player.pause')
+            : t('player.play')
         }
       >
         {wantsToPlay ? <FaPause aria-hidden="true" /> : <FaPlay aria-hidden="true" />}
