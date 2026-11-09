@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { useLanguage } from '../../context/LanguageContext';
 const Panel = styled.div`
   padding: 2rem 1rem;
   text-align: center;
@@ -19,24 +20,25 @@ const Panel = styled.div`
 `;
 export default function EmptyState({ emptyFavorites, emptyRecent = false, onClear, onBrowse }) {
   const emptyCollection = emptyFavorites || emptyRecent;
+  const { t } = useLanguage();
   return (
     <Panel>
       <h2>
         {emptyFavorites
-          ? 'Your favorites start here'
+          ? t('empty.favoritesTitle')
           : emptyRecent
-            ? 'No recent stations to show'
-            : 'No matching stations'}
+            ? t('empty.recentTitle')
+            : t('empty.noMatches')}
       </h2>
       <p>
         {emptyFavorites
-          ? 'Use the heart button on a station to save it here.'
+          ? t('empty.favoritesText')
           : emptyRecent
-            ? 'Stations appear here after playback starts. History stays on this device.'
-            : 'Try another station name or clear the country, genre and language filters.'}
+            ? t('empty.recentText')
+            : t('empty.noMatchesText')}
       </p>
       <button type="button" onClick={emptyCollection ? onBrowse : onClear}>
-        {emptyCollection ? 'Browse all stations' : 'Clear search and filters'}
+        {emptyCollection ? t('empty.browse') : t('empty.clear')}
       </button>
     </Panel>
   );
