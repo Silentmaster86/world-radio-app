@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { useFilterDisclosure } from '../../context/BrowsingContext';
 import { getCountryName } from '../../lib/stationUtils';
+import { useLanguage } from '../../context/LanguageContext';
 
 const Controls = styled.section`
   margin: 1.5rem 0;
@@ -95,18 +96,18 @@ export default function StationControls({
   recentCount = 0,
 }) {
   const [expanded, setExpanded] = useFilterDisclosure();
+  const { t } = useLanguage();
   const activeCount = [filters.country, filters.genre, filters.language].filter(Boolean).length;
-  const languages = { en: 'English', pl: 'Polish', de: 'German' };
   return (
-    <Controls aria-label="Find stations">
-      <CollectionRow role="group" aria-label="Station collection">
+    <Controls aria-label={t('filters.find')}>
+      <CollectionRow role="group" aria-label={t('filters.find')}>
         <SectionButton
           type="button"
           $active={filters.section === 'all'}
           aria-pressed={filters.section === 'all'}
           onClick={() => updateFilters({ section: 'all' })}
         >
-          All stations ({total})
+          {t('filters.all', { count: total })}
         </SectionButton>
         <SectionButton
           type="button"
@@ -114,7 +115,7 @@ export default function StationControls({
           aria-pressed={filters.section === 'favorites'}
           onClick={() => updateFilters({ section: 'favorites' })}
         >
-          Favorites ({favoriteCount})
+          {t('filters.favorites', { count: favoriteCount })}
         </SectionButton>
         <SectionButton
           id="recent-collection"
@@ -123,15 +124,15 @@ export default function StationControls({
           aria-pressed={filters.section === 'recent'}
           onClick={() => updateFilters({ section: 'recent' })}
         >
-          Recent ({recentCount})
+          {t('filters.recent', { count: recentCount })}
         </SectionButton>
       </CollectionRow>
       <Field htmlFor="station-search">
-        Search stations
+        {t('filters.search')}
         <input
           id="station-search"
           type="search"
-          placeholder="Name, genre or keyword…"
+          placeholder={t('filters.placeholder')}
           value={filters.q}
           onChange={(event) => updateFilters({ q: event.target.value })}
         />
@@ -143,52 +144,52 @@ export default function StationControls({
           aria-controls="station-refinements"
           onClick={() => setExpanded((value) => !value)}
         >
-          Filters{activeCount ? ` (${activeCount})` : ''}
+          {activeCount ? t('filters.active', { count: activeCount }) : t('filters.filters')}
         </FilterButton>
         <Reset type="button" onClick={resetFilters}>
-          Reset filters
+          {t('filters.reset')}
         </Reset>
       </MobileToolbar>
       <Refinements id="station-refinements" $open={expanded}>
         <Field htmlFor="station-country">
-          Country
+          {t('filters.country')}
           <select
             id="station-country"
             value={filters.country}
             onChange={(event) => updateFilters({ country: event.target.value })}
           >
-            <option value="">All countries</option>
+            <option value="">{t('filters.allCountries')}</option>
             {options.countries.map((code) => (
               <option key={code} value={code}>
-                {getCountryName(code)}
+                {t(`country.${code}`, {}, getCountryName(code))}
               </option>
             ))}
           </select>
         </Field>
         <Field htmlFor="station-genre">
-          Genre
+          {t('filters.genre')}
           <select
             id="station-genre"
             value={filters.genre}
             onChange={(event) => updateFilters({ genre: event.target.value })}
           >
-            <option value="">All genres</option>
+            <option value="">{t('filters.allGenres')}</option>
             {options.genres.map((genre) => (
-              <option key={genre}>{genre}</option>
+              <option key={genre} value={genre}>{t(`genre.${genre}`, {}, genre)}</option>
             ))}
           </select>
         </Field>
         <Field htmlFor="station-language">
-          Language
+          {t('filters.language')}
           <select
             id="station-language"
             value={filters.language}
             onChange={(event) => updateFilters({ language: event.target.value })}
           >
-            <option value="">All languages</option>
+            <option value="">{t('filters.allLanguages')}</option>
             {options.languages.map((code) => (
               <option key={code} value={code}>
-                {languages[code] || code}
+                {t(`language.${code}`, {}, code)}
               </option>
             ))}
           </select>
