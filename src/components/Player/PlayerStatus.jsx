@@ -66,7 +66,9 @@ export default function PlayerStatus({ announce = true }) {
           {t('status.tryAgain')}
         </button>
       )}
-      {preferenceMessage && <small style={{ display: 'block' }}>{localizeStoredMessage(t, preferenceMessage)}</small>}
+      {preferenceMessage && (
+        <small style={{ display: 'block' }}>{localizeStoredMessage(t, preferenceMessage)}</small>
+      )}
     </Status>
   );
 }
