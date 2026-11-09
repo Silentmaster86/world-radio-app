@@ -100,7 +100,7 @@ export default function StationControls({
   const activeCount = [filters.country, filters.genre, filters.language].filter(Boolean).length;
   return (
     <Controls aria-label={t('filters.find')}>
-      <CollectionRow role="group" aria-label={t('filters.find')}>
+      <CollectionRow role="group" aria-label={t('filters.collection')}>
         <SectionButton
           type="button"
           $active={filters.section === 'all'}
