@@ -139,7 +139,14 @@ export default function NowPlaying() {
             {currentStation.name}
           </h1>
           <p>
-            <span role="img" aria-label={t(`country.${currentStation.countryCode}`, {}, getCountryName(currentStation.countryCode))}>
+            <span
+              role="img"
+              aria-label={t(
+                `country.${currentStation.countryCode}`,
+                {},
+                getCountryName(currentStation.countryCode),
+              )}
+            >
               {getCountryFlag(currentStation.countryCode)}
             </span>{' '}
             · {currentStation.genres.map((genre) => t(`genre.${genre}`, {}, genre)).join(', ')}
