@@ -348,6 +348,19 @@ async function main() {
         await page.locator('#appearance').inputValue(),
         mode === 'dark' ? 'light' : 'dark',
       );
+      // Switching the UI language must not break narrow layouts or saved preferences.
+      await page.locator('#language').selectOption('pl');
+      await page.getByRole('button', { name: 'Wszystkie stacje (12)', exact: true }).waitFor();
+      assert.equal(await page.evaluate(() => document.documentElement.lang), 'pl');
+      await page.locator('#station-search').fill('wiadomości');
+      await page.waitForFunction(() => document.querySelectorAll('article').length > 0);
+      await accessible(page, `${mode}-polish`);
+      await screenshot(page, `${mode}-polish`);
+      await page.reload({ waitUntil: 'networkidle' });
+      assert.equal(await page.locator('#language').inputValue(), 'pl');
+      await page.locator('#station-search').fill('');
+      await page.locator('#language').selectOption('en');
+      assert.equal(await page.evaluate(() => document.documentElement.lang), 'en');
       // Large text must reflow; scrolling is allowed instead of clipping controls.
       await page.addStyleTag({ content: 'html { font-size: 200%; }' });
       assert.ok(
