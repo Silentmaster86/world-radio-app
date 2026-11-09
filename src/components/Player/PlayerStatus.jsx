@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { useAudio } from '../../context/AudioContext';
 import { usePwa } from '../../context/PwaContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { localizeStoredMessage } from '../../i18n';
 
 const Status = styled.div`
   font-size: 0.8rem;
@@ -65,7 +66,7 @@ export default function PlayerStatus({ announce = true }) {
           {t('status.tryAgain')}
         </button>
       )}
-      {preferenceMessage && <small style={{ display: 'block' }}>{preferenceMessage}</small>}
+      {preferenceMessage && <small style={{ display: 'block' }}>{localizeStoredMessage(t, preferenceMessage)}</small>}
     </Status>
   );
 }
