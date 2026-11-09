@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { FaDownload } from 'react-icons/fa';
 import { usePwa } from '../../context/PwaContext';
+import { useLanguage } from '../../context/LanguageContext';
 const Button = styled.button`
   display: grid;
   place-items: center;
@@ -52,6 +53,7 @@ const Dialog = styled.dialog`
 `;
 export default function InstallApp() {
   const pwa = usePwa();
+  const { t } = useLanguage();
   const dialog = useRef(null),
     opener = useRef(null);
   const [open, setOpen] = useState(false);
@@ -80,8 +82,8 @@ export default function InstallApp() {
       <Button
         ref={opener}
         type="button"
-        aria-label="Install app"
-        title="Install app"
+        aria-label={t('install.aria')}
+        title={t('install.aria')}
         onClick={install}
       >
         <FaDownload aria-hidden="true" />
@@ -96,27 +98,27 @@ export default function InstallApp() {
         }}
         onClose={() => setOpen(false)}
       >
-        <h2 id="install-heading">Install World Radio App</h2>
+        <h2 id="install-heading">{t('install.title')}</h2>
         <p id="install-steps">
           {pwa.ios
-            ? 'Open this page in Safari. Tap Share, then Add to Home Screen.'
+            ? t('install.ios')
             : pwa.macSafari
-              ? 'In Safari on Mac, open the File menu and choose Add to Dock.'
-              : 'If your browser offers Install app or Add to home screen in its menu, choose it. You can also use the install button in the address bar. On desktop, Chrome and Edge support installation.'}
+              ? t('install.mac')
+              : t('install.other')}
         </p>
         <p>
           {pwa.offlineReady
-            ? 'Saved stations can open offline. Live radio needs an internet connection.'
+            ? t('install.offlineReady')
             : pwa.status === 'error' || pwa.status === 'unsupported'
-              ? 'Offline access is not ready in this browser. Online listening is still available.'
-              : 'Preparing offline access. Keep this window online for a moment.'}
+              ? t('install.offlineError')
+              : t('install.offlinePreparing')}
         </p>
         <footer>
           <button type="button" onClick={pwa.check}>
-            {pwa.status === 'error' ? 'Try offline setup again' : 'Check for updates'}
+            {pwa.status === 'error' ? t('install.retry') : t('install.check')}
           </button>
           <button type="button" onClick={close}>
-            Close
+            {t('install.close')}
           </button>
         </footer>
       </Dialog>
