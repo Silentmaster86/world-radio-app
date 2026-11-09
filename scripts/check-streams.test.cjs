@@ -20,9 +20,11 @@ const audio = () =>
 
 test('loads curated URLs from the existing station source', () => {
   const stations = loadCuratedStations();
-  assert.equal(stations.length, 18);
+  assert.equal(stations.length, 12);
   assert.ok(stations.every((s) => s.id && s.name && s.url.startsWith('https://')));
   assert.equal(new Set(stations.map((s) => s.id)).size, stations.length);
+  assert.ok(stations.every((s) => !s.id.startsWith('somafm-')));
+  assert.ok(stations.some((s) => s.id === 'pr-chicago'));
   assert.equal(stations.filter((s) => s.fallbackUrls.length > 0).length, 3);
   assert.ok(stations.every((s) => s.fallbackUrls.every((url) => url.startsWith('https://'))));
 });

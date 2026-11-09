@@ -64,8 +64,8 @@ test('recent results keep listening order, omit missing IDs and intersect refine
 });
 
 test('search matches all words across names, genres and descriptions with normalized accents', () => {
-  expect(ids({ q: '  JAZZ   SoMaFM ' })).toEqual(['somafm-sonic-universe']);
-  expect(ids({ q: 'late-night house' })).toEqual(['somafm-beat-blender']);
+  expect(ids({ q: '  german  culture ' })).toEqual(['deutschlandfunk-kultur']);
+  expect(ids({ q: 'somafm' })).toEqual([]);
   expect(ids({ country: 'DE', language: 'de', q: 'culture' })).toEqual(['deutschlandfunk-kultur']);
   expect(ids({ q: 'jazz nonexisting' })).toEqual([]);
   const sample = [{ id: 'lodz', name: 'Radio Łódź', genres: ['Talk'], description: '' }];
@@ -74,7 +74,9 @@ test('search matches all words across names, genres and descriptions with normal
 
 test('bounded whole-number page URLs restore more results; invalid pages use the first page', () => {
   const options = getFilterOptions(stations);
-  expect(readFilters(new URLSearchParams('page=2'), options).page).toBe(2);
+  expect(readFilters(new URLSearchParams('page=2'), options).page).toBe(1);
+  const expandedOptions = getFilterOptions([...stations, { ...stations[0], id: 'extra-station' }]);
+  expect(readFilters(new URLSearchParams('page=2'), expandedOptions).page).toBe(2);
   for (const value of ['0', '-1', '2.5', '1e0', 'Infinity', '999999999999999999999']) {
     expect(readFilters(new URLSearchParams(`page=${value}`), options).page).toBe(1);
   }
