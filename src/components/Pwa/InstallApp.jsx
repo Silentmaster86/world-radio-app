@@ -100,11 +100,7 @@ export default function InstallApp() {
       >
         <h2 id="install-heading">{t('install.title')}</h2>
         <p id="install-steps">
-          {pwa.ios
-            ? t('install.ios')
-            : pwa.macSafari
-              ? t('install.mac')
-              : t('install.other')}
+          {pwa.ios ? t('install.ios') : pwa.macSafari ? t('install.mac') : t('install.other')}
         </p>
         <p>
           {pwa.offlineReady
