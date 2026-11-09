@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { FaGlobeEurope } from 'react-icons/fa';
 import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { localizeStoredMessage } from '../../i18n';
 const Header = styled.header`
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
@@ -83,7 +84,7 @@ export default function HomeHeader() {
         </select>
       </label>
       <p>{t('header.tagline')}</p>
-      {storageMessage && <p role="status">{storageMessage}</p>}
+      {storageMessage && <p role="status">{localizeStoredMessage(t, storageMessage)}</p>}
     </Header>
   );
 }
