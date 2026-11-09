@@ -89,6 +89,8 @@ test('Polish search matches translated genre and description without changing st
   expect(results.map((station) => station.id)).toContain('pr-chicago');
   expect(results.map((station) => station.id)).toContain('deutschlandfunk');
   expect(
-    filterStations(stations, [], { q: 'muzyka klasyczna' }, [], localize).map((station) => station.id),
+    filterStations(stations, [], { q: 'muzyka klasyczna' }, [], localize).map(
+      (station) => station.id,
+    ),
   ).toEqual(['deutschlandfunk-kultur']);
 });
