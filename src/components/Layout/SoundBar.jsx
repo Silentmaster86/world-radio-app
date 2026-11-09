@@ -9,6 +9,7 @@ import SleepTimer from '../Player/SleepTimer';
 import InstallApp from '../Pwa/InstallApp';
 import UpdateNotice from '../Pwa/UpdateNotice';
 import StationLogo from '../StationLogo';
+import { useLanguage } from '../../context/LanguageContext';
 
 const Dock = styled.aside`
   position: fixed;
@@ -87,6 +88,7 @@ export default function SoundBar({ onHeightChange }) {
   const ref = useRef(null);
   const measureRef = useRef(() => {});
   const { currentStation } = useAudio();
+  const { t } = useLanguage();
   const { openPlayer } = usePlayerNavigation();
   useLayoutEffect(() => {
     const previous = document.documentElement.style.getPropertyValue('--radio-player-height');
@@ -113,17 +115,17 @@ export default function SoundBar({ onHeightChange }) {
   });
   if (!currentStation) return null;
   return (
-    <Dock ref={ref} aria-label="Radio player">
+    <Dock ref={ref} aria-label={t('player.radio')}>
       <Content>
         <Info>
           <StationLogo station={currentStation} size={48} loading="eager" />
           <div>
             <h2>{currentStation.name}</h2>
-            <p>Selected station</p>
+            <p>{t('player.selected')}</p>
           </div>
         </Info>
         <PlayerControls compact mobileMini />
-        <OpenButton id="open-player" type="button" onClick={openPlayer} aria-label="Open car mode">
+        <OpenButton id="open-player" type="button" onClick={openPlayer} aria-label={t('player.openCar')}>
           <FaCarSide aria-hidden="true" />
         </OpenButton>
         <InstallApp />
