@@ -154,9 +154,7 @@ export default function SleepTimer({ compact = false }) {
             </button>
           ))}
         </Options>
-        <p>
-          {t('timer.warning')}
-        </p>
+        <p>{t('timer.warning')}</p>
         <footer>
           {active && (
             <button
