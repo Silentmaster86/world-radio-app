@@ -10,6 +10,7 @@ export const pl = {
   "home.more": "Pokaż więcej stacji (pozostało {count})",
   "home.clearHistory": "Wyczyść historię",
   "filters.find": "Znajdź stacje",
+  "filters.collection": "Kolekcja stacji",
   "filters.all": "Wszystkie stacje ({count})",
   "filters.favorites": "Ulubione ({count})",
   "filters.recent": "Ostatnio słuchane ({count})",
