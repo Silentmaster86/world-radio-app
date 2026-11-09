@@ -11,6 +11,8 @@ import { FAVORITES_KEY } from './lib/favoritesStorage';
 import { RECENT_KEY } from './lib/recentStorage';
 import { render } from './test/render';
 import { FakeAudio } from './test/FakeAudio';
+import { LanguageProvider } from './context/LanguageContext';
+import { LANGUAGE_KEY } from './i18n';
 
 function ThemedApp() {
   const { theme } = useTheme();
@@ -24,13 +26,15 @@ function ThemedApp() {
 function mount() {
   return render(
     <ErrorBoundary>
-      <FavoritesProvider>
+      <LanguageProvider>
+        <FavoritesProvider>
         <AudioProvider>
           <ThemeProviderToggle>
             <ThemedApp />
           </ThemeProviderToggle>
         </AudioProvider>
-      </FavoritesProvider>
+        </FavoritesProvider>
+      </LanguageProvider>
     </ErrorBoundary>,
   );
 }
@@ -112,6 +116,36 @@ test('removed stations disappear from collections without erasing saved IDs', ()
     [...page.container.querySelectorAll('[data-station-title]')].map((item) => item.textContent),
   ).toEqual(['PR Chicago']);
   expect(JSON.parse(localStorage.getItem(RECENT_KEY)).stationIds).toContain(removedId);
+});
+
+test('switching to Polish changes the UI without restarting radio or clearing favorites', async () => {
+  const page = mount();
+  await act(async () => page.container.querySelector('[data-station-id="pr-chicago"]').click());
+  page.click('[aria-label="Add PR Chicago to favorites"]');
+  const audio = window.Audio.mock.results[0].value;
+  const playCount = audio.play.mock.calls.length;
+  const language = page.container.querySelector('#language');
+  act(() => {
+    language.value = 'pl';
+    language.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  expect(document.documentElement.lang).toBe('pl');
+  expect(page.container.textContent).toContain('Wszystkie stacje (12)');
+  expect(page.container.textContent).toContain('Szukaj stacji');
+  expect(page.container.querySelector('[aria-label="Usuń PR Chicago z ulubionych"]')).not.toBeNull();
+  expect(window.Audio).toHaveBeenCalledTimes(1);
+  expect(audio.play).toHaveBeenCalledTimes(playCount);
+  expect(JSON.parse(localStorage.getItem(FAVORITES_KEY)).stationIds).toContain('pr-chicago');
+  expect(JSON.parse(localStorage.getItem(LANGUAGE_KEY))).toEqual({
+    version: 1,
+    language: 'pl',
+  });
+  act(() => {
+    language.value = 'en';
+    language.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  expect(document.documentElement.lang).toBe('en');
+  expect(page.container.textContent).toContain('All stations (12)');
 });
 
 test('the full app migrates old favorites and plays current catalog data', async () => {
