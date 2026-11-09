@@ -8,8 +8,8 @@ const Controls = styled.section`
   display: grid;
   gap: 1rem;
   @media (max-width: 640px) {
-    margin: 0.5rem 0;
-    gap: 0.5rem;
+    margin: 0.25rem 0;
+    gap: 0.35rem;
   }
 `;
 const Row = styled.div`
@@ -50,6 +50,21 @@ const Field = styled.label`
   input::placeholder {
     color: ${({ theme }) => theme.colors.muted};
     opacity: 1;
+  }
+`;
+const SearchField = styled(Field)`
+  @media (max-width: 640px) {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    span {
+      flex: 0 1 30%;
+    }
+    input {
+      flex: 1;
+      width: 0;
+      min-width: 0;
+    }
   }
 `;
 const SectionButton = styled.button`
@@ -127,8 +142,8 @@ export default function StationControls({
           {t('filters.recent', { count: recentCount })}
         </SectionButton>
       </CollectionRow>
-      <Field htmlFor="station-search">
-        {t('filters.search')}
+      <SearchField htmlFor="station-search">
+        <span>{t('filters.search')}</span>
         <input
           id="station-search"
           type="search"
@@ -136,7 +151,7 @@ export default function StationControls({
           value={filters.q}
           onChange={(event) => updateFilters({ q: event.target.value })}
         />
-      </Field>
+      </SearchField>
       <MobileToolbar>
         <FilterButton
           type="button"
