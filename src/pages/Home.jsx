@@ -14,6 +14,7 @@ import StationCard from '../components/Home/StationCard';
 import EmptyState from '../components/Home/EmptyState';
 
 import useStationFilters from '../hooks/useStationFilters';
+import { useLanguage } from '../context/LanguageContext';
 
 const PageWrapper = styled.main`
   width: 100%;
@@ -78,6 +79,7 @@ const More = styled.button`
 export default function Home() {
   useBrowseRestoration();
   const { setStation, currentStation, playingStationId, status } = useAudio();
+  const { t } = useLanguage();
   const { favoriteIds, isFavorite, toggleFavorite, storageMessage } = useFavorites();
   const { recentIds, historyMessage, clearHistory } = useRecentStations();
   const browsing = useStationFilters(stations, favoriteIds, recentIds);
@@ -116,8 +118,9 @@ export default function Home() {
       {filters.section === 'recent' && historyMessage && <p role="status">{historyMessage}</p>}
       <Results>
         <p role="status" aria-live="polite">
-          {visibleStations.length} of {searchedStations.length} stations
-          {searchedStations.length !== collectionCount && ` · ${collectionCount} in collection`}
+          {t('home.results', { visible: visibleStations.length, total: searchedStations.length })}
+          {searchedStations.length !== collectionCount &&
+            ` · ${t('home.collection', { count: collectionCount })}`}
         </p>
         {filters.section === 'recent' && recentIds.length > 0 && (
           <button
@@ -127,7 +130,7 @@ export default function Home() {
               document.getElementById('recent-collection')?.focus({ preventScroll: true });
             }}
           >
-            Clear history
+            {t('home.clearHistory')}
           </button>
         )}
       </Results>
@@ -161,7 +164,7 @@ export default function Home() {
             browsing.updateFilters({ page: filters.page + 1 });
           }}
         >
-          Show more stations ({searchedStations.length - visibleStations.length} remaining)
+          {t('home.more', { count: searchedStations.length - visibleStations.length })}
         </More>
       )}
     </PageWrapper>
