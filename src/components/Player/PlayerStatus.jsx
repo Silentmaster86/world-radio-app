@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { useAudio } from '../../context/AudioContext';
 import { usePwa } from '../../context/PwaContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 const Status = styled.div`
   font-size: 0.8rem;
@@ -29,25 +30,28 @@ export default function PlayerStatus({ announce = true }) {
     preferenceMessage,
   } = useAudio();
   const pwa = usePwa();
+  const { t } = useLanguage();
   const labels = {
-    idle: 'Ready to play',
+    idle: t('status.idle'),
     connecting: streamSourceIndex
-      ? 'Connecting to backup streamâ¦'
+      ? t('status.connectingBackup')
       : retryAttempt
-        ? 'Reconnectingâ¦'
-        : 'Connectingâ¦',
-    playing: streamSourceIndex ? 'Playing live (backup stream)' : 'Playing live',
-    buffering: 'Bufferingâ¦',
-    paused: 'Paused',
-    error: error?.message || 'The station is currently unavailable.',
+        ? t('status.reconnecting')
+        : t('status.connecting'),
+    playing: streamSourceIndex ? t('status.playingBackup') : t('status.playing'),
+    buffering: t('status.buffering'),
+    paused: t('status.paused'),
+    error: error?.code
+      ? t(`error.${error.code}`, {}, error.message)
+      : error?.message || t('status.error'),
   };
   const message =
     online === false && status !== 'playing'
       ? wantsToPlay
-        ? 'Offline. Waiting for a connectionâ¦'
+        ? t('status.offlineWaiting')
         : pwa?.offlineReady
-          ? 'Offline. Saved stations are available; connect to listen.'
-          : 'Offline. Connect to listen.'
+          ? t('status.offlineSaved')
+          : t('status.offline')
       : labels[status];
   return (
     <Status
@@ -57,8 +61,8 @@ export default function PlayerStatus({ announce = true }) {
     >
       {message}
       {status === 'error' && (
-        <button type="button" onClick={retry} aria-label="Retry current station">
-          Try again
+        <button type="button" onClick={retry} aria-label={t('status.retry')}>
+          {t('status.tryAgain')}
         </button>
       )}
       {preferenceMessage && <small style={{ display: 'block' }}>{preferenceMessage}</small>}
