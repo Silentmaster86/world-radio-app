@@ -23,11 +23,11 @@ root.render(
   <ErrorBoundary>
     <LanguageProvider>
       <FavoritesProvider>
-      <AudioProvider>
-        <ThemeProviderToggle>
-          <AppWithTheme />
-        </ThemeProviderToggle>
-      </AudioProvider>
+        <AudioProvider>
+          <ThemeProviderToggle>
+            <AppWithTheme />
+          </ThemeProviderToggle>
+        </AudioProvider>
       </FavoritesProvider>
     </LanguageProvider>
   </ErrorBoundary>,
