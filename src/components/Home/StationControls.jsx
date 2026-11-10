@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { useFilterDisclosure } from '../../context/BrowsingContext';
 import { getCountryName } from '../../lib/stationUtils';
@@ -91,6 +92,14 @@ const MobileToolbar = styled(Row)`
     display: flex;
   }
 `;
+const DiscoveryLink = styled(Link)`
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid currentColor;
+  border-radius: 0.65rem;
+`;
 const DesktopReset = styled(Reset)`
   @media (max-width: 640px) {
     display: none;
@@ -161,9 +170,12 @@ export default function StationControls({
         >
           {activeCount ? t('filters.active', { count: activeCount }) : t('filters.filters')}
         </FilterButton>
-        <Reset type="button" onClick={resetFilters}>
-          {t('filters.reset')}
-        </Reset>
+        {(activeCount > 0 || filters.q || filters.section !== 'all') && (
+          <Reset type="button" onClick={resetFilters}>
+            {t('filters.reset')}
+          </Reset>
+        )}
+        <DiscoveryLink to="/discover">{t('discover.open')}</DiscoveryLink>
       </MobileToolbar>
       <Refinements id="station-refinements" $open={expanded}>
         <Field htmlFor="station-country">

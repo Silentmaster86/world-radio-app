@@ -1,11 +1,12 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { findStationById } from '../lib/stationUtils';
+import { useStations } from './StationsContext';
 import { loadFavorites, saveFavorites, SESSION_ONLY_MESSAGE } from '../lib/favoritesStorage';
 
 const FavoritesContext = createContext();
 export const useFavorites = () => useContext(FavoritesContext);
 
 export const FavoritesProvider = ({ children }) => {
+  const { stations } = useStations();
   const [saved] = useState(loadFavorites);
   const [favoriteIds, setFavoriteIds] = useState(saved.favoriteIds);
   const [dirty, setDirty] = useState(false);
@@ -20,7 +21,7 @@ export const FavoritesProvider = ({ children }) => {
   }, [favoriteIds, dirty, saved]);
 
   const toggleFavorite = (id) => {
-    if (!findStationById(id)) return;
+    if (!stations.some((station) => station.id === id)) return;
     setFavoriteIds((previous) =>
       previous.includes(id) ? previous.filter((item) => item !== id) : [...previous, id],
     );

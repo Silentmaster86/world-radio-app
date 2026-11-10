@@ -1,8 +1,9 @@
+import { Link } from 'react-router-dom';
 // src/pages/Home.js
 import styled from 'styled-components';
 import { useLayoutEffect, useRef } from 'react';
 
-import { stations } from '../data/stations';
+import { useStations } from '../context/StationsContext';
 import { useAudio } from '../context/AudioContext';
 import { useFavorites } from '../context/FavoritesContext';
 import { useRecentStations } from '../context/RecentStationsContext';
@@ -17,6 +18,11 @@ import useStationFilters from '../hooks/useStationFilters';
 import { useLanguage } from '../context/LanguageContext';
 import { localizeStoredMessage } from '../i18n';
 
+const DiscoveryLink = styled(Link)`
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+`;
 const PageWrapper = styled.main`
   width: 100%;
   max-width: 1200px;
@@ -78,6 +84,7 @@ const More = styled.button`
 `;
 
 export default function Home() {
+  const { stations } = useStations();
   useBrowseRestoration();
   const { setStation, currentStation, playingStationId, status } = useAudio();
   const { t } = useLanguage();
@@ -159,6 +166,9 @@ export default function Home() {
           />
         ))}
       </StationGrid>
+      <p>
+        <DiscoveryLink to="/discover">{t('discover.title')}</DiscoveryLink>
+      </p>
       {visibleStations.length < searchedStations.length && (
         <More
           type="button"

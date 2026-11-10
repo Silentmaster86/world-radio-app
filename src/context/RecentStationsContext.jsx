@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useAudio } from './AudioContext';
-import { findStationById } from '../lib/stationUtils';
+import { useStations } from './StationsContext';
 import {
   loadRecent,
   saveRecent,
@@ -13,6 +13,7 @@ const RecentStationsContext = createContext();
 export const useRecentStations = () => useContext(RecentStationsContext);
 
 export function RecentStationsProvider({ children }) {
+  const { catalog: stations } = useStations();
   const { status, wantsToPlay, playingStationId } = useAudio();
   const [history, setHistory] = useState(loadRecent);
   const latest = useRef(history);
@@ -33,7 +34,7 @@ export function RecentStationsProvider({ children }) {
   }, []);
   const remember = useCallback(
     (id) => {
-      if (!findStationById(id)) return;
+      if (!stations.some((station) => station.id === id)) return;
       const previous = latest.current;
       const ids = prependRecent(previous.recentIds, id);
       if (
@@ -44,7 +45,7 @@ export function RecentStationsProvider({ children }) {
         return;
       persist(ids);
     },
-    [persist],
+    [persist, stations],
   );
 
   useEffect(() => {

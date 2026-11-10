@@ -1,4 +1,22 @@
 export const pl = {
+  'discover.open': 'Odkrywaj',
+  'discover.title': 'Odkrywaj radio z całego świata',
+  'discover.back': 'Wróć do moich stacji',
+  'discover.intro': 'Wyszukaj stacje ze świata i dodaj je do swojego katalogu.',
+  'discover.name': 'Nazwa stacji',
+  'discover.country': 'Kod kraju (opcjonalnie)',
+  'discover.search': 'Szukaj',
+  'discover.error': 'Katalog jest niedostępny. Spróbuj ponownie; zapisane stacje nadal działają.',
+  'discover.notice':
+    'Katalog społecznościowy. Dostępność i tożsamość stacji mogą się różnić. Tylko bezpośrednie strumienie HTTPS.',
+  'discover.storage': 'Dodane stacje są dostępne tylko w tej sesji; nie udało się zapisać zmian.',
+  'discover.loading': 'Wyszukiwanie…',
+  'discover.count': 'Zgodne wyniki: {count}',
+  'discover.add': 'Dodaj stację',
+  'discover.added': 'Dodano',
+  'discover.limit': 'Nie udało się dodać stacji. Limit zapisanych dodatkowych stacji wynosi 100.',
+  'discover.more': 'Kolejne wyniki',
+
   'header.language': 'Język',
   'header.appearance': 'Wygląd',
   'header.system': 'Systemowy',

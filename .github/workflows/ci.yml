@@ -52,6 +52,8 @@ jobs:
           "$RUNNER_TEMP/wra-browser/node_modules/.bin/playwright" install chromium
       - name: Check browser layout, navigation and accessibility
         run: NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-ux.cjs
+      - name: Check worldwide discovery with directory fixtures
+        run: NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-discovery.cjs
       - name: Check offline access and safe PWA updates
         run: NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-pwa.cjs
       - name: Check the current Netlify preview and direct routes
@@ -64,6 +66,7 @@ jobs:
           node scripts/check-preview.cjs
           NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-ux.cjs
           NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-pwa.cjs
+          NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-discovery.cjs
       - uses: actions/upload-artifact@v7
         if: always()
         with:

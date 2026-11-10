@@ -1,3 +1,4 @@
+import { StationsProvider } from './context/StationsContext';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import { AudioProvider } from './context/AudioContext';
@@ -22,13 +23,15 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <ErrorBoundary>
     <LanguageProvider>
-      <FavoritesProvider>
-        <AudioProvider>
-          <ThemeProviderToggle>
-            <AppWithTheme />
-          </ThemeProviderToggle>
-        </AudioProvider>
-      </FavoritesProvider>
+      <StationsProvider>
+        <FavoritesProvider>
+          <AudioProvider>
+            <ThemeProviderToggle>
+              <AppWithTheme />
+            </ThemeProviderToggle>
+          </AudioProvider>
+        </FavoritesProvider>
+      </StationsProvider>
     </LanguageProvider>
   </ErrorBoundary>,
 );

@@ -1,4 +1,23 @@
 export const en = {
+  'discover.open': 'Discover',
+  'discover.title': 'Discover worldwide radio',
+  'discover.back': 'Back to my stations',
+  'discover.intro': 'Search worldwide stations and add them to your local catalog.',
+  'discover.name': 'Station name',
+  'discover.country': 'Country code (optional)',
+  'discover.search': 'Search',
+  'discover.error': 'Directory unavailable. Try again; your saved stations still work.',
+  'discover.notice':
+    'Community directory. Availability and station identity may vary. HTTPS direct streams only.',
+  'discover.storage':
+    'Added stations are available for this session only; local changes could not be saved.',
+  'discover.loading': 'Searching…',
+  'discover.count': '{count} compatible results',
+  'discover.add': 'Add station',
+  'discover.added': 'Added',
+  'discover.limit': 'Could not add station. The saved catalog supports up to 100 added stations.',
+  'discover.more': 'More results',
+
   'header.language': 'Language',
   'header.appearance': 'Appearance',
   'header.system': 'System',

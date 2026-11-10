@@ -1,3 +1,4 @@
+import { StationsProvider } from './context/StationsContext';
 import { act } from 'react';
 import { ThemeProvider } from 'styled-components';
 import App from './App';
@@ -27,13 +28,15 @@ function mount() {
   return render(
     <ErrorBoundary>
       <LanguageProvider>
-        <FavoritesProvider>
-          <AudioProvider>
-            <ThemeProviderToggle>
-              <ThemedApp />
-            </ThemeProviderToggle>
-          </AudioProvider>
-        </FavoritesProvider>
+        <StationsProvider>
+          <FavoritesProvider>
+            <AudioProvider>
+              <ThemeProviderToggle>
+                <ThemedApp />
+              </ThemeProviderToggle>
+            </AudioProvider>
+          </FavoritesProvider>
+        </StationsProvider>
       </LanguageProvider>
     </ErrorBoundary>,
   );
@@ -448,4 +451,66 @@ test('return scrolling recovers when the list height settles after the first lay
   expect(window.scrollY).toBe(300);
   page.unmount();
   expect(callbacks.size).toBe(0);
+});
+
+test('worldwide search adds a station that plays, enters favorites/history and survives reload without autoplay', async () => {
+  const previousFetch = global.fetch;
+  const row = {
+    stationuuid: '12345678-1234-1234-1234-123456789abc',
+    name: 'World Jazz',
+    countrycode: 'FR',
+    url_resolved: 'https://radio.example/live',
+    tags: 'jazz',
+    languagecodes: 'fre',
+  };
+  global.fetch = jest
+    .fn()
+    .mockResolvedValue({ ok: true, json: async () => ({ rows: [row], hasMore: false }) });
+  const input = (page, selector, value) =>
+    act(() => {
+      const node = page.container.querySelector(selector);
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(node, value);
+      node.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+  try {
+    window.history.replaceState({}, '', '/discover');
+    let page = mount();
+    input(page, 'form input', 'jazz');
+    await act(async () =>
+      page.container
+        .querySelector('form')
+        .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })),
+    );
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(page.container.textContent).toContain('World Jazz');
+    act(() =>
+      [...page.container.querySelectorAll('button')]
+        .find((b) => b.textContent === 'Add station')
+        .click(),
+    );
+    expect(page.container.querySelector('article button').disabled).toBe(true);
+    page.click('a[href="/"]');
+    input(page, '#station-search', 'World Jazz');
+    expect(page.container.querySelectorAll('article')).toHaveLength(1);
+    page.click('[aria-label="Add World Jazz to favorites"]');
+    await act(async () =>
+      page.container
+        .querySelector('[data-station-id="rb-12345678-1234-1234-1234-123456789abc"]')
+        .click(),
+    );
+    expect(JSON.parse(localStorage.getItem(RECENT_KEY)).stationIds[0]).toBe(
+      'rb-' + row.stationuuid,
+    );
+    expect(window.Audio.mock.results[0].value.src).toBe(row.url_resolved);
+    expect(window.Audio).toHaveBeenCalledTimes(1);
+    page.unmount();
+    page = mount();
+    expect(
+      page.container.querySelector('[aria-label="Remove World Jazz from favorites"]'),
+    ).not.toBeNull();
+    expect(window.Audio.mock.results[1].value.play).not.toHaveBeenCalled();
+    expect(page.container.querySelectorAll('article')).toHaveLength(1);
+  } finally {
+    global.fetch = previousFetch;
+  }
 });
