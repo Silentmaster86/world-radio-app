@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { FaFilter } from 'react-icons/fa';
 import styled from 'styled-components';
 import { useFilterDisclosure } from '../../context/BrowsingContext';
 import { getCountryName } from '../../lib/stationUtils';
@@ -9,8 +9,8 @@ const Controls = styled.section`
   display: grid;
   gap: 1rem;
   @media (max-width: 640px) {
-    margin: 0.25rem 0;
-    gap: 0.35rem;
+    margin: 0.65rem 0;
+    gap: 0.5rem;
   }
 `;
 const Row = styled.div`
@@ -22,12 +22,17 @@ const Row = styled.div`
 const CollectionRow = styled(Row)`
   @media (max-width: 640px) {
     flex-wrap: nowrap;
+    background: ${({ theme }) => theme.colors.surface};
+    padding: 0.25rem;
+    border-radius: 0.8rem;
+    gap: 0.25rem;
     > button {
+      border: 0;
       flex: 1;
       min-width: 0;
       padding: 0.25rem;
-      font-size: 0.875rem;
-      line-height: 1.2;
+      font-size: 0.8rem;
+      line-height: 1.3;
       overflow-wrap: anywhere;
     }
   }
@@ -53,25 +58,21 @@ const Field = styled.label`
     opacity: 1;
   }
 `;
+const SearchRow = styled(Row)`
+  flex-wrap: nowrap;
+  align-items: end;
+  gap: 0.5rem;
+`;
 const SearchField = styled(Field)`
-  @media (max-width: 640px) {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    span {
-      flex: 0 1 30%;
-    }
-    input {
-      flex: 1;
-      width: 0;
-      min-width: 0;
-    }
+  flex: 1;
+  input {
+    border-radius: 0.8rem;
   }
 `;
 const SectionButton = styled.button`
   min-height: 44px;
   padding: 0.6rem 1rem;
-  border-radius: 999px;
+  border-radius: 0.65rem;
   border: 1px solid ${({ theme }) => theme.colors.muted};
   background: ${({ $active, theme }) => ($active ? theme.colors.accent : 'transparent')};
   color: ${({ $active, theme }) => ($active ? theme.colors.onAccent || '#fff' : theme.colors.text)};
@@ -83,7 +84,20 @@ const Reset = styled(SectionButton)`
 const FilterButton = styled(Reset)`
   display: none;
   @media (max-width: 640px) {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: 44px;
+    padding: 0.5rem;
+    span {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
   }
 `;
 const MobileToolbar = styled(Row)`
@@ -91,14 +105,6 @@ const MobileToolbar = styled(Row)`
   @media (max-width: 640px) {
     display: flex;
   }
-`;
-const DiscoveryLink = styled(Link)`
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  padding: 0.6rem 0.75rem;
-  border: 1px solid currentColor;
-  border-radius: 0.65rem;
 `;
 const DesktopReset = styled(Reset)`
   @media (max-width: 640px) {
@@ -151,32 +157,36 @@ export default function StationControls({
           {t('filters.recent', { count: recentCount })}
         </SectionButton>
       </CollectionRow>
-      <SearchField htmlFor="station-search">
-        <span>{t('filters.search')}</span>
-        <input
-          id="station-search"
-          type="search"
-          placeholder={t('filters.placeholder')}
-          value={filters.q}
-          onChange={(event) => updateFilters({ q: event.target.value })}
-        />
-      </SearchField>
-      <MobileToolbar>
+      <SearchRow>
+        <SearchField htmlFor="station-search">
+          <span>{t('filters.search')}</span>
+          <input
+            id="station-search"
+            type="search"
+            placeholder={t('filters.placeholder')}
+            value={filters.q}
+            onChange={(event) => updateFilters({ q: event.target.value })}
+          />
+        </SearchField>
         <FilterButton
           type="button"
           aria-expanded={expanded}
           aria-controls="station-refinements"
           onClick={() => setExpanded((value) => !value)}
         >
-          {activeCount ? t('filters.active', { count: activeCount }) : t('filters.filters')}
+          <FaFilter aria-hidden="true" />
+          <span>
+            {activeCount ? t('filters.active', { count: activeCount }) : t('filters.filters')}
+          </span>
         </FilterButton>
-        {(activeCount > 0 || filters.q || filters.section !== 'all') && (
+      </SearchRow>
+      {(activeCount > 0 || filters.q || filters.section !== 'all') && (
+        <MobileToolbar>
           <Reset type="button" onClick={resetFilters}>
             {t('filters.reset')}
           </Reset>
-        )}
-        <DiscoveryLink to="/discover">{t('discover.open')}</DiscoveryLink>
-      </MobileToolbar>
+        </MobileToolbar>
+      )}
       <Refinements id="station-refinements" $open={expanded}>
         <Field htmlFor="station-country">
           {t('filters.country')}
@@ -224,7 +234,7 @@ export default function StationControls({
           </select>
         </Field>
         <DesktopReset type="button" onClick={resetFilters}>
-          Reset filters
+          {t('filters.reset')}
         </DesktopReset>
       </Refinements>
     </Controls>

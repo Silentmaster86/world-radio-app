@@ -143,7 +143,7 @@ async function main() {
             first.y >= 0 && first.y + first.height <= dock + 1,
             `${language}/${mode}: first station hidden: ${JSON.stringify({ viewport, first, dock })}`,
           );
-          for (const selector of ['#language', '#appearance', 'article button']) {
+          for (const selector of ['#open-settings', 'article button']) {
             const control = page.locator(selector).first();
             assert.equal(await control.isVisible(), true);
             const box = await control.boundingBox();
@@ -158,6 +158,29 @@ async function main() {
           assert.ok(
             await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),
           );
+          await page.locator('#open-settings').click();
+          for (const selector of ['#language', '#appearance']) {
+            const box = await page.locator(selector).boundingBox();
+            assert.ok(
+              box.width >= 44 &&
+                box.height >= 44 &&
+                box.x >= 0 &&
+                box.x + box.width <= viewport.width,
+            );
+          }
+          await accessible(page, `${language}-${mode}-settings-${viewport.width}`);
+          await screenshot(page, `${language}-${mode}-settings-${viewport.width}`);
+          for (let tab = 0; tab < 5; tab++) {
+            await page.keyboard.press('Tab');
+            assert.equal(
+              await page.evaluate(() =>
+                document.querySelector('dialog[open]').contains(document.activeElement),
+              ),
+              true,
+            );
+          }
+          await page.keyboard.press('Escape');
+          assert.equal(await page.evaluate(() => document.activeElement.id), 'open-settings');
           await accessible(page, `${language}-${mode}-header-${viewport.width}`);
           await screenshot(page, `${language}-${mode}-header-${viewport.width}`);
         }
@@ -388,14 +411,18 @@ async function main() {
         .getByRole('button', { name: 'Remove Heart UK from favorites', exact: true })
         .click();
       await page.getByRole('button', { name: 'All stations (12)', exact: true }).click();
+      await page.locator('#open-settings').click();
       await page.locator('#appearance').selectOption(mode === 'dark' ? 'light' : 'dark');
+      await page.locator('#close-settings').click();
       await page.reload({ waitUntil: 'networkidle' });
       assert.equal(
         await page.locator('#appearance').inputValue(),
         mode === 'dark' ? 'light' : 'dark',
       );
       // Switching the UI language must not break narrow layouts or saved preferences.
+      await page.locator('#open-settings').click();
       await page.locator('#language').selectOption('pl');
+      await page.locator('#close-settings').click();
       await page.getByRole('button', { name: 'Wszystkie stacje (12)', exact: true }).waitFor();
       assert.equal(await page.evaluate(() => document.documentElement.lang), 'pl');
       await page.locator('#station-search').fill('wiadomości');
@@ -405,7 +432,9 @@ async function main() {
       await page.reload({ waitUntil: 'networkidle' });
       assert.equal(await page.locator('#language').inputValue(), 'pl');
       await page.locator('#station-search').fill('');
+      await page.locator('#open-settings').click();
       await page.locator('#language').selectOption('en');
+      await page.locator('#close-settings').click();
       assert.equal(await page.evaluate(() => document.documentElement.lang), 'en');
       // Large text must reflow; scrolling is allowed instead of clipping controls.
       await page.addStyleTag({ content: 'html { font-size: 200%; }' });

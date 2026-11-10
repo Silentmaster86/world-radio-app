@@ -18,6 +18,21 @@ import useStationFilters from '../hooks/useStationFilters';
 import { useLanguage } from '../context/LanguageContext';
 import { localizeStoredMessage } from '../i18n';
 
+const LibraryIntro = styled.div`
+  margin: 1.5rem 0 0;
+  h2 {
+    font-size: 1.5rem;
+    margin: 0 0 0.25rem;
+    letter-spacing: -0.03em;
+  }
+  p {
+    margin: 0;
+    color: ${({ theme }) => theme.colors.muted};
+  }
+  @media (max-width: 640px) {
+    display: none;
+  }
+`;
 const DiscoveryLink = styled(Link)`
   display: inline-flex;
   align-items: center;
@@ -32,7 +47,13 @@ const PageWrapper = styled.main`
   padding: 1rem;
   padding-bottom: 1rem;
 
-  background: ${({ theme }) => theme.colors.background};
+  background:
+    radial-gradient(
+      ellipse at top right,
+      color-mix(in srgb, ${({ theme }) => theme.colors.accent} 7%, transparent),
+      transparent 55%
+    ),
+    ${({ theme }) => theme.colors.background};
 
   color: ${({ theme }) => theme.colors.text};
 
@@ -44,12 +65,12 @@ const PageWrapper = styled.main`
 
 const StationGrid = styled.section`
   display: grid;
-  gap: ${({ theme }) => theme.spacing.md};
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 
   @media (max-width: 640px) {
     grid-template-columns: 1fr;
-    gap: 0.8rem;
+    gap: 0.5rem;
   }
 `;
 
@@ -113,6 +134,10 @@ export default function Home() {
   return (
     <PageWrapper>
       <HomeHeader />
+      <LibraryIntro>
+        <h2>{t('library.title')}</h2>
+        <p>{t('library.description')}</p>
+      </LibraryIntro>
 
       <StationControls
         {...browsing}

@@ -1,6 +1,7 @@
+import HomeHeader from '../components/Home/HomeHeader';
 import { countryOptions } from '../lib/countries';
 import { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useStations } from '../context/StationsContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -10,10 +11,64 @@ const Page = styled.main`
   margin: auto;
   padding: 1rem;
   form {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 0.75rem;
     align-items: end;
+    margin: 1.25rem 0;
+  }
+  .country-field {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .country-field select {
+    flex: 1;
+    width: 0;
+  }
+  .intro {
+    color: ${({ theme }) => theme.colors.muted};
+  }
+  > h1 {
+    font-size: 1.75rem;
+    letter-spacing: -0.035em;
+    margin: 1.5rem 0 0.5rem;
+  }
+  @media (max-width: 640px) {
+    .intro {
+      display: none;
+    }
+    > h1 {
+      font-size: 1.4rem;
+      margin: 1rem 0 0.5rem;
+    }
+  }
+  .directory-info {
+    font-size: 0.75rem;
+    color: ${({ theme }) => theme.colors.muted};
+    margin-top: 1.5rem;
+  }
+  summary {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  article h2 {
+    margin: 0 0 0.25rem;
+    font-size: 0.95rem;
+  }
+  article p {
+    margin: 0;
+    font-size: 0.75rem;
+    color: ${({ theme }) => theme.colors.muted};
+  }
+  article button {
+    min-width: 44px;
+  }
+  article details p {
+    margin: 0.5rem 0;
   }
   label {
     display: grid;
@@ -48,13 +103,13 @@ const Page = styled.main`
   }
   article {
     display: flex;
-    gap: 1rem;
+    gap: 0.65rem;
     align-items: center;
     justify-content: space-between;
     border: 1px solid ${({ theme }) => theme.colors.border};
-    border-radius: 0.75rem;
-    padding: 0.75rem;
-    margin: 0.75rem 0;
+    border-radius: 0.85rem;
+    padding: 0.65rem;
+    margin: 0.5rem 0;
     overflow-wrap: anywhere;
   }
   article div {
@@ -133,9 +188,9 @@ export default function Discover() {
   }
   return (
     <Page>
-      <Link to="/">{t('discover.back')}</Link>
-      <h1>{t('discover.title')}</h1>
-      <p>{t('discover.intro')}</p>
+      <HomeHeader headingAs="div" back />
+      <h1>{t('discover.heading')}</h1>
+      <p className="intro">{t('discover.intro')}</p>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -146,7 +201,10 @@ export default function Discover() {
           {t('discover.name')}
           <input value={q} onChange={(e) => setQ(e.target.value)} maxLength={80} />
         </label>
-        <label>
+        <button disabled={q.trim().length < 2 && !/^[a-z]{2}$/i.test(country.trim())}>
+          {t('discover.search')}
+        </button>
+        <label className="country-field">
           {t('discover.country')}
           <select value={country} onChange={(e) => setCountry(e.target.value)}>
             <option value="">{t('filters.allCountries')}</option>
@@ -157,16 +215,7 @@ export default function Discover() {
             ))}
           </select>
         </label>
-        <button disabled={q.trim().length < 2 && !/^[a-z]{2}$/i.test(country.trim())}>
-          {t('discover.search')}
-        </button>
       </form>
-      <p>
-        <a href="https://www.radio-browser.info/" target="_blank" rel="noreferrer">
-          Radio Browser
-        </a>{' '}
-        · {t('discover.notice')}
-      </p>
       {storageIssue && <p role="status">{t('discover.storage')}</p>}
       {error && <p role="alert">{error}</p>}
       <p role="status">
@@ -180,16 +229,6 @@ export default function Discover() {
             : ''}
       </p>
       {searched && !busy && result.rows.length === 0 && <p>{t('discover.empty')}</p>}
-      {searched && !busy && lastQuery.current?.country && q.trim().length >= 2 && (
-        <button
-          onClick={() => {
-            setCountry('');
-            search(0, { country: '' });
-          }}
-        >
-          {t('discover.allCountries')}
-        </button>
-      )}
       {result.rows.map((row) => {
         const station = normalizeDirectoryStation(row);
         const existing =
@@ -202,10 +241,16 @@ export default function Discover() {
                 {station?.countryCode || String(row.countrycode || '').slice(0, 2)} ·{' '}
                 {station?.genres.join(', ') || String(row.codec || '').slice(0, 24)}
               </p>
-              {!station && <p>{t('discover.unsupported')}</p>}
+              {!station && (
+                <details>
+                  <summary>{t('discover.unsupportedShort')}</summary>
+                  <p>{t('discover.unsupported')}</p>
+                </details>
+              )}
             </div>
             <button
               disabled={!station || !!existing}
+              aria-label={!station ? t('discover.unavailableLabel') : undefined}
               onClick={() => {
                 if (!addStation(row)) setError(t('discover.limit'));
               }}
@@ -215,6 +260,16 @@ export default function Discover() {
           </article>
         );
       })}
+      {searched && !busy && lastQuery.current?.country && q.trim().length >= 2 && (
+        <button
+          onClick={() => {
+            setCountry('');
+            search(0, { country: '' });
+          }}
+        >
+          {t('discover.allCountries')}
+        </button>
+      )}
       {result.hasMore && (
         <button disabled={busy} onClick={() => search(result.page + 1)}>
           {t('discover.more')}
@@ -225,6 +280,12 @@ export default function Discover() {
           <button onClick={() => navigate('/')}>{t('discover.back')}</button>
         </p>
       )}
+      <p className="directory-info">
+        <a href="https://www.radio-browser.info/" target="_blank" rel="noreferrer">
+          Radio Browser
+        </a>{' '}
+        · {t('discover.notice')}
+      </p>
     </Page>
   );
 }

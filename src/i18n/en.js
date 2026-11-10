@@ -1,5 +1,13 @@
 export const en = {
-  'discover.unavailable': 'Unavailable',
+  'discover.unavailableLabel': 'Cannot add this stream',
+  'discover.unsupportedShort': 'Stream not supported',
+  'discover.heading': 'Discover stations',
+  'settings.title': 'Settings',
+  'settings.done': 'Done',
+  'library.title': 'Your radio, your way',
+  'library.description': 'Pick a station and press play.',
+
+  'discover.unavailable': '—',
   'discover.unsupported':
     'This entry uses a format this player does not support, an insecure address or invalid stream data. It cannot be added yet.',
   'discover.allCountries': 'Search this name in all countries',
@@ -18,8 +26,8 @@ export const en = {
     'Added stations are available for this session only; local changes could not be saved.',
   'discover.loading': 'Searching…',
   'discover.count': '{count} results · {compatible} can be added',
-  'discover.add': 'Add station',
-  'discover.added': 'Added',
+  'discover.add': 'Add',
+  'discover.added': 'Saved',
   'discover.limit': 'Could not add station. The saved catalog supports up to 100 added stations.',
   'discover.more': 'More results',
 

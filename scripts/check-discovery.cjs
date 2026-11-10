@@ -4,6 +4,11 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { chromium } = require('playwright');
 const { AxeBuilder } = require('@axe-core/playwright');
+const output = path.resolve(
+  'test-results/discovery',
+  process.env.WRA_BASE_URL ? 'preview' : 'build',
+);
+fs.mkdirSync(output, { recursive: true });
 const { createAppContext } = require('./browser-context.cjs');
 async function main() {
   const root = path.resolve('build');
@@ -54,6 +59,13 @@ async function main() {
                   url_resolved: 'https://radio.example/live',
                   tags: 'jazz',
                 },
+                {
+                  stationuuid: '22345678-1234-1234-1234-123456789abc',
+                  name: 'BBC Radio 1',
+                  countrycode: 'GB',
+                  hls: 1,
+                  url_resolved: 'https://radio.example/live.m3u8',
+                },
               ],
               hasMore: false,
             },
@@ -82,9 +94,24 @@ async function main() {
             axe.violations.map((x) => x.id),
             [],
           );
-          if (!(await page.locator('article button').isDisabled()))
-            await page.locator('article button').click();
-          assert.equal(await page.locator('article button').isDisabled(), true);
+          await page.screenshot({
+            path: path.join(output, `${language}-${colorScheme}-${width}.png`),
+            fullPage: true,
+          });
+          const result = page
+            .locator('article')
+            .filter({ has: page.getByRole('heading', { name: 'World Jazz', exact: true }) });
+          if (!(await result.locator('button').isDisabled()))
+            await result.locator('button').click();
+          assert.equal(await result.locator('button').isDisabled(), true);
+          assert.equal(
+            await page
+              .locator('article')
+              .filter({ has: page.getByRole('heading', { name: 'BBC Radio 1', exact: true }) })
+              .locator('button')
+              .isDisabled(),
+            true,
+          );
           const key = await page.evaluate(
             () => JSON.parse(localStorage.getItem('wra:stations:v1')).stations[0].id,
           );

@@ -1,5 +1,13 @@
 export const pl = {
-  'discover.unavailable': 'Niedostępna',
+  'discover.unavailableLabel': 'Nie można dodać tego strumienia',
+  'discover.unsupportedShort': 'Nieobsługiwany strumień',
+  'discover.heading': 'Odkrywaj stacje',
+  'settings.title': 'Ustawienia',
+  'settings.done': 'Gotowe',
+  'library.title': 'Twoje radio. Twój wybór.',
+  'library.description': 'Wybierz stację i słuchaj.',
+
+  'discover.unavailable': '—',
   'discover.unsupported':
     'Ten wpis używa nieobsługiwanego formatu, niezabezpieczonego adresu lub nieprawidłowych danych strumienia. Na razie nie można go dodać.',
   'discover.allCountries': 'Szukaj tej nazwy we wszystkich krajach',
@@ -18,8 +26,8 @@ export const pl = {
   'discover.storage': 'Dodane stacje są dostępne tylko w tej sesji; nie udało się zapisać zmian.',
   'discover.loading': 'Wyszukiwanie…',
   'discover.count': 'Wyniki: {count} · Można dodać: {compatible}',
-  'discover.add': 'Dodaj stację',
-  'discover.added': 'Dodano',
+  'discover.add': 'Dodaj',
+  'discover.added': 'Zapisano',
   'discover.limit': 'Nie udało się dodać stacji. Limit zapisanych dodatkowych stacji wynosi 100.',
   'discover.more': 'Kolejne wyniki',
 

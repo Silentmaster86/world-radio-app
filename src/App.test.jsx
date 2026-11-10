@@ -127,6 +127,7 @@ test('switching to Polish changes the UI without restarting radio or clearing fa
   page.click('[aria-label="Add PR Chicago to favorites"]');
   const audio = window.Audio.mock.results[0].value;
   const playCount = audio.play.mock.calls.length;
+  page.click('#open-settings');
   const language = page.container.querySelector('#language');
   act(() => {
     language.value = 'pl';
@@ -484,9 +485,7 @@ test('worldwide search adds a station that plays, enters favorites/history and s
     expect(global.fetch).toHaveBeenCalledTimes(1);
     expect(page.container.textContent).toContain('World Jazz');
     act(() =>
-      [...page.container.querySelectorAll('button')]
-        .find((b) => b.textContent === 'Add station')
-        .click(),
+      [...page.container.querySelectorAll('button')].find((b) => b.textContent === 'Add').click(),
     );
     expect(page.container.querySelector('article button').disabled).toBe(true);
     page.click('a[href="/"]');
@@ -576,4 +575,21 @@ test('discovery uses named countries and explains BBC HLS results without hiding
   } finally {
     global.fetch = previousFetch;
   }
+});
+
+test('settings open and close without restarting playback or changing saved stations', async () => {
+  const page = mount();
+  await act(async () => page.container.querySelector('[data-station-id="heart-uk"]').click());
+  const audio = window.Audio.mock.results[0].value;
+  const pauses = audio.pause.mock.calls.length;
+  page.click('#open-settings');
+  const dialog = page.container.querySelector('dialog[open]');
+  expect(dialog).not.toBeNull();
+  expect(document.activeElement.id).toBe('language');
+  page.click('#close-settings');
+  expect(dialog.hasAttribute('open')).toBe(false);
+  expect(document.activeElement.id).toBe('open-settings');
+  expect(audio.pause).toHaveBeenCalledTimes(pauses);
+  expect(window.Audio).toHaveBeenCalledTimes(1);
+  expect(page.container.querySelector('[data-player-status]').dataset.playerStatus).toBe('playing');
 });
