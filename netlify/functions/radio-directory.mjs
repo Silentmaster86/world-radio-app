@@ -45,7 +45,6 @@ export function createHandler({
       reverse: 'true',
       limit: '25',
       offset: String(page * 25),
-      is_https: 'true',
     });
     if (/^[A-Z]{2}$/.test(country)) params.set('countrycode', country);
     for (const host of hosts) {

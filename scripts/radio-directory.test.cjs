@@ -26,6 +26,11 @@ test('discovers mirrors, rejects foreign hosts, fails over and bounds paging', a
   assert.match(urls[1], /^https:\/\/nl1.api.radio-browser.info/);
   assert.equal(new URL(urls[1]).searchParams.get('offset'), '1000');
   assert.equal(new URL(urls[1]).searchParams.get('countrycode'), 'FR');
+  assert.equal(
+    new URL(urls[1]).searchParams.has('is_https'),
+    false,
+    'incompatible entries must reach the UI for explanation',
+  );
 });
 test('rejects invalid requests without contacting external services', async () => {
   const { createHandler } = await load();
