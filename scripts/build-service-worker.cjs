@@ -18,7 +18,10 @@ const extra = [
 const urls = [
   ...new Set([
     ...Object.values(manifest.files).filter(
-      (url) => url.startsWith('/static/') && !/\.(map|txt)$/.test(url),
+      (url) =>
+        url.startsWith('/static/') &&
+        !/\.(map|txt)$/.test(url) &&
+        !(manifest.optionalFiles || []).includes(url),
     ),
     ...extra,
   ]),

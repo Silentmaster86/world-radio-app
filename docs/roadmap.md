@@ -28,19 +28,43 @@ history; their original follow-up lists are no longer the current backlog.
 - Polish and English interface with persistent preference, translated station
   descriptions and bilingual catalog search. See [language.md](language.md).
 
-## Next work, in priority order
+## Current delivery plan
 
-1. **Real-device playback review.** Check iOS Safari/Android native MP3/AAC,
-   lock-screen controls, background playback, safe areas and installation. HTTP
-   stream reachability and Chromium fixtures do not establish those behaviors.
-   PR Chicago's publisher source has been verified and its current endpoint is
-   documented in [station-sources.md](station-sources.md).
-2. **Worldwide directory discovery.** Build on the Radio Browser evaluation in
-   [catalog.md](catalog.md): mirror discovery, result normalization, persistent
-   added stations, bounded caching/offline fallback and identity verification.
-3. **Interface and sharing refinements.** Apply findings from phone testing
-   and consider direct station sharing and richer artwork.
+Worldwide Radio Browser discovery, saved added stations, PL/EN settings and the
+compact mobile layout have shipped. The next stages are complete product
+increments, each with a preview, regression checks and manual acceptance before
+production. They are improvements, not a list of confirmed defects.
 
-These are product improvements and verification tasks, not a list of confirmed
-application defects. Monitoring tool advisories and reconsidering Babel 8 remain
-ongoing maintenance, as described in [tooling.md](tooling.md).
+1. **HLS playback (current branch).** Enable compatible HTTPS HLS stations,
+   including verified BBC Radio 1 sources, using the shared player. Keep existing
+   favorites, history and Sleep Timer. See [hls.md](hls.md).
+2. **Personal data backup.** Versioned JSON export/import of added stations,
+   favorites and preferences; validate imports, show a summary and deduplicate
+   stable IDs. Define merge/replace explicitly and preserve existing data on
+   invalid input. Local-file backup first, no mandatory account or cloud service.
+3. **Library management and sharing.** Reorder favorites, remove added stations
+   with safe handling of current playback/history, and add station sharing/direct
+   links with clear behavior when a recipient has not saved that station.
+4. **Visual redesign and richer animation.** A coherent visual direction for the
+   library, discovery, player and settings; stronger artwork, typography and
+   hierarchy. Add purposeful transitions, playback feedback and loading states.
+   Keep compact phone layouts, 44px touch targets, light/dark contrast, keyboard
+   access and reduced-motion support. Check actual mobile performance before
+   adding persistent effects or large animation dependencies.
+5. **Additional interface languages.** Start with roughly 10–15 major languages,
+   choosing coverage and review capacity before adding more. Generate/review
+   dictionaries, load them on demand and cache for offline UI; localize plurals,
+   country names and formatting. Add RTL layout support for Arabic, not just
+   translated text. This translates the interface, not live radio broadcasts.
+
+   Candidate translation APIs: [Google Cloud Translation](https://cloud.google.com/translate/docs/languages)
+   and [Azure Translator](https://learn.microsoft.com/en-us/azure/ai-services/translator/language-support).
+   Supported languages vary by service/model; neither means literally every world
+   language. Prefer translation during development over a paid request on every
+   page view. Keep credentials in tooling/server secrets and review cost/terms
+   before enabling a service. No paid API is enabled by this roadmap.
+
+Physical-device review remains a release task: iOS/Android audio, lock-screen
+controls, background behavior, installation and safe areas cannot be established
+by HTTP reachability or Chromium fixtures. Runtime advisories and Babel 8
+compatibility remain ongoing maintenance; see [tooling.md](tooling.md).

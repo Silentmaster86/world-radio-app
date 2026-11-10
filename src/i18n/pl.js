@@ -22,7 +22,7 @@ export const pl = {
   'discover.search': 'Szukaj',
   'discover.error': 'Katalog jest niedostępny. Spróbuj ponownie; zapisane stacje nadal działają.',
   'discover.notice':
-    'Katalog społecznościowy. Dostępność i tożsamość stacji mogą się różnić. Tylko bezpośrednie strumienie HTTPS.',
+    'Katalog społecznościowy. Dostępność i tożsamość stacji mogą się różnić. Strumienie MP3, AAC i HLS przez HTTPS; obsługa zależy od przeglądarki.',
   'discover.storage': 'Dodane stacje są dostępne tylko w tej sesji; nie udało się zapisać zmian.',
   'discover.loading': 'Wyszukiwanie…',
   'discover.count': 'Wyniki: {count} · Można dodać: {compatible}',

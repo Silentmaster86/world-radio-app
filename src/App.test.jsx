@@ -514,7 +514,7 @@ test('worldwide search adds a station that plays, enters favorites/history and s
   }
 });
 
-test('discovery uses named countries and explains BBC HLS results without hiding them', async () => {
+test('discovery uses named countries and accepts HTTPS HLS results', async () => {
   const previousFetch = global.fetch;
   const rows = [
     {
@@ -560,8 +560,8 @@ test('discovery uses named countries and explains BBC HLS results without hiding
       'Absolute Radio',
       'BBC Radio 1',
     ]);
-    expect(page.container.querySelectorAll('article button:disabled')).toHaveLength(1);
-    expect(page.container.textContent).toContain('This entry uses a format');
+    expect(page.container.querySelectorAll('article button:disabled')).toHaveLength(0);
+    expect(page.container.querySelectorAll('article button:not(:disabled)')).toHaveLength(3);
     global.fetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ rows: [], hasMore: false }),

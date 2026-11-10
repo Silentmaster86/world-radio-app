@@ -60,11 +60,19 @@ async function main() {
                   tags: 'jazz',
                 },
                 {
-                  stationuuid: '22345678-1234-1234-1234-123456789abc',
-                  name: 'BBC Radio 1',
+                  stationuuid: 'a740cc4c-9563-4fbe-a13f-e7f9e89b7441',
+                  name: 'BBC Radio 1 (128k)',
                   countrycode: 'GB',
                   hls: 1,
-                  url_resolved: 'https://radio.example/live.m3u8',
+                  url_resolved:
+                    'http://as-hls-ww-live.akamaized.net/pool_01505109/live/ww/bbc_radio_one/bbc_radio_one.isml/bbc_radio_one-audio%3d128000.norewind.m3u8',
+                },
+                {
+                  stationuuid: '22345678-1234-1234-1234-123456789abc',
+                  name: 'Legacy HTTP station',
+                  countrycode: 'GB',
+                  hls: 1,
+                  url_resolved: 'http://radio.example/live.m3u8',
                 },
               ],
               hasMore: false,
@@ -107,11 +115,29 @@ async function main() {
           assert.equal(
             await page
               .locator('article')
-              .filter({ has: page.getByRole('heading', { name: 'BBC Radio 1', exact: true }) })
+              .filter({
+                has: page.getByRole('heading', { name: 'Legacy HTTP station', exact: true }),
+              })
               .locator('button')
               .isDisabled(),
             true,
           );
+          const bbc = page
+            .locator('article')
+            .filter({ has: page.getByRole('heading', { name: 'BBC Radio 1 (128k)', exact: true }) })
+            .locator('button');
+          if (width === 320) {
+            assert.equal(await bbc.isDisabled(), false);
+            await bbc.click();
+          }
+          assert.equal(await bbc.isDisabled(), true);
+          const hls = await page.evaluate(() =>
+            JSON.parse(localStorage.getItem('wra:stations:v1')).stations.find(
+              (s) => s.name === 'BBC Radio 1 (128k)',
+            ),
+          );
+          assert.equal(hls.streamType, 'hls');
+          assert.ok(hls.url.startsWith('https://'));
           const key = await page.evaluate(
             () => JSON.parse(localStorage.getItem('wra:stations:v1')).stations[0].id,
           );

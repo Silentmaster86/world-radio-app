@@ -75,6 +75,7 @@ export function createAudioPlayer({
   createAudio = () => new Audio(),
   connectionTimeoutMs = 15000,
   retryDelays = [1000, 2000, 4000],
+  loadHls = () => import('./hlsPlayback'),
   ...options
 }) {
   const audio = createAudio();
@@ -87,6 +88,7 @@ export function createAudioPlayer({
   let retryTimer = null;
   let failures = 0;
   let sourceIndex = 0;
+  let hlsSource = null;
   const listeners = new Set();
 
   function publish(patch) {
@@ -126,6 +128,8 @@ export function createAudioPlayer({
   }
 
   function releaseSource() {
+    hlsSource?.destroy();
+    hlsSource = null;
     audio.pause();
     if (audio.getAttribute('src') !== null) {
       audio.removeAttribute('src');
@@ -202,7 +206,9 @@ export function createAudioPlayer({
       generation === attempt.generation &&
       state.wantsToPlay &&
       state.selectedStationId === station.id &&
-      (!audio.currentSrc || audio.currentSrc === streamUrl);
+      (!audio.currentSrc ||
+        audio.currentSrc === streamUrl ||
+        (active === attempt && hlsSource?.matches(audio.currentSrc)));
     const confirmPlaying = () => {
       if (!isCurrent() || audio.paused || audio.ended || audio.readyState < 3) return;
       clearTimeout(timeout);
@@ -236,16 +242,42 @@ export function createAudioPlayer({
       Object.entries(events).forEach(([name, handler]) => audio.removeEventListener(name, handler));
     publish({ status: 'connecting', playingStationId: null, error: null });
     armTimeout(attempt);
-    try {
-      audio.src = streamUrl;
-      audio.load();
-      Promise.resolve(audio.play())
-        .then(confirmPlaying)
+    const playCurrent = () => {
+      if (active !== attempt || generation !== attempt.generation || !state.wantsToPlay) return;
+      try {
+        Promise.resolve(audio.play())
+          .then(confirmPlaying)
+          .catch((error) => {
+            if (active === attempt && generation === attempt.generation) fail(attempt, error);
+          });
+      } catch (error) {
+        fail(attempt, error);
+      }
+    };
+    const hls = station.streamType === 'hls' || /\.m3u8(?:$|[?#])/i.test(streamUrl);
+    if (hls && !audio.canPlayType?.('application/vnd.apple.mpegurl')) {
+      loadHls()
+        .then(({ attachHls }) => {
+          if (active !== attempt || generation !== attempt.generation || !state.wantsToPlay) return;
+          hlsSource = attachHls(audio, streamUrl, {
+            ready: playCurrent,
+            error: (error) => {
+              if (active === attempt && generation === attempt.generation) fail(attempt, error);
+            },
+          });
+          hlsSource.start();
+        })
         .catch((error) => {
-          if (active === attempt && generation === attempt.generation) fail(attempt, error);
+          if (active === attempt) fail(attempt, error);
         });
-    } catch (error) {
-      fail(attempt, error);
+    } else {
+      try {
+        audio.src = streamUrl;
+        audio.load();
+        playCurrent();
+      } catch (error) {
+        fail(attempt, error);
+      }
     }
     return result;
   }
@@ -277,6 +309,7 @@ export function createAudioPlayer({
     // for Android to potentially keep a resumable media notification.
     // An unconfirmed connection or ordinary app/timer pause still unloads it.
     if (retainSource && hadPlayingSource && audio.getAttribute('src') !== null) {
+      hlsSource?.pause();
       audio.pause();
     } else {
       releaseSource();

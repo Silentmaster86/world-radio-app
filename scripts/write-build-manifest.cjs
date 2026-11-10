@@ -26,7 +26,16 @@ function writeBuildManifest(root) {
     }
   }
   collect('static');
-  const manifest = { files, entrypoints: [...entrypoints] };
+  // HLS is downloaded on first HLS playback, not by startup/SW precaching.
+  const optionalFiles = new Set();
+  function optional(key) {
+    const chunk = vite[key];
+    if (!chunk || entrypoints.has(chunk.file) || optionalFiles.has('/' + chunk.file)) return;
+    optionalFiles.add('/' + chunk.file);
+    for (const child of chunk.imports || []) optional(child);
+  }
+  for (const key of Object.keys(vite)) if (key.endsWith('/hlsPlayback.js')) optional(key);
+  const manifest = { files, entrypoints: [...entrypoints], optionalFiles: [...optionalFiles] };
   fs.writeFileSync(
     path.join(root, 'asset-manifest.json'),
     JSON.stringify(manifest, null, 2) + '\n',

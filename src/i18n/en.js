@@ -21,7 +21,7 @@ export const en = {
   'discover.search': 'Search',
   'discover.error': 'Directory unavailable. Try again; your saved stations still work.',
   'discover.notice':
-    'Community directory. Availability and station identity may vary. HTTPS direct streams only.',
+    'Community directory. Availability and station identity may vary. HTTPS MP3, AAC and HLS streams; browser support varies.',
   'discover.storage':
     'Added stations are available for this session only; local changes could not be saved.',
   'discover.loading': 'Searching…',
