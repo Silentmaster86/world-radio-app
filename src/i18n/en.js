@@ -1,4 +1,7 @@
 export const en = {
+  'settings.backupError': 'Backup could not load. Reconnect and reload the app to try again.',
+  'settings.backup': 'Library backup',
+  'settings.loading': 'Loading…',
   'discover.unavailableLabel': 'Cannot add this stream',
   'discover.unsupportedShort': 'Stream not supported',
   'discover.heading': 'Discover stations',

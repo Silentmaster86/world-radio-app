@@ -56,6 +56,8 @@ jobs:
         run: NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-discovery.cjs
       - name: Check real HLS decoding and lazy engine loading
         run: NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-hls.cjs
+      - name: Check backup files and uninterrupted import playback
+        run: NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-backup.cjs
       - name: Check offline access and safe PWA updates
         run: NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-pwa.cjs
       - name: Check the current Netlify preview and direct routes
@@ -70,6 +72,7 @@ jobs:
           NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-pwa.cjs
           NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-discovery.cjs
           NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-hls.cjs
+          NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-backup.cjs
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -77,6 +80,7 @@ jobs:
           path: |
             test-results/ux
             test-results/discovery
+            test-results/backup
       - uses: actions/upload-artifact@v7
         if: always()
         with:

@@ -9,6 +9,7 @@ export default class ErrorBoundary extends Component {
 
   render() {
     if (!this.state.hasError) return this.props.children;
+    if (this.props.fallback) return this.props.fallback;
 
     // This must work even when a provider or the theme has failed to initialize.
     return (

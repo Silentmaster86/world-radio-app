@@ -32,7 +32,19 @@ export function StationsProvider({ children }) {
   }
   return (
     <StationsContext.Provider
-      value={{ stations, catalog: catalog.current, addStation, storageIssue }}
+      value={{
+        stations,
+        catalog: catalog.current,
+        addStation,
+        storageIssue,
+        restoreStations: (added) => {
+          for (const station of added)
+            if (!catalog.current.some((s) => s.id === station.id || s.url === station.url))
+              catalog.current.push(station);
+          setStations(catalog.current.slice());
+          setStorageIssue(false);
+        },
+      }}
     >
       {children}
     </StationsContext.Provider>

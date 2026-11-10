@@ -1,4 +1,8 @@
 export const pl = {
+  'settings.backupError':
+    'Nie udało się wczytać kopii biblioteki. Połącz się z internetem i odśwież aplikację, aby spróbować ponownie.',
+  'settings.backup': 'Kopia biblioteki',
+  'settings.loading': 'Wczytywanie…',
   'discover.unavailableLabel': 'Nie można dodać tego strumienia',
   'discover.unsupportedShort': 'Nieobsługiwany strumień',
   'discover.heading': 'Odkrywaj stacje',

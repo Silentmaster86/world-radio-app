@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom';
-import { useEffect, useId, useRef, useState } from 'react';
+import ErrorBoundary from '../ErrorBoundary';
+import { lazy, Suspense, useEffect, useId, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { FaGlobeEurope, FaSlidersH, FaArrowLeft, FaCompass } from 'react-icons/fa';
 import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { localizeStoredMessage } from '../../i18n';
+const BackupPanel = lazy(() => import('../Backup/BackupPanel'));
 const Header = styled.header`
   display: flex;
   flex-wrap: wrap;
@@ -120,6 +122,7 @@ export default function HomeHeader({ headingAs = 'h1', back = false }) {
   const { mode, setThemeMode, storageMessage } = useTheme();
   const { language, setLanguage, t } = useLanguage();
   const [open, setOpen] = useState(false);
+  const [backupOpen, setBackupOpen] = useState(false);
   const dialog = useRef(null);
   const opener = useRef(null);
   const title = useId();
@@ -134,6 +137,7 @@ export default function HomeHeader({ headingAs = 'h1', back = false }) {
     if (dialog.current.close && dialog.current.open) dialog.current.close();
     else dialog.current.removeAttribute('open');
     setOpen(false);
+    setBackupOpen(false);
     opener.current?.focus({ preventScroll: true });
   };
   return (
@@ -172,9 +176,9 @@ export default function HomeHeader({ headingAs = 'h1', back = false }) {
         aria-labelledby={title}
         onKeyDown={(event) => {
           if (event.key !== 'Tab') return;
-          const controls = [...dialog.current.querySelectorAll('select, button')].filter(
-            (node) => !node.disabled,
-          );
+          const controls = [
+            ...dialog.current.querySelectorAll('select, button, input, a[href]'),
+          ].filter((node) => !node.disabled);
           const first = controls[0],
             last = controls[controls.length - 1];
           if (event.shiftKey && document.activeElement === first) {
@@ -208,6 +212,22 @@ export default function HomeHeader({ headingAs = 'h1', back = false }) {
           </select>
         </label>
         {storageMessage && <p role="status">{localizeStoredMessage(t, storageMessage)}</p>}
+        <button type="button" data-open-backup onClick={() => setBackupOpen(true)}>
+          {t('settings.backup')}
+        </button>
+        {backupOpen && (
+          <ErrorBoundary
+            fallback={
+              <p role="alert" data-backup-load-error>
+                {t('settings.backupError')}
+              </p>
+            }
+          >
+            <Suspense fallback={<p role="status">{t('settings.loading')}</p>}>
+              <BackupPanel />
+            </Suspense>
+          </ErrorBoundary>
+        )}
         <footer>
           <button id="close-settings" data-close-settings type="button" onClick={close}>
             {t('settings.done')}

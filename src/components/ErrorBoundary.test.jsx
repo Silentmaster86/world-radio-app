@@ -31,3 +31,24 @@ test('recovers a child failure without relying on providers or deleting data', (
     localStorage.clear();
   }
 });
+
+test('a local feature fallback leaves surrounding application content mounted', () => {
+  const log = jest.spyOn(console, 'error').mockImplementation(() => {});
+  function BrokenFeature() {
+    throw new Error('Chunk unavailable');
+  }
+  try {
+    const page = render(
+      <>
+        <p>Radio keeps playing</p>
+        <ErrorBoundary fallback={<p role="alert">Backup unavailable</p>}>
+          <BrokenFeature />
+        </ErrorBoundary>
+      </>,
+    );
+    expect(page.container.textContent).toBe('Radio keeps playingBackup unavailable');
+    expect(page.container.querySelector('main')).toBeNull();
+  } finally {
+    log.mockRestore();
+  }
+});
