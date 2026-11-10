@@ -1,3 +1,4 @@
+import { StationsProvider } from './context/StationsContext';
 import { act } from 'react';
 import { ThemeProvider } from 'styled-components';
 import App from './App';
@@ -11,6 +12,8 @@ import { FAVORITES_KEY } from './lib/favoritesStorage';
 import { RECENT_KEY } from './lib/recentStorage';
 import { render } from './test/render';
 import { FakeAudio } from './test/FakeAudio';
+import { LanguageProvider } from './context/LanguageContext';
+import { LANGUAGE_KEY } from './i18n';
 
 function ThemedApp() {
   const { theme } = useTheme();
@@ -24,13 +27,17 @@ function ThemedApp() {
 function mount() {
   return render(
     <ErrorBoundary>
-      <FavoritesProvider>
-        <AudioProvider>
-          <ThemeProviderToggle>
-            <ThemedApp />
-          </ThemeProviderToggle>
-        </AudioProvider>
-      </FavoritesProvider>
+      <LanguageProvider>
+        <StationsProvider>
+          <FavoritesProvider>
+            <AudioProvider>
+              <ThemeProviderToggle>
+                <ThemedApp />
+              </ThemeProviderToggle>
+            </AudioProvider>
+          </FavoritesProvider>
+        </StationsProvider>
+      </LanguageProvider>
     </ErrorBoundary>,
   );
 }
@@ -112,6 +119,39 @@ test('removed stations disappear from collections without erasing saved IDs', ()
     [...page.container.querySelectorAll('[data-station-title]')].map((item) => item.textContent),
   ).toEqual(['PR Chicago']);
   expect(JSON.parse(localStorage.getItem(RECENT_KEY)).stationIds).toContain(removedId);
+});
+
+test('switching to Polish changes the UI without restarting radio or clearing favorites', async () => {
+  const page = mount();
+  await act(async () => page.container.querySelector('[data-station-id="pr-chicago"]').click());
+  page.click('[aria-label="Add PR Chicago to favorites"]');
+  const audio = window.Audio.mock.results[0].value;
+  const playCount = audio.play.mock.calls.length;
+  page.click('#open-settings');
+  const language = page.container.querySelector('#language');
+  act(() => {
+    language.value = 'pl';
+    language.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  expect(document.documentElement.lang).toBe('pl');
+  expect(page.container.textContent).toContain('Wszystkie stacje (12)');
+  expect(page.container.textContent).toContain('Szukaj stacji');
+  expect(
+    page.container.querySelector('[aria-label="Usuń PR Chicago z ulubionych"]'),
+  ).not.toBeNull();
+  expect(window.Audio).toHaveBeenCalledTimes(1);
+  expect(audio.play).toHaveBeenCalledTimes(playCount);
+  expect(JSON.parse(localStorage.getItem(FAVORITES_KEY)).stationIds).toContain('pr-chicago');
+  expect(JSON.parse(localStorage.getItem(LANGUAGE_KEY))).toEqual({
+    version: 1,
+    language: 'pl',
+  });
+  act(() => {
+    language.value = 'en';
+    language.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  expect(document.documentElement.lang).toBe('en');
+  expect(page.container.textContent).toContain('All stations (12)');
 });
 
 test('the full app migrates old favorites and plays current catalog data', async () => {
@@ -412,4 +452,144 @@ test('return scrolling recovers when the list height settles after the first lay
   expect(window.scrollY).toBe(300);
   page.unmount();
   expect(callbacks.size).toBe(0);
+});
+
+test('worldwide search adds a station that plays, enters favorites/history and survives reload without autoplay', async () => {
+  const previousFetch = global.fetch;
+  const row = {
+    stationuuid: '12345678-1234-1234-1234-123456789abc',
+    name: 'World Jazz',
+    countrycode: 'FR',
+    url_resolved: 'https://radio.example/live',
+    tags: 'jazz',
+    languagecodes: 'fre',
+  };
+  global.fetch = jest
+    .fn()
+    .mockResolvedValue({ ok: true, json: async () => ({ rows: [row], hasMore: false }) });
+  const input = (page, selector, value) =>
+    act(() => {
+      const node = page.container.querySelector(selector);
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(node, value);
+      node.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+  try {
+    window.history.replaceState({}, '', '/discover');
+    let page = mount();
+    input(page, 'form input', 'jazz');
+    await act(async () =>
+      page.container
+        .querySelector('form')
+        .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })),
+    );
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(page.container.textContent).toContain('World Jazz');
+    act(() =>
+      [...page.container.querySelectorAll('button')].find((b) => b.textContent === 'Add').click(),
+    );
+    expect(page.container.querySelector('article button').disabled).toBe(true);
+    page.click('a[href="/"]');
+    input(page, '#station-search', 'World Jazz');
+    expect(page.container.querySelectorAll('article')).toHaveLength(1);
+    page.click('[aria-label="Add World Jazz to favorites"]');
+    await act(async () =>
+      page.container
+        .querySelector('[data-station-id="rb-12345678-1234-1234-1234-123456789abc"]')
+        .click(),
+    );
+    expect(JSON.parse(localStorage.getItem(RECENT_KEY)).stationIds[0]).toBe(
+      'rb-' + row.stationuuid,
+    );
+    expect(window.Audio.mock.results[0].value.src).toBe(row.url_resolved);
+    expect(window.Audio).toHaveBeenCalledTimes(1);
+    page.unmount();
+    page = mount();
+    expect(
+      page.container.querySelector('[aria-label="Remove World Jazz from favorites"]'),
+    ).not.toBeNull();
+    expect(window.Audio.mock.results[1].value.play).not.toHaveBeenCalled();
+    expect(page.container.querySelectorAll('article')).toHaveLength(1);
+  } finally {
+    global.fetch = previousFetch;
+  }
+});
+
+test('discovery uses named countries and explains BBC HLS results without hiding them', async () => {
+  const previousFetch = global.fetch;
+  const rows = [
+    {
+      stationuuid: '12345678-1234-1234-1234-123456789abc',
+      name: 'KISS',
+      countrycode: 'GB',
+      url_resolved: 'https://radio.example/kiss',
+    },
+    {
+      stationuuid: '22345678-1234-1234-1234-123456789abc',
+      name: 'Absolute Radio',
+      countrycode: 'GB',
+      url_resolved: 'https://radio.example/absolute',
+    },
+    {
+      stationuuid: '32345678-1234-1234-1234-123456789abc',
+      name: 'BBC Radio 1',
+      countrycode: 'GB',
+      url_resolved: 'https://radio.example/radio1.m3u8',
+      hls: 1,
+    },
+  ];
+  global.fetch = jest
+    .fn()
+    .mockResolvedValue({ ok: true, json: async () => ({ rows, hasMore: false }) });
+  try {
+    window.history.replaceState({}, '', '/discover');
+    const page = mount();
+    const country = page.container.querySelector('form select');
+    expect(country.querySelector('option[value="GB"]').textContent).toBe('United Kingdom');
+    act(() => {
+      country.value = 'GB';
+      country.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    await act(async () =>
+      page.container
+        .querySelector('form')
+        .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })),
+    );
+    expect(global.fetch.mock.calls[0][0]).toContain('country=GB');
+    expect([...page.container.querySelectorAll('article h2')].map((n) => n.textContent)).toEqual([
+      'KISS',
+      'Absolute Radio',
+      'BBC Radio 1',
+    ]);
+    expect(page.container.querySelectorAll('article button:disabled')).toHaveLength(1);
+    expect(page.container.textContent).toContain('This entry uses a format');
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ rows: [], hasMore: false }),
+    });
+    await act(async () =>
+      page.container
+        .querySelector('form')
+        .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })),
+    );
+    expect(page.container.textContent).toContain('No stations found.');
+  } finally {
+    global.fetch = previousFetch;
+  }
+});
+
+test('settings open and close without restarting playback or changing saved stations', async () => {
+  const page = mount();
+  await act(async () => page.container.querySelector('[data-station-id="heart-uk"]').click());
+  const audio = window.Audio.mock.results[0].value;
+  const pauses = audio.pause.mock.calls.length;
+  page.click('#open-settings');
+  const dialog = page.container.querySelector('dialog[open]');
+  expect(dialog).not.toBeNull();
+  expect(document.activeElement.id).toBe('language');
+  page.click('#close-settings');
+  expect(dialog.hasAttribute('open')).toBe(false);
+  expect(document.activeElement.id).toBe('open-settings');
+  expect(audio.pause).toHaveBeenCalledTimes(pauses);
+  expect(window.Audio).toHaveBeenCalledTimes(1);
+  expect(page.container.querySelector('[data-player-status]').dataset.playerStatus).toBe('playing');
 });

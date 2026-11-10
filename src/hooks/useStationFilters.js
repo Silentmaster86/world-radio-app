@@ -1,6 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
 import { useRef } from 'react';
 import { normalizeStationQuery } from '../lib/stationUtils';
+import { useLanguage } from '../context/LanguageContext';
 
 export const STATION_PAGE_SIZE = 12;
 export const defaultFilters = {
@@ -34,7 +35,13 @@ export function readFilters(params, options) {
     page: Number.isSafeInteger(page) && page >= 1 && page <= options.pageCount ? page : 1,
   };
 }
-export function filterStations(stations, favoriteIds, filters = defaultFilters, recentIds = []) {
+export function filterStations(
+  stations,
+  favoriteIds,
+  filters = defaultFilters,
+  recentIds = [],
+  localize = null,
+) {
   const { section, country, genre, language, q } = { ...defaultFilters, ...filters };
   const query = normalizeStationQuery(q);
   const terms = query.split(' ').filter(Boolean);
@@ -49,14 +56,21 @@ export function filterStations(stations, favoriteIds, filters = defaultFilters, 
       (!country || station.countryCode === country) &&
       (!genre || station.genres.includes(genre)) &&
       (!language || station.languageCodes.includes(language)) &&
-      terms.every((term) =>
-        normalizeStationQuery(
-          [station.name, ...station.genres, station.description || ''].join(' '),
-        ).includes(term),
-      ),
+      terms.every((term) => {
+        const translated = localize
+          ? [
+              ...station.genres.map((genre) => localize(`genre.${genre}`, {}, genre)),
+              localize(`description.${station.id}`, {}, station.description || ''),
+            ]
+          : [];
+        return normalizeStationQuery(
+          [station.name, ...station.genres, station.description || '', ...translated].join(' '),
+        ).includes(term);
+      }),
   );
 }
 export default function useStationFilters(stations, favoriteIds, recentIds = []) {
+  const { t } = useLanguage();
   const [params, setParams] = useSearchParams();
   const renderedSearch = params.toString();
   const latest = useRef({ renderedSearch, params });
@@ -77,7 +91,7 @@ export default function useStationFilters(stations, favoriteIds, recentIds = [])
     latest.current.params = result;
     setParams(result, { replace: true, preventScrollReset: true });
   };
-  const searchedStations = filterStations(stations, favoriteIds, filters, recentIds);
+  const searchedStations = filterStations(stations, favoriteIds, filters, recentIds, t);
   return {
     filters,
     options,

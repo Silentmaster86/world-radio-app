@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { stations } from '../data/stations';
+import { useStations } from './StationsContext';
 import { createAudioPlayer, createInitialPlayerState } from '../lib/audioPlayer';
 import { bindMediaSession } from '../lib/mediaSession';
 import { createSleepTimer } from '../lib/sleepTimer';
@@ -13,6 +13,7 @@ const AudioContext = createContext();
 export const useAudio = () => useContext(AudioContext);
 
 export function AudioProvider({ children }) {
+  const { catalog: stations } = useStations();
   const playerRef = useRef(null);
   const timerRef = useRef(null);
   const [sleepTimerDeadline, setSleepTimerDeadline] = useState(null);
@@ -74,7 +75,7 @@ export function AudioProvider({ children }) {
       player.dispose();
       playerRef.current = null;
     };
-  }, [settings]);
+  }, [settings, stations]);
 
   useEffect(() => {
     if (!settings.canPersist) return;

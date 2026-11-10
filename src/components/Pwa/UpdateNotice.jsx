@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { usePwa } from '../../context/PwaContext';
+import { useLanguage } from '../../context/LanguageContext';
 const Notice = styled.div`
   margin-top: 0.5rem;
   display: flex;
@@ -21,12 +22,13 @@ const Notice = styled.div`
 `;
 export default function UpdateNotice() {
   const pwa = usePwa();
+  const { t } = useLanguage();
   if (!pwa?.updateVisible) return null;
   return (
     <Notice role="status">
-      <p>Update ready. Finish listening, close all app windows and tabs, then reopen.</p>
+      <p>{t('update.notice')}</p>
       <button type="button" onClick={pwa.dismissUpdate}>
-        Later
+        {t('update.later')}
       </button>
     </Notice>
   );

@@ -164,7 +164,9 @@ async function main() {
       'Install app',
     );
     await page.getByRole('button', { name: 'Add Capital Dance to favorites', exact: true }).click();
+    await page.locator('#open-settings').click();
     await page.locator('#appearance').selectOption('dark');
+    await page.locator('#close-settings').click();
     // Confirmed playback uses the controlled fixture, never a real network stream.
     await page.locator('[data-station-id="heart-uk"]').click();
     await page.locator('[data-player-status="playing"]').waitFor();
@@ -201,7 +203,7 @@ async function main() {
     await page.locator('#station-country').selectOption('DE');
     await page.locator('#station-language').selectOption('de');
     await page.waitForFunction(() => document.querySelectorAll('article').length === 3);
-    assert.equal(await page.locator('article svg').count(), 3);
+    assert.equal(await page.locator('article [data-station-logo]').count(), 3);
     assert.equal(await page.evaluate(() => window.__pwaAudio[0].playCalls), 0);
     await page.screenshot({ path: path.join(output, 'offline-catalog.png'), fullPage: true });
     await page.goto(`${base}/now-playing`, { waitUntil: 'domcontentloaded' });

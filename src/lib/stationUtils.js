@@ -18,11 +18,20 @@ export function resolveLegacyStationId(saved) {
 }
 
 export function getCountryFlag(code) {
-  return countries[code]?.flag || '🌍';
+  if (countries[code]) return countries[code].flag;
+  return /^[A-Z]{2}$/.test(code || '') && !['XX', 'ZZ'].includes(code)
+    ? String.fromCodePoint(...[...code].map((c) => c.charCodeAt(0) + 127397))
+    : '🌍';
 }
 
 export function getCountryName(code) {
-  return countries[code]?.name || 'Unknown country';
+  if (countries[code]) return countries[code].name;
+  if (!/^[A-Z]{2}$/.test(code || '') || ['XX', 'ZZ'].includes(code)) return 'Unknown country';
+  try {
+    return new Intl.DisplayNames(['en'], { type: 'region' }).of(code);
+  } catch {
+    return 'Unknown country';
+  }
 }
 
 export function normalizeStationQuery(value) {

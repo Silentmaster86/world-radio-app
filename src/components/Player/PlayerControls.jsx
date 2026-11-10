@@ -9,6 +9,7 @@ import {
   FaStepBackward,
 } from 'react-icons/fa';
 import { useAudio } from '../../context/AudioContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 const Controls = styled.div`
   display: flex;
@@ -129,20 +130,21 @@ export default function PlayerControls({
     toggleMute,
     canChangeVolume,
   } = useAudio();
+  const { t } = useLanguage();
 
   return (
     <Controls
       $compact={compact}
       $car={variant === 'car'}
       role="group"
-      aria-label="Playback controls"
+      aria-label={t('player.playback')}
     >
       <HideOnMobile $hide={mobileMini}>
         <IconButton
           type="button"
           $car={variant === 'car'}
           onClick={prevStation}
-          aria-label="Previous station"
+          aria-label={t('player.previous')}
         >
           <FaStepBackward aria-hidden="true" />
         </IconButton>
@@ -155,7 +157,11 @@ export default function PlayerControls({
         type="button"
         onClick={togglePlay}
         aria-label={
-          wantsToPlay ? (status === 'connecting' ? 'Cancel connection' : 'Pause') : 'Play'
+          wantsToPlay
+            ? status === 'connecting'
+              ? t('player.cancel')
+              : t('player.pause')
+            : t('player.play')
         }
       >
         {wantsToPlay ? <FaPause aria-hidden="true" /> : <FaPlay aria-hidden="true" />}
@@ -166,17 +172,17 @@ export default function PlayerControls({
           type="button"
           $car={variant === 'car'}
           onClick={nextStation}
-          aria-label="Next station"
+          aria-label={t('player.next')}
         >
           <FaStepForward aria-hidden="true" />
         </IconButton>
       </HideOnMobile>
       {showVolume && (
-        <VolumeGroup $mini={mobileMini} role="group" aria-label="Volume controls">
+        <VolumeGroup $mini={mobileMini} role="group" aria-label={t('player.volumeControls')}>
           <IconButton
             type="button"
             onClick={toggleMute}
-            aria-label={muted ? 'Unmute' : 'Mute'}
+            aria-label={muted ? t('player.unmute') : t('player.mute')}
             aria-pressed={muted}
           >
             {muted ? <FaVolumeMute aria-hidden="true" /> : <FaVolumeUp aria-hidden="true" />}
@@ -189,14 +195,14 @@ export default function PlayerControls({
                 max="1"
                 step="0.01"
                 value={volume}
-                aria-label="Volume"
+                aria-label={t('player.volume')}
                 aria-valuetext={`${Math.round(volume * 100)}%`}
                 onChange={(event) => changeVolume(Number(event.target.value))}
               />
               <span aria-hidden="true">{Math.round(volume * 100)}%</span>
             </>
           ) : (
-            <small>Use device volume controls</small>
+            <small>{t('player.useDevice')}</small>
           )}
         </VolumeGroup>
       )}

@@ -1,52 +1,79 @@
+import { FaPlay, FaMusic } from 'react-icons/fa';
 import styled from 'styled-components';
 import StationLogo from '../StationLogo';
 import { getCountryFlag, getCountryName } from '../../lib/stationUtils';
+import { useLanguage } from '../../context/LanguageContext';
 
 const Card = styled.article`
   background: ${({ theme }) => theme.colors.surface};
-  border: 2px solid
+  border: 1px solid
     ${({ $selected, theme }) => ($selected ? theme.colors.accent : theme.colors.border)};
-  border-radius: 1rem;
-  padding: 1.25rem 1rem;
+  border-radius: 0.85rem;
+  padding: 0.75rem;
   position: relative;
   height: 100%;
   @media (max-width: 640px) {
-    padding: 0.85rem;
+    padding: 0.5rem 0.65rem;
   }
 `;
 const StationButton = styled.button`
   width: 100%;
   min-width: 0;
-  min-height: 172px;
+  min-height: 64px;
   padding: 0;
   border: 0;
   border-radius: 0.5rem;
   background: transparent;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  text-align: center;
+  justify-content: start;
+  gap: 0.75rem;
+  text-align: left;
+  padding-right: 2.75rem;
   @media (max-width: 640px) {
-    min-height: 60px;
+    min-height: 52px;
     flex-direction: row;
     justify-content: start;
-    gap: 0.85rem;
+    gap: 0.65rem;
     text-align: left;
     padding-right: 2.75rem;
   }
 `;
 const Logo = styled(StationLogo)`
-  width: 80px;
-  height: 80px;
+  width: 48px;
+  height: 48px;
   border-radius: 0.75rem;
-  margin-bottom: 1rem;
+  margin: 0;
+  flex-shrink: 0;
   object-fit: contain;
   @media (max-width: 640px) {
-    width: 54px;
-    height: 54px;
+    width: 40px;
+    height: 40px;
     margin: 0;
     flex-shrink: 0;
+  }
+`;
+const LogoFrame = styled.span`
+  display: block;
+  position: relative;
+  flex-shrink: 0;
+  > span {
+    svg {
+      width: 8px;
+      height: 8px;
+    }
+    position: absolute;
+    bottom: -3px;
+    right: -3px;
+    width: 18px;
+    height: 18px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    font-size: 9px;
+    background: ${({ theme }) => theme.colors.accent};
+    color: ${({ theme }) => theme.colors.onAccent};
   }
 `;
 const Info = styled.div`
@@ -54,8 +81,8 @@ const Info = styled.div`
   overflow-wrap: anywhere;
 `;
 const Name = styled.h2`
-  margin: 0 0 0.35rem;
-  font-size: 1rem;
+  margin: 0 0 0.2rem;
+  font-size: 0.95rem;
 `;
 const ActionText = styled.span`
   position: absolute;
@@ -70,14 +97,15 @@ const ActionText = styled.span`
 `;
 const Meta = styled.p`
   margin: 0;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: ${({ theme }) => theme.colors.muted};
 `;
 const FavoriteButton = styled.button`
   width: 44px;
   height: 44px;
   position: absolute;
-  top: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
   right: 0.5rem;
   background: transparent;
   border: 0;
@@ -97,15 +125,16 @@ export default function StationCard({
   onPlay,
   onFavorite,
 }) {
+  const { t } = useLanguage();
   const status = isActive
-    ? 'Playing'
+    ? t('station.playing')
     : {
-        idle: 'Selected',
-        connecting: 'Connecting…',
-        playing: 'Playing',
-        buffering: 'Buffering…',
-        paused: 'Paused',
-        error: 'Unavailable',
+        idle: t('station.selected'),
+        connecting: t('station.connecting'),
+        playing: t('station.playing'),
+        buffering: t('station.buffering'),
+        paused: t('station.paused'),
+        error: t('station.unavailable'),
       }[playbackStatus];
   return (
     <Card $selected={isSelected}>
@@ -115,15 +144,25 @@ export default function StationCard({
         data-station-id={station.id}
         aria-current={isSelected ? 'true' : undefined}
       >
-        <ActionText>Play </ActionText>
-        <Logo station={station} sizes="(max-width: 640px) 54px, 80px" />
+        <ActionText>{t('station.play')} </ActionText>
+        <LogoFrame aria-hidden="true">
+          <Logo station={station} sizes="(max-width: 640px) 40px, 48px" />
+          <span>{isActive ? <FaMusic /> : <FaPlay />}</span>
+        </LogoFrame>
         <Info>
           <Name data-station-title>{station.name}</Name>
           <Meta>
-            <span role="img" aria-label={getCountryName(station.countryCode)}>
+            <span
+              role="img"
+              aria-label={t(
+                `country.${station.countryCode}`,
+                {},
+                getCountryName(station.countryCode),
+              )}
+            >
               {getCountryFlag(station.countryCode)}
             </span>{' '}
-            · {station.genres.join(', ')}
+            · {station.genres.map((genre) => t(`genre.${genre}`, {}, genre)).join(', ')}
           </Meta>
           {isSelected && <Meta>{status}</Meta>}
         </Info>
@@ -131,7 +170,9 @@ export default function StationCard({
       <FavoriteButton
         type="button"
         onClick={onFavorite}
-        aria-label={`${isFavorite ? 'Remove' : 'Add'} ${station.name} ${isFavorite ? 'from' : 'to'} favorites`}
+        aria-label={t(isFavorite ? 'station.removeFavorite' : 'station.addFavorite', {
+          station: station.name,
+        })}
         aria-pressed={isFavorite}
       >
         {isFavorite ? '♥' : '♡'}

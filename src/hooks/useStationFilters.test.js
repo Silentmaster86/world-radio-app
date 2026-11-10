@@ -1,5 +1,6 @@
 import { stations } from '../data/stations';
 import { filterStations, getFilterOptions, readFilters } from './useStationFilters';
+import { translate } from '../i18n';
 const ids = (filters, favorites = []) =>
   filterStations(stations, favorites, filters).map((station) => station.id);
 test('country is independent of station language', () => {
@@ -80,4 +81,16 @@ test('bounded whole-number page URLs restore more results; invalid pages use the
   for (const value of ['0', '-1', '2.5', '1e0', 'Infinity', '999999999999999999999']) {
     expect(readFilters(new URLSearchParams(`page=${value}`), options).page).toBe(1);
   }
+});
+
+test('Polish search matches translated genre and description without changing station data', () => {
+  const localize = (key, params, fallback) => translate('pl', key, params, fallback);
+  const results = filterStations(stations, [], { q: 'wiadomości' }, [], localize);
+  expect(results.map((station) => station.id)).toContain('pr-chicago');
+  expect(results.map((station) => station.id)).toContain('deutschlandfunk');
+  expect(
+    filterStations(stations, [], { q: 'muzyka klasyczna' }, [], localize).map(
+      (station) => station.id,
+    ),
+  ).toEqual(['deutschlandfunk-kultur']);
 });

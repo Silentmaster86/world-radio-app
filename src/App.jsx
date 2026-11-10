@@ -1,8 +1,10 @@
+import DirectoryClickReporter from './components/DirectoryClickReporter';
 import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import styled from 'styled-components';
 import SoundBar from './components/Layout/SoundBar';
 import Home from './pages/Home';
+import Discover from './pages/Discover';
 import NowPlaying from './pages/NowPlaying';
 import { PwaProvider } from './context/PwaContext';
 import { BrowsingProvider } from './context/BrowsingContext';
@@ -22,6 +24,7 @@ function AppShell() {
     <AppWrapper $car={isCar} $playerHeight={playerHeight}>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/discover" element={<Discover />} />
         <Route path="/now-playing" element={<NowPlaying />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
@@ -33,6 +36,7 @@ export default function App() {
   return (
     <PwaProvider>
       <RecentStationsProvider>
+        <DirectoryClickReporter />
         <Router>
           <BrowsingProvider>
             <AppShell />

@@ -9,6 +9,7 @@ Supports:
 - ✅ Sleep timer with selectable duration and cancellation
 - ✅ Recent stations from confirmed playback, stored locally
 - ✅ Curated 12-station catalog, keyword search and filters
+- ✅ English / Polish interface with saved language selection and localized search
 - ✅ Progressive station reveal for larger catalogs, with reload and player-return continuity
 - ✅ Responsive mobile/desktop layout
 - ✅ Installable as a PWA (Android, desktop)
@@ -176,3 +177,6 @@ stations and supports filtering, reload/offline access and independent clearing.
 The [curated catalog](docs/catalog.md) ships 12 stations with keyword search,
 country/genre/language filters and groups of 12 results. Publisher sources and
 live reachability checks are recorded in [station-sources.md](docs/station-sources.md).
+
+The [Polish and English interface](docs/language.md) lets you switch languages
+without restarting playback or losing saved stations.

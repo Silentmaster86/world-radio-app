@@ -1,14 +1,16 @@
+import { FaFilter } from 'react-icons/fa';
 import styled from 'styled-components';
 import { useFilterDisclosure } from '../../context/BrowsingContext';
 import { getCountryName } from '../../lib/stationUtils';
+import { useLanguage } from '../../context/LanguageContext';
 
 const Controls = styled.section`
   margin: 1.5rem 0;
   display: grid;
   gap: 1rem;
   @media (max-width: 640px) {
-    margin: 0.75rem 0;
-    gap: 0.65rem;
+    margin: 0.65rem 0;
+    gap: 0.5rem;
   }
 `;
 const Row = styled.div`
@@ -20,12 +22,17 @@ const Row = styled.div`
 const CollectionRow = styled(Row)`
   @media (max-width: 640px) {
     flex-wrap: nowrap;
+    background: ${({ theme }) => theme.colors.surface};
+    padding: 0.25rem;
+    border-radius: 0.8rem;
+    gap: 0.25rem;
     > button {
+      border: 0;
       flex: 1;
       min-width: 0;
       padding: 0.25rem;
-      font-size: 0.875rem;
-      line-height: 1.2;
+      font-size: 0.8rem;
+      line-height: 1.3;
       overflow-wrap: anywhere;
     }
   }
@@ -51,10 +58,21 @@ const Field = styled.label`
     opacity: 1;
   }
 `;
+const SearchRow = styled(Row)`
+  flex-wrap: nowrap;
+  align-items: end;
+  gap: 0.5rem;
+`;
+const SearchField = styled(Field)`
+  flex: 1;
+  input {
+    border-radius: 0.8rem;
+  }
+`;
 const SectionButton = styled.button`
   min-height: 44px;
   padding: 0.6rem 1rem;
-  border-radius: 999px;
+  border-radius: 0.65rem;
   border: 1px solid ${({ theme }) => theme.colors.muted};
   background: ${({ $active, theme }) => ($active ? theme.colors.accent : 'transparent')};
   color: ${({ $active, theme }) => ($active ? theme.colors.onAccent || '#fff' : theme.colors.text)};
@@ -66,7 +84,20 @@ const Reset = styled(SectionButton)`
 const FilterButton = styled(Reset)`
   display: none;
   @media (max-width: 640px) {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: 44px;
+    padding: 0.5rem;
+    span {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
   }
 `;
 const MobileToolbar = styled(Row)`
@@ -95,18 +126,18 @@ export default function StationControls({
   recentCount = 0,
 }) {
   const [expanded, setExpanded] = useFilterDisclosure();
+  const { t } = useLanguage();
   const activeCount = [filters.country, filters.genre, filters.language].filter(Boolean).length;
-  const languages = { en: 'English', pl: 'Polish', de: 'German' };
   return (
-    <Controls aria-label="Find stations">
-      <CollectionRow role="group" aria-label="Station collection">
+    <Controls aria-label={t('filters.find')}>
+      <CollectionRow role="group" aria-label={t('filters.collection')}>
         <SectionButton
           type="button"
           $active={filters.section === 'all'}
           aria-pressed={filters.section === 'all'}
           onClick={() => updateFilters({ section: 'all' })}
         >
-          All stations ({total})
+          {t('filters.all', { count: total })}
         </SectionButton>
         <SectionButton
           type="button"
@@ -114,7 +145,7 @@ export default function StationControls({
           aria-pressed={filters.section === 'favorites'}
           onClick={() => updateFilters({ section: 'favorites' })}
         >
-          Favorites ({favoriteCount})
+          {t('filters.favorites', { count: favoriteCount })}
         </SectionButton>
         <SectionButton
           id="recent-collection"
@@ -123,78 +154,87 @@ export default function StationControls({
           aria-pressed={filters.section === 'recent'}
           onClick={() => updateFilters({ section: 'recent' })}
         >
-          Recent ({recentCount})
+          {t('filters.recent', { count: recentCount })}
         </SectionButton>
       </CollectionRow>
-      <Field htmlFor="station-search">
-        Search stations
-        <input
-          id="station-search"
-          type="search"
-          placeholder="Name, genre or keyword…"
-          value={filters.q}
-          onChange={(event) => updateFilters({ q: event.target.value })}
-        />
-      </Field>
-      <MobileToolbar>
+      <SearchRow>
+        <SearchField htmlFor="station-search">
+          <span>{t('filters.search')}</span>
+          <input
+            id="station-search"
+            type="search"
+            placeholder={t('filters.placeholder')}
+            value={filters.q}
+            onChange={(event) => updateFilters({ q: event.target.value })}
+          />
+        </SearchField>
         <FilterButton
           type="button"
           aria-expanded={expanded}
           aria-controls="station-refinements"
           onClick={() => setExpanded((value) => !value)}
         >
-          Filters{activeCount ? ` (${activeCount})` : ''}
+          <FaFilter aria-hidden="true" />
+          <span>
+            {activeCount ? t('filters.active', { count: activeCount }) : t('filters.filters')}
+          </span>
         </FilterButton>
-        <Reset type="button" onClick={resetFilters}>
-          Reset filters
-        </Reset>
-      </MobileToolbar>
+      </SearchRow>
+      {(activeCount > 0 || filters.q || filters.section !== 'all') && (
+        <MobileToolbar>
+          <Reset type="button" onClick={resetFilters}>
+            {t('filters.reset')}
+          </Reset>
+        </MobileToolbar>
+      )}
       <Refinements id="station-refinements" $open={expanded}>
         <Field htmlFor="station-country">
-          Country
+          {t('filters.country')}
           <select
             id="station-country"
             value={filters.country}
             onChange={(event) => updateFilters({ country: event.target.value })}
           >
-            <option value="">All countries</option>
+            <option value="">{t('filters.allCountries')}</option>
             {options.countries.map((code) => (
               <option key={code} value={code}>
-                {getCountryName(code)}
+                {t(`country.${code}`, {}, getCountryName(code))}
               </option>
             ))}
           </select>
         </Field>
         <Field htmlFor="station-genre">
-          Genre
+          {t('filters.genre')}
           <select
             id="station-genre"
             value={filters.genre}
             onChange={(event) => updateFilters({ genre: event.target.value })}
           >
-            <option value="">All genres</option>
+            <option value="">{t('filters.allGenres')}</option>
             {options.genres.map((genre) => (
-              <option key={genre}>{genre}</option>
+              <option key={genre} value={genre}>
+                {t(`genre.${genre}`, {}, genre)}
+              </option>
             ))}
           </select>
         </Field>
         <Field htmlFor="station-language">
-          Language
+          {t('filters.language')}
           <select
             id="station-language"
             value={filters.language}
             onChange={(event) => updateFilters({ language: event.target.value })}
           >
-            <option value="">All languages</option>
+            <option value="">{t('filters.allLanguages')}</option>
             {options.languages.map((code) => (
               <option key={code} value={code}>
-                {languages[code] || code}
+                {t(`language.${code}`, {}, code)}
               </option>
             ))}
           </select>
         </Field>
         <DesktopReset type="button" onClick={resetFilters}>
-          Reset filters
+          {t('filters.reset')}
         </DesktopReset>
       </Refinements>
     </Controls>

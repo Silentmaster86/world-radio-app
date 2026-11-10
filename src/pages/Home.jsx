@@ -1,8 +1,9 @@
+import { Link } from 'react-router-dom';
 // src/pages/Home.js
 import styled from 'styled-components';
 import { useLayoutEffect, useRef } from 'react';
 
-import { stations } from '../data/stations';
+import { useStations } from '../context/StationsContext';
 import { useAudio } from '../context/AudioContext';
 import { useFavorites } from '../context/FavoritesContext';
 import { useRecentStations } from '../context/RecentStationsContext';
@@ -14,7 +15,29 @@ import StationCard from '../components/Home/StationCard';
 import EmptyState from '../components/Home/EmptyState';
 
 import useStationFilters from '../hooks/useStationFilters';
+import { useLanguage } from '../context/LanguageContext';
+import { localizeStoredMessage } from '../i18n';
 
+const LibraryIntro = styled.div`
+  margin: 1.5rem 0 0;
+  h2 {
+    font-size: 1.5rem;
+    margin: 0 0 0.25rem;
+    letter-spacing: -0.03em;
+  }
+  p {
+    margin: 0;
+    color: ${({ theme }) => theme.colors.muted};
+  }
+  @media (max-width: 640px) {
+    display: none;
+  }
+`;
+const DiscoveryLink = styled(Link)`
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+`;
 const PageWrapper = styled.main`
   width: 100%;
   max-width: 1200px;
@@ -24,7 +47,13 @@ const PageWrapper = styled.main`
   padding: 1rem;
   padding-bottom: 1rem;
 
-  background: ${({ theme }) => theme.colors.background};
+  background:
+    radial-gradient(
+      ellipse at top right,
+      color-mix(in srgb, ${({ theme }) => theme.colors.accent} 7%, transparent),
+      transparent 55%
+    ),
+    ${({ theme }) => theme.colors.background};
 
   color: ${({ theme }) => theme.colors.text};
 
@@ -36,12 +65,12 @@ const PageWrapper = styled.main`
 
 const StationGrid = styled.section`
   display: grid;
-  gap: ${({ theme }) => theme.spacing.md};
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 
   @media (max-width: 640px) {
     grid-template-columns: 1fr;
-    gap: 0.8rem;
+    gap: 0.5rem;
   }
 `;
 
@@ -76,8 +105,10 @@ const More = styled.button`
 `;
 
 export default function Home() {
+  const { stations } = useStations();
   useBrowseRestoration();
   const { setStation, currentStation, playingStationId, status } = useAudio();
+  const { t } = useLanguage();
   const { favoriteIds, isFavorite, toggleFavorite, storageMessage } = useFavorites();
   const { recentIds, historyMessage, clearHistory } = useRecentStations();
   const browsing = useStationFilters(stations, favoriteIds, recentIds);
@@ -103,6 +134,10 @@ export default function Home() {
   return (
     <PageWrapper>
       <HomeHeader />
+      <LibraryIntro>
+        <h2>{t('library.title')}</h2>
+        <p>{t('library.description')}</p>
+      </LibraryIntro>
 
       <StationControls
         {...browsing}
@@ -111,13 +146,16 @@ export default function Home() {
         recentCount={recentCount}
       />
 
-      {storageMessage && <p role="status">{storageMessage}</p>}
+      {storageMessage && <p role="status">{localizeStoredMessage(t, storageMessage)}</p>}
 
-      {filters.section === 'recent' && historyMessage && <p role="status">{historyMessage}</p>}
+      {filters.section === 'recent' && historyMessage && (
+        <p role="status">{localizeStoredMessage(t, historyMessage)}</p>
+      )}
       <Results>
         <p role="status" aria-live="polite">
-          {visibleStations.length} of {searchedStations.length} stations
-          {searchedStations.length !== collectionCount && ` · ${collectionCount} in collection`}
+          {t('home.results', { visible: visibleStations.length, total: searchedStations.length })}
+          {searchedStations.length !== collectionCount &&
+            ` · ${t('home.collection', { count: collectionCount })}`}
         </p>
         {filters.section === 'recent' && recentIds.length > 0 && (
           <button
@@ -127,7 +165,7 @@ export default function Home() {
               document.getElementById('recent-collection')?.focus({ preventScroll: true });
             }}
           >
-            Clear history
+            {t('home.clearHistory')}
           </button>
         )}
       </Results>
@@ -153,6 +191,9 @@ export default function Home() {
           />
         ))}
       </StationGrid>
+      <p>
+        <DiscoveryLink to="/discover">{t('discover.title')}</DiscoveryLink>
+      </p>
       {visibleStations.length < searchedStations.length && (
         <More
           type="button"
@@ -161,7 +202,7 @@ export default function Home() {
             browsing.updateFilters({ page: filters.page + 1 });
           }}
         >
-          Show more stations ({searchedStations.length - visibleStations.length} remaining)
+          {t('home.more', { count: searchedStations.length - visibleStations.length })}
         </More>
       )}
     </PageWrapper>
