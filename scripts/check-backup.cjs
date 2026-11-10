@@ -230,6 +230,11 @@ async function main() {
             await page.waitForFunction(
               async () => !!(await navigator.serviceWorker.getRegistration())?.active,
             );
+            // Installation can finish after the first reload on a real host.
+            // This app deliberately avoids claim/skipWaiting: navigate online
+            // under the active worker before asking it to serve an offline page.
+            await page.reload({ waitUntil: 'networkidle' });
+            await page.waitForFunction(() => !!navigator.serviceWorker.controller);
             await context.setOffline(true);
             await page.reload({ waitUntil: 'domcontentloaded' });
             await openPanel(page);
