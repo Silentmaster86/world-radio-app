@@ -32,6 +32,11 @@ export const FavoritesProvider = ({ children }) => {
     <FavoritesContext.Provider
       value={{
         favoriteIds,
+        restoreFavorites: (ids) => {
+          setFavoriteIds(ids);
+          setDirty(false);
+          setStorageMessage('');
+        },
         isFavorite: (id) => favoriteIds.includes(id),
         toggleFavorite,
         storageMessage,

@@ -73,6 +73,11 @@ export function RecentStationsProvider({ children }) {
     <RecentStationsContext.Provider
       value={{
         recentIds: history.recentIds,
+        restoreRecent: (recentIds) => {
+          const next = { ...latest.current, recentIds, message: '' };
+          latest.current = next;
+          setHistory(next);
+        },
         historyMessage: history.message,
         clearHistory: () => persist([]),
       }}

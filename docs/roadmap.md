@@ -35,13 +35,14 @@ compact mobile layout have shipped. The next stages are complete product
 increments, each with a preview, regression checks and manual acceptance before
 production. They are improvements, not a list of confirmed defects.
 
-1. **HLS playback (current branch).** Enable compatible HTTPS HLS stations,
+1. **HLS playback (shipped in PR #25).** Enable compatible HTTPS HLS stations,
    including verified BBC Radio 1 sources, using the shared player. Keep existing
    favorites, history and Sleep Timer. See [hls.md](hls.md).
-2. **Personal data backup.** Versioned JSON export/import of added stations,
-   favorites and preferences; validate imports, show a summary and deduplicate
-   stable IDs. Define merge/replace explicitly and preserve existing data on
-   invalid input. Local-file backup first, no mandatory account or cloud service.
+2. **Personal data backup (current branch).** Versioned JSON export/import of added stations,
+   favorites, history and preferences. Validate files, preview and combine data
+   with stable ID/URL deduplication; preserve the live player and Sleep Timer.
+   Settings import is opt-in; no replacement mode or required account.
+   See [library-backup.md](library-backup.md).
 3. **Library management and sharing.** Reorder favorites, remove added stations
    with safe handling of current playback/history, and add station sharing/direct
    links with clear behavior when a recipient has not saved that station.
