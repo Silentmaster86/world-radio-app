@@ -1,7 +1,8 @@
 # Worldwide discovery
 
-Implementation branch: `feat/worldwide-discovery`, based on PR #24's verified
-Polish/English interface and responsive fix. No additional PR is created.
+Release review: PR #24 combines the Polish/English interface, responsive fix
+and worldwide discovery. The feature branch is integrated into the existing PR;
+no additional PR is needed.
 
 `/discover` searches Radio Browser by station name and optional two-letter
 country code. The mobile toolbar and catalog footer link to it. Results are
@@ -44,6 +45,7 @@ reachability is separate. A manual call of the real server handler returned HTTP
 not established by a directory result. Netlify deployment is needed to expose
 the server function; plain `vite preview` serves the UI, not serverless functions.
 
-Before merging this branch, merge PR #24 first. This branch has no deploy preview
-because no new PR was requested. Production and exact-head Netlify routing remain
-to be verified when the feature is deployed for review.
+Review the combined release at PR #24's exact-head Netlify preview, including
+direct `/discover` navigation and the deployed directory function. Production
+merge/deployment waits for user acceptance of the preview. Browser simulations
+do not replace real iPhone/Android playback and background checks.

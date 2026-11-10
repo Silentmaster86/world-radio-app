@@ -32,7 +32,7 @@ async function main() {
   }
   assert.ok(ready, 'Timed out waiting for the current commit Netlify preview');
   const scripts = [];
-  for (const route of ['/', '/now-playing']) {
+  for (const route of ['/', '/now-playing', '/discover']) {
     const response = await fetch(new URL(route, WRA_BASE_URL), {
       signal: AbortSignal.timeout(20000),
     });
@@ -55,7 +55,9 @@ async function main() {
     signal: AbortSignal.timeout(20000),
   });
   assert.equal(script.status, 200, 'Preview application script is unavailable');
-  console.log(`Verified current-commit Netlify preview: ${WRA_BASE_URL}/ and /now-playing`);
+  console.log(
+    `Verified current-commit Netlify preview: ${WRA_BASE_URL}/, /now-playing and /discover`,
+  );
 }
 main().catch((error) => {
   console.error(error);
