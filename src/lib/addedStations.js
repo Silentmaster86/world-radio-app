@@ -1,3 +1,4 @@
+import { verifiedStreamUrl } from './verifiedStreams';
 import { readStorage, writeStorage } from './storage';
 export const ADDED_KEY = 'wra:stations:v1';
 export const ADDED_LIMIT = 100;
@@ -7,10 +8,10 @@ export function normalizeDirectoryStation(row) {
   if (!/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/.test(uuid)) return null;
   let url;
   try {
-    url = new URL(row.url_resolved || row.url);
+    url = new URL(verifiedStreamUrl(row));
     if (url.protocol !== 'https:' || url.username || url.password || url.href.length > 2048)
       return null;
-    if (/\.(m3u8?|pls|asx)(?:$|[?#])/i.test(url.href) || Number(row.hls) === 1) return null;
+    if (/\.(m3u|pls|asx)(?:$|[?#])/i.test(url.href)) return null;
   } catch {
     return null;
   }
@@ -35,6 +36,9 @@ export function normalizeDirectoryStation(row) {
       .slice(0, 3),
     description: '',
     directoryId: uuid,
+    ...(Number(row.hls) === 1 || row.streamType === 'hls' || /\.m3u8(?:$|[?#])/i.test(url.href)
+      ? { streamType: 'hls' }
+      : {}),
   };
 }
 export function loadAddedStations() {
@@ -47,6 +51,7 @@ export function loadAddedStations() {
     : []) {
     const station = normalizeDirectoryStation({
       stationuuid: row.directoryId,
+      streamType: row.streamType,
       name: row.name,
       url: row.url,
       countrycode: row.countryCode,

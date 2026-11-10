@@ -51,3 +51,14 @@ test('production manifest lists existing assets and HTML loads the entry', () =>
   assert.ok(!html.includes('/src/main.jsx'));
   assert.ok(initialJavaScript('build').gzipBytes > 0);
 });
+
+test('HLS engine stays out of initial chunks and the worker precache', () => {
+  const manifest = JSON.parse(fs.readFileSync('build/asset-manifest.json'));
+  const worker = fs.readFileSync('build/service-worker.js', 'utf8');
+  assert.ok(manifest.optionalFiles.length > 0, 'HLS optional chunk must be identified');
+  for (const file of manifest.optionalFiles) {
+    assert.ok(Object.values(manifest.files).includes(file));
+    assert.ok(!manifest.entrypoints.includes(file.replace(/^\//, '')));
+    assert.ok(!worker.includes(JSON.stringify(file)), `Worker must not preload ${file}`);
+  }
+});

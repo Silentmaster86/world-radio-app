@@ -425,3 +425,110 @@ test('dispose settles pending work, cancels timers and detaches event handlers',
   expect(changed).not.toHaveBeenCalled();
   expect(audio.src).toBe('');
 });
+
+const hlsStation = {
+  id: 'hls',
+  name: 'HLS',
+  url: 'https://radio.example/live.m3u8',
+  streamType: 'hls',
+};
+function hlsSetup(extra = {}) {
+  let callbacks;
+  const attachment = {
+    start: jest.fn(),
+    destroy: jest.fn(),
+    pause: jest.fn(),
+    matches: (src) => src === 'blob:hls',
+  };
+  const attachHls = jest.fn((_audio, _url, handlers) => {
+    callbacks = handlers;
+    return attachment;
+  });
+  const loadHls = jest.fn().mockResolvedValue({ attachHls });
+  const result = setup({ stations: [hlsStation, ...stations], loadHls, ...extra });
+  return {
+    ...result,
+    attachment,
+    attachHls,
+    loadHls,
+    ready: () => callbacks.ready(),
+    error: (e) => callbacks.error(e),
+  };
+}
+test('HLS loads only on demand and confirms playing on the same blob-backed audio', async () => {
+  const h = hlsSetup();
+  expect(h.loadHls).not.toHaveBeenCalled();
+  const result = h.player.play();
+  await flush();
+  expect(h.attachment.start).toHaveBeenCalledTimes(1);
+  expect(h.audio.play).not.toHaveBeenCalled();
+  h.audio._src = 'blob:hls';
+  h.ready();
+  expect(await result).toBe(true);
+  expect(h.player.getSnapshot().playingStationId).toBe('hls');
+  h.player.pause();
+  expect(h.attachment.destroy).toHaveBeenCalledTimes(1);
+  expect(h.audio.getAttribute('src')).toBeNull();
+});
+test('native HLS avoids the optional engine', async () => {
+  const audio = new FakeAudio();
+  audio.canPlayType = () => 'probably';
+  const h = hlsSetup({ audio });
+  expect(await h.player.play()).toBe(true);
+  expect(h.loadHls).not.toHaveBeenCalled();
+  expect(audio.src).toBe(hlsStation.url);
+});
+test('pausing during module loading never attaches or autoplays later', async () => {
+  const pending = deferred();
+  const h = hlsSetup({ loadHls: () => pending.promise });
+  const result = h.player.play();
+  h.player.pause();
+  pending.resolve({ attachHls: h.attachHls });
+  await flush();
+  expect(await result).toBe(false);
+  expect(h.attachHls).not.toHaveBeenCalled();
+  expect(h.audio.play).not.toHaveBeenCalled();
+});
+test('changing stations while HLS loads ignores the old completion', async () => {
+  const pending = deferred();
+  const h = hlsSetup({ loadHls: () => pending.promise });
+  h.player.play();
+  await h.player.selectStation('second');
+  pending.resolve({ attachHls: h.attachHls });
+  await flush();
+  expect(h.attachHls).not.toHaveBeenCalled();
+  expect(h.player.getSnapshot().playingStationId).toBe('second');
+});
+test('late HLS callbacks cannot restart paused playback or overwrite the next station', async () => {
+  const h = hlsSetup();
+  h.player.play();
+  await flush();
+  h.player.pause();
+  const count = h.audio.play.mock.calls.length;
+  h.ready();
+  h.error({ code: 3 });
+  expect(h.audio.play).toHaveBeenCalledTimes(count);
+  expect(h.player.getSnapshot().status).toBe('paused');
+});
+test('system pause stops HLS requests while keeping a resumable source; disposal destroys it', async () => {
+  const h = hlsSetup();
+  const result = h.player.play();
+  await flush();
+  h.audio._src = 'blob:hls';
+  h.ready();
+  await result;
+  h.player.pause({ retainSource: true });
+  expect(h.attachment.pause).toHaveBeenCalledTimes(1);
+  expect(h.attachment.destroy).not.toHaveBeenCalled();
+  h.player.dispose();
+  expect(h.attachment.destroy).toHaveBeenCalledTimes(1);
+});
+test('fatal HLS decoding failures release the engine and produce an actionable error', async () => {
+  const h = hlsSetup();
+  const result = h.player.play();
+  await flush();
+  h.error({ code: 3 });
+  expect(await result).toBe(false);
+  expect(h.attachment.destroy).toHaveBeenCalledTimes(1);
+  expect(h.player.getSnapshot().error.code).toBe('decode');
+});
