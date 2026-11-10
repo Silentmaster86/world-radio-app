@@ -43,13 +43,14 @@ async function main() {
         let requests = 0;
         await context.route('**/.netlify/functions/radio-directory?*', (route) => {
           requests++;
+          assert.equal(new URL(route.request().url()).searchParams.get('country'), 'GB');
           return route.fulfill({
             json: {
               rows: [
                 {
                   stationuuid: '12345678-1234-1234-1234-123456789abc',
                   name: 'World Jazz',
-                  countrycode: 'FR',
+                  countrycode: 'GB',
                   url_resolved: 'https://radio.example/live',
                   tags: 'jazz',
                 },
@@ -63,12 +64,13 @@ async function main() {
           await page.setViewportSize({ width, height: width === 320 ? 568 : 900 });
           await page.goto(base + '/discover', { waitUntil: 'networkidle' });
           await page.locator('form input').first().fill('jazz');
+          await page.locator('form select').selectOption('GB');
           await page.locator('form button').click();
           await page.getByRole('heading', { name: 'World Jazz', exact: true }).waitFor();
           assert.ok(
             await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),
           );
-          for (const selector of ['form input', 'form button', 'article button'])
+          for (const selector of ['form input', 'form select', 'form button', 'article button'])
             for (const node of await page.locator(selector).all()) {
               const box = await node.boundingBox();
               assert.ok(box.width >= 44 && box.height >= 44);

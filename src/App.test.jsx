@@ -514,3 +514,66 @@ test('worldwide search adds a station that plays, enters favorites/history and s
     global.fetch = previousFetch;
   }
 });
+
+test('discovery uses named countries and explains BBC HLS results without hiding them', async () => {
+  const previousFetch = global.fetch;
+  const rows = [
+    {
+      stationuuid: '12345678-1234-1234-1234-123456789abc',
+      name: 'KISS',
+      countrycode: 'GB',
+      url_resolved: 'https://radio.example/kiss',
+    },
+    {
+      stationuuid: '22345678-1234-1234-1234-123456789abc',
+      name: 'Absolute Radio',
+      countrycode: 'GB',
+      url_resolved: 'https://radio.example/absolute',
+    },
+    {
+      stationuuid: '32345678-1234-1234-1234-123456789abc',
+      name: 'BBC Radio 1',
+      countrycode: 'GB',
+      url_resolved: 'https://radio.example/radio1.m3u8',
+      hls: 1,
+    },
+  ];
+  global.fetch = jest
+    .fn()
+    .mockResolvedValue({ ok: true, json: async () => ({ rows, hasMore: false }) });
+  try {
+    window.history.replaceState({}, '', '/discover');
+    const page = mount();
+    const country = page.container.querySelector('form select');
+    expect(country.querySelector('option[value="GB"]').textContent).toBe('United Kingdom');
+    act(() => {
+      country.value = 'GB';
+      country.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    await act(async () =>
+      page.container
+        .querySelector('form')
+        .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })),
+    );
+    expect(global.fetch.mock.calls[0][0]).toContain('country=GB');
+    expect([...page.container.querySelectorAll('article h2')].map((n) => n.textContent)).toEqual([
+      'KISS',
+      'Absolute Radio',
+      'BBC Radio 1',
+    ]);
+    expect(page.container.querySelectorAll('article button:disabled')).toHaveLength(1);
+    expect(page.container.textContent).toContain('This entry uses a format');
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ rows: [], hasMore: false }),
+    });
+    await act(async () =>
+      page.container
+        .querySelector('form')
+        .dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })),
+    );
+    expect(page.container.textContent).toContain('No stations found.');
+  } finally {
+    global.fetch = previousFetch;
+  }
+});

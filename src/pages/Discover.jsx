@@ -1,3 +1,4 @@
+import { countryOptions } from '../lib/countries';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -21,11 +22,13 @@ const Page = styled.main`
     min-width: 0;
   }
   input,
+  select,
   button,
   a {
     min-height: 44px;
   }
   input,
+  select,
   button {
     padding: 0.65rem;
     font: inherit;
@@ -34,8 +37,10 @@ const Page = styled.main`
     background: ${({ theme }) => theme.colors.surface};
     color: inherit;
   }
-  input {
+  input,
+  select {
     width: 100%;
+    min-width: 0;
   }
   a {
     display: inline-flex;
@@ -63,7 +68,7 @@ const Page = styled.main`
   }
 `;
 export default function Discover() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { stations, addStation, storageIssue } = useStations();
   const navigate = useNavigate();
   const [q, setQ] = useState('');
@@ -82,12 +87,14 @@ export default function Discover() {
     },
     [],
   );
-  async function search(page = 0) {
+  async function search(page = 0, overrides = {}) {
     controller.current?.abort();
     const current = ++serial.current;
     const abort = new AbortController();
     controller.current = abort;
-    const query = page ? lastQuery.current : { q: q.trim(), country: country.trim().toUpperCase() };
+    const query = page
+      ? lastQuery.current
+      : { q: q.trim(), country: country.trim().toUpperCase(), ...overrides };
     lastQuery.current = query;
     const timeout = setTimeout(() => abort.abort(), 15000);
     setBusy(true);
@@ -101,7 +108,12 @@ export default function Discover() {
       const data = await response.json();
       if (!Array.isArray(data.rows)) throw new Error('directory');
       if (current !== serial.current) return;
-      const rows = data.rows.filter((row) => normalizeDirectoryStation(row));
+      const rows = data.rows.filter(
+        (row) =>
+          typeof row?.name === 'string' &&
+          row.name.trim() &&
+          /^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(row.stationuuid || ''),
+      );
       setResult((previous) => ({
         rows: [
           ...new Map(
@@ -136,13 +148,14 @@ export default function Discover() {
         </label>
         <label>
           {t('discover.country')}
-          <input
-            value={country}
-            onChange={(e) => setCountry(e.target.value)}
-            maxLength={2}
-            pattern="[A-Za-z]{2}|"
-            placeholder="PL"
-          />
+          <select value={country} onChange={(e) => setCountry(e.target.value)}>
+            <option value="">{t('filters.allCountries')}</option>
+            {countryOptions(language).map(({ code, name }) => (
+              <option key={code} value={code}>
+                {name}
+              </option>
+            ))}
+          </select>
         </label>
         <button disabled={q.trim().length < 2 && !/^[a-z]{2}$/i.test(country.trim())}>
           {t('discover.search')}
@@ -160,27 +173,44 @@ export default function Discover() {
         {busy
           ? t('discover.loading')
           : searched
-            ? t('discover.count', { count: result.rows.length })
+            ? t('discover.count', {
+                count: result.rows.length,
+                compatible: result.rows.filter((row) => normalizeDirectoryStation(row)).length,
+              })
             : ''}
       </p>
+      {searched && !busy && result.rows.length === 0 && <p>{t('discover.empty')}</p>}
+      {searched && !busy && lastQuery.current?.country && q.trim().length >= 2 && (
+        <button
+          onClick={() => {
+            setCountry('');
+            search(0, { country: '' });
+          }}
+        >
+          {t('discover.allCountries')}
+        </button>
+      )}
       {result.rows.map((row) => {
         const station = normalizeDirectoryStation(row);
-        const existing = stations.find((s) => s.id === station.id || s.url === station.url);
+        const existing =
+          station && stations.find((s) => s.id === station.id || s.url === station.url);
         return (
-          <article key={station.id}>
+          <article key={row.stationuuid}>
             <div>
-              <h2>{station.name}</h2>
+              <h2>{row.name.slice(0, 120)}</h2>
               <p>
-                {station.countryCode} · {station.genres.join(', ')}
+                {station?.countryCode || String(row.countrycode || '').slice(0, 2)} ·{' '}
+                {station?.genres.join(', ') || String(row.codec || '').slice(0, 24)}
               </p>
+              {!station && <p>{t('discover.unsupported')}</p>}
             </div>
             <button
-              disabled={!!existing}
+              disabled={!station || !!existing}
               onClick={() => {
                 if (!addStation(row)) setError(t('discover.limit'));
               }}
             >
-              {t(existing ? 'discover.added' : 'discover.add')}
+              {t(!station ? 'discover.unavailable' : existing ? 'discover.added' : 'discover.add')}
             </button>
           </article>
         );

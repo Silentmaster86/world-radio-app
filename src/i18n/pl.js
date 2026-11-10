@@ -1,17 +1,23 @@
 export const pl = {
+  'discover.unavailable': 'Niedostępna',
+  'discover.unsupported':
+    'Ten wpis używa nieobsługiwanego formatu, niezabezpieczonego adresu lub nieprawidłowych danych strumienia. Na razie nie można go dodać.',
+  'discover.allCountries': 'Szukaj tej nazwy we wszystkich krajach',
+  'discover.empty':
+    'Nie znaleziono stacji. Spróbuj krótszej nazwy lub wyszukaj we wszystkich krajach.',
   'discover.open': 'Odkrywaj',
   'discover.title': 'Odkrywaj radio z całego świata',
   'discover.back': 'Wróć do moich stacji',
   'discover.intro': 'Wyszukaj stacje ze świata i dodaj je do swojego katalogu.',
   'discover.name': 'Nazwa stacji',
-  'discover.country': 'Kod kraju (opcjonalnie)',
+  'discover.country': 'Kraj',
   'discover.search': 'Szukaj',
   'discover.error': 'Katalog jest niedostępny. Spróbuj ponownie; zapisane stacje nadal działają.',
   'discover.notice':
     'Katalog społecznościowy. Dostępność i tożsamość stacji mogą się różnić. Tylko bezpośrednie strumienie HTTPS.',
   'discover.storage': 'Dodane stacje są dostępne tylko w tej sesji; nie udało się zapisać zmian.',
   'discover.loading': 'Wyszukiwanie…',
-  'discover.count': 'Zgodne wyniki: {count}',
+  'discover.count': 'Wyniki: {count} · Można dodać: {compatible}',
   'discover.add': 'Dodaj stację',
   'discover.added': 'Dodano',
   'discover.limit': 'Nie udało się dodać stacji. Limit zapisanych dodatkowych stacji wynosi 100.',

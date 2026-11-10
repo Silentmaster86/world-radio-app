@@ -1,10 +1,15 @@
 export const en = {
+  'discover.unavailable': 'Unavailable',
+  'discover.unsupported':
+    'This entry uses a format this player does not support, an insecure address or invalid stream data. It cannot be added yet.',
+  'discover.allCountries': 'Search this name in all countries',
+  'discover.empty': 'No stations found. Try a shorter name or search all countries.',
   'discover.open': 'Discover',
   'discover.title': 'Discover worldwide radio',
   'discover.back': 'Back to my stations',
   'discover.intro': 'Search worldwide stations and add them to your local catalog.',
   'discover.name': 'Station name',
-  'discover.country': 'Country code (optional)',
+  'discover.country': 'Country',
   'discover.search': 'Search',
   'discover.error': 'Directory unavailable. Try again; your saved stations still work.',
   'discover.notice':
@@ -12,7 +17,7 @@ export const en = {
   'discover.storage':
     'Added stations are available for this session only; local changes could not be saved.',
   'discover.loading': 'Searching…',
-  'discover.count': '{count} compatible results',
+  'discover.count': '{count} results · {compatible} can be added',
   'discover.add': 'Add station',
   'discover.added': 'Added',
   'discover.limit': 'Could not add station. The saved catalog supports up to 100 added stations.',

@@ -4,8 +4,8 @@ Release review: PR #24 combines the Polish/English interface, responsive fix
 and worldwide discovery. The feature branch is integrated into the existing PR;
 no additional PR is needed.
 
-`/discover` searches Radio Browser by station name and optional two-letter
-country code. The mobile toolbar and catalog footer link to it. Results are
+`/discover` searches Radio Browser by station name and an optional country
+chosen from a translated list. The server also maps the common UK alias to GB. The mobile toolbar and catalog footer link to it. Results are
 requested explicitly, 25 at a time, with cancellation, errors, deduplication and
 bounded paging. English/Polish and both themes are supported.
 
@@ -23,8 +23,10 @@ Sources: [API usage](https://api.radio-browser.info/) and
 not a broadcaster identity verification service. Its availability flags cannot
 guarantee regional/device playback.
 
-Only HTTPS URLs without credentials, HLS flags or playlist extensions are
-accepted. Remote artwork is not loaded. At most 100 added station records are
+Only HTTPS URLs without credentials, HLS flags or playlist extensions can be
+added. Unsupported entries remain visible with an explanation and a disabled
+add action, rather than silently disappearing. Empty searches explain how to
+try a shorter name or all countries. Remote artwork is not loaded. At most 100 added station records are
 stored under `wra:stations:v1`. Records are validated again on startup; malformed
 entries are discarded and newer schemas are left untouched. Storage errors keep
 working session additions with an explanatory message. Additions are saved

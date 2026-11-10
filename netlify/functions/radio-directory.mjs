@@ -14,7 +14,10 @@ export function createHandler({
     const query = String(input.q || '')
       .trim()
       .slice(0, 80);
-    const country = String(input.country || '').toUpperCase();
+    const rawCountry = String(input.country || '')
+      .trim()
+      .toUpperCase();
+    const country = rawCountry === 'UK' ? 'GB' : rawCountry;
     const page = Math.min(40, Math.max(0, Number.parseInt(input.page, 10) || 0));
     if (!click && query.length < 2 && !/^[A-Z]{2}$/.test(country))
       return { statusCode: 400, body: '{}' };

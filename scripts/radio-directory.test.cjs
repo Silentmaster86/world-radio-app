@@ -51,3 +51,21 @@ test('returns service error if all mirrors return invalid JSON or fail', async (
     503,
   );
 });
+
+test('accepts the common UK country alias using Radio Browser GB code', async () => {
+  const { createHandler } = await load();
+  let requestUrl;
+  const handler = createHandler({
+    lookup: async () => [{ name: 'de1.api.radio-browser.info' }],
+    request: async (url) => {
+      requestUrl = url;
+      return new Response('[]');
+    },
+  });
+  assert.equal(
+    (await handler({ httpMethod: 'GET', queryStringParameters: { q: 'Kiss', country: ' uk ' } }))
+      .statusCode,
+    200,
+  );
+  assert.equal(new URL(requestUrl).searchParams.get('countrycode'), 'GB');
+});
