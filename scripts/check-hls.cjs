@@ -4,7 +4,7 @@ const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
 const { chromium } = require('playwright');
-const { createAppContext } = require('./browser-context.cjs');
+const { createAppContext, waitForServiceWorker } = require('./browser-context.cjs');
 const uuid = '12345678-1234-1234-1234-123456789abc';
 const root = path.resolve('build');
 const aac = process.env.WRA_HLS_CODEC === 'aac';
@@ -102,9 +102,7 @@ async function main() {
     const errors = [];
     page.on('pageerror', (error) => errors.push(error.message));
     await page.goto(base + '/?q=HLS+fixture', { waitUntil: 'networkidle' });
-    await page.waitForFunction(
-      async () => !!(await navigator.serviceWorker.getRegistration())?.active,
-    );
+    await waitForServiceWorker(page);
     assert.equal(engines, 0, 'HLS must not be precached or downloaded before playback');
     assert.equal(manifests, 0);
     await page.locator('article button[aria-pressed]').click();

@@ -5,7 +5,7 @@ const path = require('node:path');
 const http = require('node:http');
 const { chromium } = require('playwright');
 const { AxeBuilder } = require('@axe-core/playwright');
-const { createAppContext } = require('./browser-context.cjs');
+const { createAppContext, waitForServiceWorker } = require('./browser-context.cjs');
 const output = path.resolve('test-results/backup', process.env.WRA_BASE_URL ? 'preview' : 'build');
 fs.mkdirSync(output, { recursive: true });
 const uuid = '12345678-1234-1234-1234-123456789abc';
@@ -227,9 +227,7 @@ async function main() {
             1,
           );
           if (width === 320) {
-            await page.waitForFunction(
-              async () => !!(await navigator.serviceWorker.getRegistration())?.active,
-            );
+            await waitForServiceWorker(page);
             // Installation can finish after the first reload on a real host.
             // This app deliberately avoids claim/skipWaiting: navigate online
             // under the active worker before asking it to serve an offline page.
