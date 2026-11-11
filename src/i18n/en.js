@@ -1,4 +1,6 @@
 export const en = {
+  'nav.library': 'Manage library',
+  'nav.loadError': 'This view could not load. Reconnect and try again.',
   'settings.backupError': 'Backup could not load. Reconnect and reload the app to try again.',
   'settings.backup': 'Library backup',
   'settings.loading': 'Loading…',

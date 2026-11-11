@@ -37,6 +37,19 @@ export function StationsProvider({ children }) {
         catalog: catalog.current,
         addStation,
         storageIssue,
+        removeStation: (id) => {
+          const index = catalog.current.findIndex((s) => s.id === id && s.directoryId);
+          if (index < 0) return false;
+          const remaining = catalog.current.filter((s) => s.directoryId && s.id !== id);
+          if (!initial.canPersist || !saveAddedStations(remaining)) {
+            setStorageIssue(true);
+            return false;
+          }
+          catalog.current.splice(index, 1);
+          setStations(catalog.current.slice());
+          setStorageIssue(false);
+          return true;
+        },
         restoreStations: (added) => {
           for (const station of added)
             if (!catalog.current.some((s) => s.id === station.id || s.url === station.url))

@@ -14,6 +14,7 @@ import { render } from './test/render';
 import { FakeAudio } from './test/FakeAudio';
 import { LanguageProvider } from './context/LanguageContext';
 import { LANGUAGE_KEY } from './i18n';
+const initialFetch = global.fetch;
 
 function ThemedApp() {
   const { theme } = useTheme();
@@ -50,7 +51,10 @@ beforeEach(() => {
   window.history.replaceState({}, '', '/');
   jest.spyOn(window, 'Audio').mockImplementation(() => new FakeAudio());
 });
-afterEach(() => jest.restoreAllMocks());
+afterEach(() => {
+  jest.restoreAllMocks();
+  global.fetch = initialFetch;
+});
 
 test('compact catalog preserves audio, navigation, reload and current search results', async () => {
   window.history.replaceState({}, '', '/?campaign=demo');
@@ -476,6 +480,7 @@ test('worldwide search adds a station that plays, enters favorites/history and s
   try {
     window.history.replaceState({}, '', '/discover');
     let page = mount();
+    await act(async () => {});
     input(page, 'form input', 'jazz');
     await act(async () =>
       page.container
@@ -543,6 +548,7 @@ test('discovery uses named countries and accepts HTTPS HLS results', async () =>
   try {
     window.history.replaceState({}, '', '/discover');
     const page = mount();
+    await act(async () => {});
     const country = page.container.querySelector('form select');
     expect(country.querySelector('option[value="GB"]').textContent).toBe('United Kingdom');
     act(() => {
@@ -592,4 +598,220 @@ test('settings open and close without restarting playback or changing saved stat
   expect(audio.pause).toHaveBeenCalledTimes(pauses);
   expect(window.Audio).toHaveBeenCalledTimes(1);
   expect(page.container.querySelector('[data-player-status]').dataset.playerStatus).toBe('playing');
+});
+
+const libraryRows = [1, 2].map((index) => ({
+  id: `rb-12345678-1234-1234-1234-${String(index).padStart(12, '0')}`,
+  directoryId: `12345678-1234-1234-1234-${String(index).padStart(12, '0')}`,
+  name: `Library ${index}`,
+  url: `https://radio.example/${index}`,
+  countryCode: 'GB',
+  languageCodes: ['en'],
+  genres: ['pop'],
+  description: '',
+}));
+function seedLibrary() {
+  global.fetch = jest.fn().mockResolvedValue({ ok: true });
+  localStorage.setItem('wra:stations:v1', JSON.stringify({ version: 1, stations: libraryRows }));
+  localStorage.setItem(
+    FAVORITES_KEY,
+    JSON.stringify({
+      version: 1,
+      stationIds: ['heart-uk', 'temporarily-removed', 'capital-dance', libraryRows[0].id],
+    }),
+  );
+  localStorage.setItem(RECENT_KEY, JSON.stringify({ version: 1, stationIds: [libraryRows[0].id] }));
+  localStorage.setItem(
+    'wra:player:v1',
+    JSON.stringify({ version: 1, stationId: libraryRows[0].id, volume: 0.4, muted: false }),
+  );
+}
+test('library order survives reload; deleting another station preserves audio/timer and deleting the selected station stops both', async () => {
+  seedLibrary();
+  window.history.replaceState({}, '', '/library');
+  let page = mount();
+  await act(async () => {});
+  await act(async () => page.container.querySelector('[aria-label="Play"]').click());
+  page.click('[data-sleep-timer]');
+  page.click('[data-sleep-minutes="15"]');
+  const audio = window.Audio.mock.results[0].value,
+    source = audio.src;
+  page.click('[data-move-down="heart-uk"]');
+  expect(JSON.parse(localStorage.getItem(FAVORITES_KEY)).stationIds).toEqual([
+    'capital-dance',
+    'temporarily-removed',
+    'heart-uk',
+    libraryRows[0].id,
+  ]);
+  expect(document.activeElement.dataset.favoriteHeading).toBe('heart-uk');
+  page.click(`[data-remove-station="${libraryRows[1].id}"]`);
+  page.click('[data-cancel-remove]');
+  expect(page.container.querySelectorAll('[data-added-row]')).toHaveLength(2);
+  page.click(`[data-remove-station="${libraryRows[1].id}"]`);
+  page.click('[data-confirm-remove]');
+  expect(audio.src).toBe(source);
+  expect(audio.paused).toBe(false);
+  expect(page.container.querySelector('[data-sleep-timer]').getAttribute('aria-pressed')).toBe(
+    'true',
+  );
+  expect(window.Audio).toHaveBeenCalledTimes(1);
+  page.click(`[data-remove-station="${libraryRows[0].id}"]`);
+  page.click('[data-confirm-remove]');
+  expect(audio.src).toBe('');
+  expect(page.container.querySelector('[data-player-status]').dataset.playerStatus).toBe('idle');
+  expect(page.container.querySelector('[data-sleep-timer]').getAttribute('aria-pressed')).toBe(
+    'false',
+  );
+  expect(JSON.parse(localStorage.getItem('wra:stations:v1')).stations).toEqual([]);
+  expect(JSON.parse(localStorage.getItem(FAVORITES_KEY)).stationIds).toContain(libraryRows[0].id);
+  expect(JSON.parse(localStorage.getItem(RECENT_KEY)).stationIds).toContain(libraryRows[0].id);
+  page.unmount();
+  page = mount();
+  await act(async () => {});
+  expect(window.Audio.mock.results[1].value.play).not.toHaveBeenCalled();
+  expect(
+    [...page.container.querySelectorAll('[data-favorite-row]')].map(
+      (node) => node.dataset.favoriteRow,
+    ),
+  ).toEqual(['capital-dance', 'heart-uk']);
+});
+test('a failed station deletion keeps its library entry, active source and timer', async () => {
+  seedLibrary();
+  window.history.replaceState({}, '', '/library');
+  const page = mount();
+  await act(async () => {});
+  await act(async () => page.container.querySelector('[aria-label="Play"]').click());
+  page.click('[data-sleep-timer]');
+  page.click('[data-sleep-minutes="15"]');
+  const before = localStorage.getItem('wra:stations:v1'),
+    audio = window.Audio.mock.results[0].value,
+    source = audio.src,
+    original = Storage.prototype.setItem;
+  jest.spyOn(Storage.prototype, 'setItem').mockImplementation(function (key, value) {
+    if (key === 'wra:stations:v1') throw Error('quota');
+    return original.call(this, key, value);
+  });
+  page.click(`[data-remove-station="${libraryRows[0].id}"]`);
+  page.click('[data-confirm-remove]');
+  expect(page.container.querySelector('[role=alert]').textContent).toContain('kept');
+  expect(localStorage.getItem('wra:stations:v1')).toBe(before);
+  expect(audio.src).toBe(source);
+  expect(audio.paused).toBe(false);
+  expect(page.container.querySelector('[data-sleep-timer]').getAttribute('aria-pressed')).toBe(
+    'true',
+  );
+});
+test('a recipient reviews a shared HLS station before adding, without autoplay', async () => {
+  const previous = global.fetch,
+    id = libraryRows[0].directoryId;
+  global.fetch = jest.fn().mockResolvedValue({
+    ok: true,
+    json: async () => ({
+      rows: [
+        { stationuuid: id, name: 'Shared HLS', url: 'https://radio.example/live.m3u8', hls: 1 },
+      ],
+    }),
+  });
+  try {
+    window.history.replaceState({}, '', `/station/rb-${id}`);
+    const page = mount();
+    await act(async () => {});
+    expect(global.fetch.mock.calls[0][0]).toBe('/.netlify/functions/radio-directory?id=' + id);
+    expect(page.container.querySelector('[data-add-shared]')).not.toBeNull();
+    expect(localStorage.getItem('wra:stations:v1')).toBeNull();
+    expect(window.Audio.mock.results[0].value.play).not.toHaveBeenCalled();
+    page.click('[data-add-shared]');
+    expect(JSON.parse(localStorage.getItem('wra:stations:v1')).stations[0].streamType).toBe('hls');
+    expect(page.container.querySelector('[data-station-id]')).not.toBeNull();
+    expect(window.Audio.mock.results[0].value.play).not.toHaveBeenCalled();
+    expect(window.Audio).toHaveBeenCalledTimes(1);
+  } finally {
+    global.fetch = previous;
+  }
+});
+test('shared lookup rejects a different identity and exposes retry for network failures', async () => {
+  const previous = global.fetch,
+    id = libraryRows[0].directoryId;
+  global.fetch = jest
+    .fn()
+    .mockResolvedValueOnce({ ok: false })
+    .mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        rows: [
+          {
+            stationuuid: libraryRows[1].directoryId,
+            name: 'Wrong',
+            url: 'https://radio.example/live',
+          },
+        ],
+      }),
+    });
+  try {
+    window.history.replaceState({}, '', `/station/rb-${id}`);
+    const page = mount();
+    await act(async () => {});
+    expect(page.container.querySelector('[role=alert]').textContent).toContain('Reconnect');
+    await act(async () =>
+      [...page.container.querySelectorAll('button')]
+        .find((button) => button.textContent === 'Try again')
+        .click(),
+    );
+    expect(page.container.querySelector('[role=alert]').textContent).toContain('not available');
+    expect(page.container.querySelector('[data-add-shared]')).toBeNull();
+    expect(localStorage.getItem('wra:stations:v1')).toBeNull();
+  } finally {
+    global.fetch = previous;
+  }
+});
+test('a shared URL already present as a curated stream resolves to its existing station without duplicate storage', async () => {
+  const previous = global.fetch,
+    id = libraryRows[0].directoryId;
+  global.fetch = jest.fn().mockResolvedValue({
+    ok: true,
+    json: async () => ({ rows: [{ stationuuid: id, name: 'Duplicate', url: stations[0].url }] }),
+  });
+  try {
+    window.history.replaceState({}, '', `/station/rb-${id}`);
+    const page = mount();
+    await act(async () => {});
+    await act(async () => page.container.querySelector('[data-add-shared]').click());
+    expect(window.location.pathname).toBe('/station/capital-dance');
+    expect(localStorage.getItem('wra:stations:v1')).toBeNull();
+    expect(window.Audio.mock.results[0].value.play).not.toHaveBeenCalled();
+  } finally {
+    global.fetch = previous;
+  }
+});
+test('unknown local share IDs never trigger a directory request or playback', async () => {
+  const previous = global.fetch;
+  global.fetch = jest.fn();
+  try {
+    window.history.replaceState({}, '', '/station/not-in-catalog');
+    const page = mount();
+    await act(async () => {});
+    expect(page.container.querySelector('[role=alert]').textContent).toContain('not available');
+    expect(global.fetch).not.toHaveBeenCalled();
+    expect(window.Audio.mock.results[0].value.play).not.toHaveBeenCalled();
+  } finally {
+    global.fetch = previous;
+  }
+});
+
+test('removing the selected idle station also cancels a timer started while paused', async () => {
+  seedLibrary();
+  window.history.replaceState({}, '', '/library');
+  const page = mount();
+  await act(async () => {});
+  page.click('[data-sleep-timer]');
+  page.click('[data-sleep-minutes="15"]');
+  expect(page.container.querySelector('[data-sleep-timer]').getAttribute('aria-pressed')).toBe(
+    'true',
+  );
+  page.click(`[data-remove-station="${libraryRows[0].id}"]`);
+  page.click('[data-confirm-remove]');
+  expect(page.container.querySelector('[data-sleep-timer]').getAttribute('aria-pressed')).toBe(
+    'false',
+  );
+  expect(window.Audio.mock.results[0].value.play).not.toHaveBeenCalled();
 });

@@ -13,7 +13,7 @@ const AudioContext = createContext();
 export const useAudio = () => useContext(AudioContext);
 
 export function AudioProvider({ children }) {
-  const { catalog: stations } = useStations();
+  const { catalog: stations, removeStation: removeSavedStation } = useStations();
   const playerRef = useRef(null);
   const timerRef = useRef(null);
   const [sleepTimerDeadline, setSleepTimerDeadline] = useState(null);
@@ -108,6 +108,12 @@ export function AudioProvider({ children }) {
         sleepTimerDeadline,
         setSleepTimer: (minutes) => timerRef.current?.start(minutes),
         cancelSleepTimer: () => timerRef.current?.cancel(),
+        removeStation: (id) => {
+          if (!removeSavedStation(id)) return false;
+          if (playerRef.current?.getSnapshot().selectedStationId === id) timerRef.current?.cancel();
+          invoke('forgetStation', id);
+          return true;
+        },
         selectStation: (id) => invoke('selectStation', id),
         setStation: (station) => invoke('selectStation', station?.id),
         play: () => invoke('play'),

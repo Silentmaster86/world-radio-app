@@ -32,7 +32,14 @@ async function main() {
   }
   assert.ok(ready, 'Timed out waiting for the current commit Netlify preview');
   const scripts = [];
-  for (const route of ['/', '/now-playing', '/discover']) {
+  for (const route of [
+    '/',
+    '/now-playing',
+    '/discover',
+    '/library',
+    '/station/capital-dance',
+    '/station/rb-a740cc4c-9563-4fbe-a13f-e7f9e89b7441',
+  ]) {
     const response = await fetch(new URL(route, WRA_BASE_URL), {
       signal: AbortSignal.timeout(20000),
     });
@@ -50,13 +57,16 @@ async function main() {
     assert.ok(script, `Missing application script on ${route}`);
     scripts.push(script);
   }
-  assert.equal(scripts[0], scripts[1], 'Direct route serves a different application');
+  assert.ok(
+    scripts.every((script) => script === scripts[0]),
+    'Direct route serves a different application',
+  );
   const script = await fetch(new URL(scripts[0], WRA_BASE_URL), {
     signal: AbortSignal.timeout(20000),
   });
   assert.equal(script.status, 200, 'Preview application script is unavailable');
   console.log(
-    `Verified current-commit Netlify preview: ${WRA_BASE_URL}/, /now-playing and /discover`,
+    `Verified current-commit Netlify preview: ${WRA_BASE_URL}/, /now-playing, /discover, /library and shared station routes`,
   );
 }
 main().catch((error) => {

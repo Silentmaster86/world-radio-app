@@ -11,6 +11,9 @@ export function createHandler({
       event.httpMethod === 'POST' &&
       /^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/.test(input.click || '');
     if (event.httpMethod !== 'GET' && !click) return { statusCode: 405, body: '' };
+    const id = String(input.id || '').toLowerCase();
+    if (input.id !== undefined && !/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/.test(id))
+      return { statusCode: 400, body: '{}' };
     const query = String(input.q || '')
       .trim()
       .slice(0, 80);
@@ -19,7 +22,7 @@ export function createHandler({
       .toUpperCase();
     const country = rawCountry === 'UK' ? 'GB' : rawCountry;
     const page = Math.min(40, Math.max(0, Number.parseInt(input.page, 10) || 0));
-    if (!click && query.length < 2 && !/^[A-Z]{2}$/.test(country))
+    if (!click && !id && query.length < 2 && !/^[A-Z]{2}$/.test(country))
       return { statusCode: 400, body: '{}' };
     let hosts;
     try {
@@ -50,7 +53,7 @@ export function createHandler({
     for (const host of hosts) {
       try {
         const response = await request(
-          `https://${host}${click ? '/json/url/' + input.click : '/json/stations/search?' + params}`,
+          `https://${host}${click ? '/json/url/' + input.click : id ? '/json/stations/byuuid/' + id : '/json/stations/search?' + params}`,
           {
             headers: {
               'User-Agent':
@@ -72,8 +75,12 @@ export function createHandler({
           statusCode: 200,
           headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=120' },
           body: JSON.stringify({
-            rows: rows.slice(0, 25),
-            hasMore: rows.length === 25 && page < 40,
+            rows: id
+              ? rows
+                  .filter((row) => String(row?.stationuuid || '').toLowerCase() === id)
+                  .slice(0, 1)
+              : rows.slice(0, 25),
+            hasMore: !id && rows.length === 25 && page < 40,
           }),
         };
       } catch {

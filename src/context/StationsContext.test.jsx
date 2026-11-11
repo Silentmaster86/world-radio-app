@@ -10,10 +10,16 @@ const row = {
   url: 'https://radio.example/live',
 };
 function Probe() {
-  const { addStation, stations, storageIssue } = useStations();
+  const { addStation, removeStation, stations, storageIssue } = useStations();
   const audio = useAudio();
   return (
     <>
+      <button data-remove onClick={() => removeStation('rb-' + row.stationuuid)}>
+        Remove
+      </button>
+      <button data-remove-curated onClick={() => removeStation('capital-dance')}>
+        Remove curated
+      </button>
       <button data-add onClick={() => addStation(row)}>
         Add
       </button>
@@ -72,4 +78,16 @@ test('future station storage is preserved while session additions remain usable'
   expect(localStorage.getItem(ADDED_KEY)).toBe(raw);
   expect(Number(page.container.querySelector('p').textContent)).toBe(count + 1);
   expect(page.container.querySelector('p').dataset.issue).toBe('true');
+});
+
+test('curated stations and future-schema storage cannot be deleted', () => {
+  const raw = '{"version":8,"keep":true}';
+  localStorage.setItem(ADDED_KEY, raw);
+  const page = mount(),
+    count = Number(page.container.querySelector('p').textContent);
+  page.click('[data-add]');
+  page.click('[data-remove]');
+  page.click('[data-remove-curated]');
+  expect(Number(page.container.querySelector('p').textContent)).toBe(count + 1);
+  expect(localStorage.getItem(ADDED_KEY)).toBe(raw);
 });

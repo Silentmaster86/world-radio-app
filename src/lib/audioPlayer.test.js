@@ -532,3 +532,32 @@ test('fatal HLS decoding failures release the engine and produce an actionable e
   expect(h.attachment.destroy).toHaveBeenCalledTimes(1);
   expect(h.player.getSnapshot().error.code).toBe('decode');
 });
+
+test('forgetting an unrelated station keeps playback; forgetting the selected one unloads without autoplay', async () => {
+  const { audio, player } = setup();
+  await player.selectStation('second');
+  const plays = audio.play.mock.calls.length;
+  player.forgetStation('third');
+  expect(player.getSnapshot().status).toBe('playing');
+  expect(audio.src).toBe(stations[1].url);
+  player.forgetStation('second');
+  expect(audio.src).toBe('');
+  expect(player.getSnapshot()).toMatchObject({
+    selectedStationId: 'first',
+    status: 'idle',
+    wantsToPlay: false,
+  });
+  expect(audio.play).toHaveBeenCalledTimes(plays);
+});
+test('forgetting an HLS station cancels its pending import and cannot resume later', async () => {
+  const pending = deferred(),
+    h = hlsSetup({ loadHls: () => pending.promise });
+  const result = h.player.play();
+  h.player.forgetStation('hls');
+  pending.resolve({ attachHls: h.attachHls });
+  await flush();
+  expect(await result).toBe(false);
+  expect(h.attachHls).not.toHaveBeenCalled();
+  expect(h.audio.play).not.toHaveBeenCalled();
+  expect(h.player.getSnapshot().status).toBe('idle');
+});

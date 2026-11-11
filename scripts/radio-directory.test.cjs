@@ -74,3 +74,38 @@ test('accepts the common UK country alias using Radio Browser GB code', async ()
   );
   assert.equal(new URL(requestUrl).searchParams.get('countrycode'), 'GB');
 });
+
+test('UUID lookup uses only trusted mirror paths and returns only the requested identity', async () => {
+  const { createHandler } = await load();
+  const id = '12345678-1234-1234-1234-123456789abc';
+  let target;
+  const handler = createHandler({
+    lookup: async () => [{ name: 'de1.api.radio-browser.info' }],
+    request: async (url) => {
+      target = url;
+      return new Response(
+        JSON.stringify([{ stationuuid: 'other' }, { stationuuid: id, name: 'Shared' }]),
+      );
+    },
+  });
+  const response = await handler({ httpMethod: 'GET', queryStringParameters: { id } });
+  assert.equal(target, `https://de1.api.radio-browser.info/json/stations/byuuid/${id}`);
+  assert.equal(response.statusCode, 200);
+  assert.deepEqual(JSON.parse(response.body), {
+    rows: [{ stationuuid: id, name: 'Shared' }],
+    hasMore: false,
+  });
+});
+test('invalid lookup identities are rejected before DNS or fetch', async () => {
+  const { createHandler } = await load();
+  const handler = createHandler({
+    lookup: () => {
+      assert.fail('Unexpected DNS');
+    },
+  });
+  for (const id of ['', '../x', 'https://evil.example', 'rb-invalid'])
+    assert.equal(
+      (await handler({ httpMethod: 'GET', queryStringParameters: { id, q: 'Valid' } })).statusCode,
+      400,
+    );
+});
