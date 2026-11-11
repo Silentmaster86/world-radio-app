@@ -797,3 +797,21 @@ test('unknown local share IDs never trigger a directory request or playback', as
     global.fetch = previous;
   }
 });
+
+test('removing the selected idle station also cancels a timer started while paused', async () => {
+  seedLibrary();
+  window.history.replaceState({}, '', '/library');
+  const page = mount();
+  await act(async () => {});
+  page.click('[data-sleep-timer]');
+  page.click('[data-sleep-minutes="15"]');
+  expect(page.container.querySelector('[data-sleep-timer]').getAttribute('aria-pressed')).toBe(
+    'true',
+  );
+  page.click(`[data-remove-station="${libraryRows[0].id}"]`);
+  page.click('[data-confirm-remove]');
+  expect(page.container.querySelector('[data-sleep-timer]').getAttribute('aria-pressed')).toBe(
+    'false',
+  );
+  expect(window.Audio.mock.results[0].value.play).not.toHaveBeenCalled();
+});

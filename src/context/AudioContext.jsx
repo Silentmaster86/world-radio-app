@@ -110,6 +110,7 @@ export function AudioProvider({ children }) {
         cancelSleepTimer: () => timerRef.current?.cancel(),
         removeStation: (id) => {
           if (!removeSavedStation(id)) return false;
+          if (playerRef.current?.getSnapshot().selectedStationId === id) timerRef.current?.cancel();
           invoke('forgetStation', id);
           return true;
         },
