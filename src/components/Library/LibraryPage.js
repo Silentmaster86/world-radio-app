@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-export const LibraryPage = styled.main`
+export const LibraryPage = styled.main.attrs({ className: 'library-page' })`
   max-width: 900px;
   margin: auto;
   padding: 1rem;

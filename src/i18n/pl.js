@@ -1,4 +1,5 @@
 export const pl = {
+  'library.eyebrow': 'TWÓJ ŚWIAT DŹWIĘKÓW.',
   'nav.library': 'Zarządzaj biblioteką',
   'nav.loadError': 'Nie udało się wczytać widoku. Połącz się z internetem i spróbuj ponownie.',
   'settings.backupError':

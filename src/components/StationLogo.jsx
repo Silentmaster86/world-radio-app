@@ -1,3 +1,4 @@
+import { stationHue } from '../lib/stationVisuals';
 export default function StationLogo({
   station,
   size = 80,
@@ -21,7 +22,7 @@ export default function StationLogo({
         aria-hidden="true"
         {...props}
       >
-        <rect width="80" height="80" rx="12" fill="#24324a" />
+        <rect width="80" height="80" rx="12" fill={`hsl(${stationHue(station.id)} 45% 25%)`} />
         <text
           x="40"
           y="43"

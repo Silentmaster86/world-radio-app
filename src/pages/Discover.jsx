@@ -187,7 +187,7 @@ export default function Discover() {
     }
   }
   return (
-    <Page>
+    <Page className="discover-page">
       <HomeHeader headingAs="div" back />
       <h1>{t('discover.heading')}</h1>
       <p className="intro">{t('discover.intro')}</p>

@@ -43,15 +43,16 @@ production. They are improvements, not a list of confirmed defects.
    with stable ID/URL deduplication; preserve the live player and Sleep Timer.
    Settings import is opt-in; no replacement mode or required account.
    See [library-backup.md](library-backup.md).
-3. **Library management and sharing (current branch).** Reorder favorites, remove
+3. **Library management and sharing (shipped in PR #27).** Reorder favorites, remove
    added stations safely, and share direct links with a recipient preview/add flow.
    See [library-management.md](library-management.md).
-4. **Visual redesign and richer animation.** A coherent visual direction for the
+4. **Visual redesign and richer animation (current branch).** A coherent visual direction for the
    library, discovery, player and settings; stronger artwork, typography and
    hierarchy. Add purposeful transitions, playback feedback and loading states.
    Keep compact phone layouts, 44px touch targets, light/dark contrast, keyboard
    access and reduced-motion support. Check actual mobile performance before
    adding persistent effects or large animation dependencies.
+   See [visual-design.md](visual-design.md).
 5. **Additional interface languages.** Start with roughly 10–15 major languages,
    choosing coverage and review capacity before adding more. Generate/review
    dictionaries, load them on demand and cache for offline UI; localize plurals,

@@ -1,4 +1,5 @@
 export const en = {
+  'library.eyebrow': 'TUNE IN. FEEL AT HOME.',
   'nav.library': 'Manage library',
   'nav.loadError': 'This view could not load. Reconnect and try again.',
   'settings.backupError': 'Backup could not load. Reconnect and reload the app to try again.',

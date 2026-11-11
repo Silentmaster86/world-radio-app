@@ -23,6 +23,7 @@ async function main() {
     const type = {
       '.html': 'text/html',
       '.js': 'text/javascript',
+      '.css': 'text/css',
       '.json': 'application/json',
       '.webp': 'image/webp',
       '.png': 'image/png',
