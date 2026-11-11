@@ -1,4 +1,8 @@
 export const pl = {
+  'language.loading': 'Wczytywanie języka…',
+  'language.failed':
+    'Nie udało się wczytać języka. Obecny język i radio działają dalej. Połącz się z internetem lub otwórz aplikację ponownie i spróbuj jeszcze raz.',
+  'language.session': 'Zmiana języka dotyczy tej sesji; nie udało się zapisać ustawienia.',
   'library.eyebrow': 'TWÓJ ŚWIAT DŹWIĘKÓW.',
   'nav.library': 'Zarządzaj biblioteką',
   'nav.loadError': 'Nie udało się wczytać widoku. Połącz się z internetem i spróbuj ponownie.',

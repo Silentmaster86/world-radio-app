@@ -46,18 +46,20 @@ production. They are improvements, not a list of confirmed defects.
 3. **Library management and sharing (shipped in PR #27).** Reorder favorites, remove
    added stations safely, and share direct links with a recipient preview/add flow.
    See [library-management.md](library-management.md).
-4. **Visual redesign and richer animation (current branch).** A coherent visual direction for the
+4. **Visual redesign and richer animation (shipped in PR #28).** A coherent visual direction for the
    library, discovery, player and settings; stronger artwork, typography and
    hierarchy. Add purposeful transitions, playback feedback and loading states.
    Keep compact phone layouts, 44px touch targets, light/dark contrast, keyboard
    access and reduced-motion support. Check actual mobile performance before
    adding persistent effects or large animation dependencies.
    See [visual-design.md](visual-design.md).
-5. **Additional interface languages.** Start with roughly 10–15 major languages,
-   choosing coverage and review capacity before adding more. Generate/review
-   dictionaries, load them on demand and cache for offline UI; localize plurals,
-   country names and formatting. Add RTL layout support for Arabic, not just
-   translated text. This translates the interface, not live radio broadcasts.
+5. **Additional interface languages (current branch).** First batch: eight
+   languages, adding DE/ES/FR/PT/IT/UK to EN/PL, including backup/library/error
+   text. Separate cached dictionaries, atomic selection, translated search,
+   country names and offline switching. See [language.md](language.md).
+   Later batches can expand toward 10–15 major languages after terminology review;
+   Arabic needs full RTL support and Asian scripts need typography/layout checks.
+   This translates the interface, not live radio broadcasts.
 
    Candidate translation APIs: [Google Cloud Translation](https://cloud.google.com/translate/docs/languages)
    and [Azure Translator](https://learn.microsoft.com/en-us/azure/ai-services/translator/language-support).

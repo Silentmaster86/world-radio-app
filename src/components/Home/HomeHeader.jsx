@@ -5,10 +5,11 @@ import { FaGlobeEurope, FaSlidersH, FaArrowLeft, FaCompass } from 'react-icons/f
 import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { localizeStoredMessage } from '../../i18n';
+import { LANGUAGE_NAMES } from '../../i18n';
 const BackupPanel = lazy(() => import('../Backup/BackupPanel'));
 export default function HomeHeader({ headingAs = 'h1', back = false }) {
   const { mode, setThemeMode, storageMessage } = useTheme();
-  const { language, setLanguage, t } = useLanguage();
+  const { language, setLanguage, pendingLanguage, languageMessage, t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [backupOpen, setBackupOpen] = useState(false);
   const dialog = useRef(null);
@@ -91,11 +92,21 @@ export default function HomeHeader({ headingAs = 'h1', back = false }) {
         <h2 id={title}>{t('settings.title')}</h2>
         <label htmlFor="language">
           {t('header.language')}
-          <select id="language" value={language} onChange={(e) => setLanguage(e.target.value)}>
-            <option value="en">English</option>
-            <option value="pl">Polski</option>
+          <select
+            id="language"
+            value={pendingLanguage || language}
+            onChange={(e) => setLanguage(e.target.value)}
+            aria-busy={!!pendingLanguage}
+          >
+            {Object.entries(LANGUAGE_NAMES).map(([code, name]) => (
+              <option key={code} value={code} lang={code}>
+                {name}
+              </option>
+            ))}
           </select>
         </label>
+        {pendingLanguage && <p role="status">{t('language.loading')}</p>}
+        {languageMessage && <p role="status">{t(languageMessage)}</p>}
         <label htmlFor="appearance">
           {t('header.appearance')}
           <select id="appearance" value={mode} onChange={(e) => setThemeMode(e.target.value)}>

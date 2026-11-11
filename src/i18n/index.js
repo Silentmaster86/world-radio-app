@@ -2,13 +2,62 @@ import { en } from './en';
 import { pl } from './pl';
 
 export const LANGUAGE_KEY = 'wra:language:v1';
-export const SUPPORTED_LANGUAGES = ['en', 'pl'];
+export const LANGUAGE_NAMES = {
+  en: 'English',
+  pl: 'Polski',
+  de: 'Deutsch',
+  es: 'Español',
+  fr: 'Français',
+  pt: 'Português',
+  it: 'Italiano',
+  uk: 'Українська',
+};
+export const SUPPORTED_LANGUAGES = Object.keys(LANGUAGE_NAMES);
 
 const dictionaries = { en, pl };
+const loaders = {
+  de: () => import('./locales/de'),
+  es: () => import('./locales/es'),
+  fr: () => import('./locales/fr'),
+  pt: () => import('./locales/pt'),
+  it: () => import('./locales/it'),
+  uk: () => import('./locales/uk'),
+};
+const loading = new Map();
+const displayNames = new Map();
+export const hasLanguage = (language) => Object.hasOwn(dictionaries, language);
+export function loadLanguage(language) {
+  if (hasLanguage(language)) return Promise.resolve();
+  if (!Object.hasOwn(loaders, language)) return Promise.reject(new Error('language'));
+  if (!loading.has(language)) {
+    loading.set(
+      language,
+      loaders[language]()
+        .then(({ default: dictionary }) => {
+          dictionaries[language] = dictionary;
+        })
+        .finally(() => loading.delete(language)),
+    );
+  }
+  return loading.get(language);
+}
 
 export function translate(language, key, params = {}, fallback) {
   const catalog = dictionaries[language] || en;
-  const template = catalog[key] ?? en[key] ?? fallback ?? key;
+  let localized;
+  const [namespace, code] = key.split('.');
+  if (!catalog[key] && ['country', 'language'].includes(namespace) && code) {
+    try {
+      const type = namespace === 'country' ? 'region' : 'language';
+      const id = `${language}:${type}`;
+      if (!displayNames.has(id)) displayNames.set(id, new Intl.DisplayNames([language], { type }));
+      const name = displayNames.get(id).of(code);
+      if (name !== code) localized = name;
+    } catch {
+      // Older browsers and invalid external language/region codes use the fallback.
+    }
+  }
+  const template = catalog[key] ?? localized ?? en[key] ?? fallback ?? key;
   return String(template).replace(/\{([a-zA-Z0-9_]+)\}/g, (match, name) =>
     Object.hasOwn(params, name) ? String(params[name]) : match,
   );

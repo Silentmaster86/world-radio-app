@@ -62,14 +62,14 @@ test('saved Polish is restored without changing playback-related storage', () =>
 });
 
 test('invalid values fall back to English without overwriting data', () => {
-  localStorage.setItem(LANGUAGE_KEY, JSON.stringify({ version: 1, language: 'de' }));
+  localStorage.setItem(LANGUAGE_KEY, JSON.stringify({ version: 1, language: 'zz' }));
   const page = render(
     <LanguageProvider>
       <LanguagePreview />
     </LanguageProvider>,
   );
   expect(page.container.querySelector('[data-testid="language"]').textContent).toBe('en');
-  expect(JSON.parse(localStorage.getItem(LANGUAGE_KEY)).language).toBe('de');
+  expect(JSON.parse(localStorage.getItem(LANGUAGE_KEY)).language).toBe('zz');
 });
 
 test('a future schema stays untouched and changes only this session', () => {

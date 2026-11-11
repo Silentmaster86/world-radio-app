@@ -16,6 +16,7 @@ import {
   downloadBackup,
 } from '../../lib/libraryBackup';
 import { backupMessage } from './messages';
+import { hasLanguage, loadLanguage } from '../../i18n';
 
 const Panel = styled.section`
   margin-top: 1.25rem;
@@ -67,15 +68,17 @@ export default function BackupPanel() {
     favorites = useFavorites(),
     recent = useRecentStations(),
     audio = useAudio();
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage, t: ui } = useLanguage();
   const { mode, setThemeMode } = useTheme();
   const [incoming, setIncoming] = useState(null),
     [includeSettings, setIncludeSettings] = useState(false),
     [reading, setReading] = useState(false),
+    [applying, setApplying] = useState(false),
     [message, setMessage] = useState(''),
     [error, setError] = useState('');
   const fileRef = useRef(null),
-    generation = useRef(0);
+    generation = useRef(0),
+    commitRef = useRef(null);
   const title = useId();
   useEffect(
     () => () => {
@@ -107,6 +110,7 @@ export default function BackupPanel() {
     setError('');
     setIncludeSettings(false);
     setReading(false);
+    setApplying(false);
     if (!file) {
       setReading(false);
       return;
@@ -127,7 +131,26 @@ export default function BackupPanel() {
       if (request === generation.current) setReading(false);
     }
   }
+  // Playback/library may change while a language downloads; commit the latest view.
+  commitRef.current = commit;
   function apply() {
+    const request = ++generation.current;
+    const finish = () => {
+      if (request !== generation.current) return;
+      setApplying(false);
+      commitRef.current();
+    };
+    if (includeSettings && !hasLanguage(incoming.settings.language)) {
+      setApplying(true);
+      setError('');
+      loadLanguage(incoming.settings.language).then(finish, () => {
+        if (request !== generation.current) return;
+        setApplying(false);
+        setError('language');
+      });
+    } else finish();
+  }
+  function commit() {
     try {
       // Build again on confirmation: playback may have changed history since preview.
       const plan = planImport(incoming, withSavedLibrary(current()));
@@ -179,6 +202,7 @@ export default function BackupPanel() {
           data-backup-file
         />
       </label>
+      {applying && <p role="status">{ui('language.loading')}</p>}
       {reading && <p role="status">{t('reading')}</p>}
       {incoming && (
         <div data-backup-preview>
@@ -188,6 +212,7 @@ export default function BackupPanel() {
           <label>
             <input
               type="checkbox"
+              disabled={applying}
               checked={includeSettings}
               onChange={(e) => setIncludeSettings(e.target.checked)}
               data-backup-settings
@@ -196,13 +221,14 @@ export default function BackupPanel() {
           </label>
           <p>{t('settingsHint')}</p>
           <div className="backup-actions">
-            <button type="button" disabled={!preview} data-backup-apply onClick={apply}>
+            <button type="button" disabled={!preview || applying} data-backup-apply onClick={apply}>
               {t('apply')}
             </button>
             <button
               type="button"
               onClick={() => {
                 generation.current++;
+                setApplying(false);
                 setIncoming(null);
                 setError('');
                 fileRef.current.value = '';

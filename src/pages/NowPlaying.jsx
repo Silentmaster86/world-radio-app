@@ -128,12 +128,12 @@ export default function NowPlaying() {
       style={{ '--station-hue': stationHue(currentStation.id) }}
     >
       <PlayerCard className="now-playing-card" aria-label={t('player.carLabel')}>
-        <TopBar>
+        <TopBar className="car-topbar">
           <HomeButton type="button" onClick={returnToStations} aria-label={t('player.back')}>
             <FaHome aria-hidden="true" />
           </HomeButton>
           <SleepTimer compact />
-          <CarBadge>
+          <CarBadge className="car-badge">
             <FaCarSide aria-hidden="true" /> {t('player.car')}
           </CarBadge>
         </TopBar>

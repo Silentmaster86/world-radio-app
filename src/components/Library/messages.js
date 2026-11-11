@@ -1,4 +1,5 @@
-const en = {
+import { translate } from '../../i18n';
+export const en = {
   title: 'Manage library',
   intro: 'Set your favorite order, remove added stations and share radio links.',
   favorites: 'Favorite order',
@@ -73,8 +74,9 @@ const pl = {
   saved: 'Stacja jest w Twojej bibliotece. Naciśnij Odtwórz, aby słuchać.',
 };
 export function libraryMessage(language, key, params = {}) {
-  return ((language === 'pl' ? pl : en)[key] || en[key] || key).replace(
-    /\{(\w+)\}/g,
-    (token, key) => String(params[key] ?? token),
-  );
+  return (
+    language === 'pl'
+      ? pl[key] || en[key] || key
+      : translate(language, `manage.${key}`, {}, en[key] || key)
+  ).replace(/\{(\w+)\}/g, (token, key) => String(params[key] ?? token));
 }

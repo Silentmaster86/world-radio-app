@@ -1,4 +1,7 @@
-const en = {
+import { translate } from '../../i18n';
+export const en = {
+  language:
+    'Could not load the imported language. Nothing was imported. Reconnect or import without settings.',
   title: 'Library backup',
   intro:
     'Save your added stations, favorites, recent stations and settings in a JSON file. The file stays on your device.',
@@ -29,6 +32,8 @@ const en = {
   unknown: 'The import failed. Try again.',
 };
 const pl = {
+  language:
+    'Nie udało się wczytać importowanego języka. Nic nie zaimportowano. Połącz się z internetem lub importuj bez ustawień.',
   title: 'Kopia biblioteki',
   intro:
     'Zapisz dodane stacje, ulubione, historię i ustawienia w pliku JSON. Plik pozostaje na Twoim urządzeniu.',
@@ -59,6 +64,9 @@ const pl = {
   unknown: 'Import nie powiódł się. Spróbuj ponownie.',
 };
 export function backupMessage(language, key, params = {}) {
-  const message = (language === 'pl' ? pl : en)[key] || en[key] || en.unknown;
+  const message =
+    language === 'pl'
+      ? pl[key] || en[key] || en.unknown
+      : translate(language, `backup.${key}`, {}, en[key] || en.unknown);
   return message.replace(/\{(\w+)\}/g, (token, key) => String(params[key] ?? token));
 }
