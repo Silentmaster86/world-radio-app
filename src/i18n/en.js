@@ -1,4 +1,8 @@
 export const en = {
+  'language.loading': 'Loading language…',
+  'language.failed':
+    'Could not load this language. Your current language and radio are unchanged. Reconnect or reopen the app, then try again.',
+  'language.session': 'Language changes apply to this session; the preference could not be saved.',
   'library.eyebrow': 'TUNE IN. FEEL AT HOME.',
   'nav.library': 'Manage library',
   'nav.loadError': 'This view could not load. Reconnect and try again.',

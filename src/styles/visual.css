@@ -716,12 +716,14 @@ body .library-page [data-confirm-remove] {
   color: var(--wra-danger);
 }
 body .now-playing-page {
+  grid-template-columns: minmax(0, 1fr);
   background:
     radial-gradient(ellipse at 50% 35%, hsl(var(--station-hue) 60% 50% / 0.18), transparent 65%),
     radial-gradient(ellipse at 5% 0%, var(--wra-atmosphere), transparent 65%),
     radial-gradient(ellipse at 100% 90%, var(--wra-horizon), transparent 65%), var(--wra-bg);
 }
 body .now-playing-card {
+  min-width: 0;
   border-color: var(--wra-line);
   border-radius: 28px;
   box-shadow: 0 24px 80px var(--wra-shadow);
@@ -1033,6 +1035,23 @@ body .now-playing-card {
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
+}
+.now-playing-card .car-topbar {
+  display: grid;
+  grid-template-columns: 44px auto minmax(0, 1fr);
+  gap: 0.5rem;
+}
+.car-topbar > button:first-child {
+  min-width: 44px;
+}
+.car-topbar .car-badge {
+  min-width: 0;
+  justify-self: end;
+  overflow-wrap: anywhere;
+  text-align: end;
+}
+.car-badge > svg {
+  flex-shrink: 0;
 }
 body a {
   color: var(--wra-accent);

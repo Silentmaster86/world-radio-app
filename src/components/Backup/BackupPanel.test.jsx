@@ -12,6 +12,7 @@ import { ThemeProviderToggle, useTheme } from '../../context/ThemeContext';
 import { normalizeDirectoryStation } from '../../lib/addedStations';
 import { createBackup, downloadBackup } from '../../lib/libraryBackup';
 import BackupPanel from './BackupPanel';
+import * as i18n from '../../i18n';
 
 jest.mock('../../lib/libraryBackup', () => ({
   ...jest.requireActual('../../lib/libraryBackup'),
@@ -78,6 +79,47 @@ beforeEach(() => {
   jest.spyOn(window, 'Audio').mockImplementation(() => new FakeAudio());
 });
 afterEach(() => jest.restoreAllMocks());
+test('failed language preflight writes no imported data and preserves live audio and timer', async () => {
+  const page = mount();
+  await act(async () => {
+    await api.audio.play();
+    api.audio.setSleepTimer(15);
+  });
+  const incoming = payload();
+  incoming.settings.language = 'de';
+  await choose(page, incoming);
+  page.click('[data-backup-settings]');
+  const before = { ...localStorage },
+    audio = window.Audio.mock.results[0].value,
+    source = audio.src,
+    deadline = api.audio.sleepTimerDeadline;
+  jest.spyOn(i18n, 'loadLanguage').mockRejectedValueOnce(Error('offline'));
+  await act(async () => page.container.querySelector('[data-backup-apply]').click());
+  expect(page.container.querySelector('[role="alert"]').textContent).toContain(
+    'Nothing was imported',
+  );
+  expect({ ...localStorage }).toEqual(before);
+  expect(audio.src).toBe(source);
+  expect(api.audio.status).toBe('playing');
+  expect(api.audio.sleepTimerDeadline).toBe(deadline);
+  expect(api.language.language).toBe('en');
+});
+test('cancelling while an imported language downloads prevents a late import', async () => {
+  const page = mount(),
+    request = deferred(),
+    incoming = payload();
+  incoming.settings.language = 'fr';
+  await choose(page, incoming);
+  page.click('[data-backup-settings]');
+  const before = { ...localStorage };
+  jest.spyOn(i18n, 'loadLanguage').mockReturnValueOnce(request.promise);
+  page.click('[data-backup-apply]');
+  expect(page.container.querySelector('[data-backup-apply]').disabled).toBe(true);
+  page.click('[data-backup-cancel]');
+  await act(async () => request.resolve());
+  expect({ ...localStorage }).toEqual(before);
+  expect(api.stations.stations.some((s) => s.id === added.id)).toBe(false);
+});
 test('file selection and cancellation have no import effects; download uses current state', async () => {
   const page = mount();
   await act(async () => {
