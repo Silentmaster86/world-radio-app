@@ -1,10 +1,27 @@
 # Radio studio visual design
 
-The application now uses a shared studio-inspired visual language: deep navy and
-iris in dark mode, pale neutral surfaces and deeper violet in light mode. Both
+The application now uses a shared studio-inspired visual language: midnight navy and
+aqua in dark mode, porcelain/indigo with a soft mint horizon in light mode.
+System appearance follows the OS and uses the corresponding complete palette. Both
 retain explicit contrast for text, focus and actionable controls. Station logos
 are unchanged; deterministic ID-derived hues decorate artwork/fallback initials
 without changing station identity, data or broadcaster metadata.
+
+## Atmosphere and color
+
+Static radial light pools and an original local SVG radio-wave field span the
+page behind content. Each theme has its own atmosphere, horizon and shadow
+values. The waveform is decorative, ignores pointer input, does not animate,
+and introduces no remote image/font request. Native CSS masks reuse the same
+small SVG in desktop artwork panels; mobile artwork remains compact. The SVG
+is emitted by Vite and cached with the offline shell. In forced-colors mode the
+decorative layers are hidden.
+
+Cards, the settings sheet and the mini player use opaque theme surfaces with
+subtle tinted depth, rather than placing controls directly over patterned
+backgrounds. Contrast, focus and touch sizes still take precedence over effects.
+Changing the OS scheme in System mode updates all theme variables without
+recreating Audio, clearing data or restarting a stream.
 
 ## Responsive surfaces
 
@@ -50,11 +67,12 @@ validate its MIME type, so this design also works offline. Browser static server
 serve the new CSS asset as `text/css`. The existing initial JS budget stays in
 place and counts all initial chunks.
 
-`node scripts/check-design.cjs` covers 24 combinations of PL/EN, light/dark,
+`node scripts/check-design.cjs` covers 36 combinations of PL/EN, light/dark/system,
 320/390/desktop and normal/reduced motion. It decodes an original MP3 fixture
 through real Audio, verifies active feedback, no idle animation loops, reduced
 motion, artwork sizing, and a single uninterrupted audio instance while changing
-language/theme and switching player views. Pause must unload the stream and stop
+language/theme and switching player views. In System mode, OS light/dark changes
+are also verified during uninterrupted playback. Pause must unload the stream and stop
 persistent motion. Screenshots are retained for both the library and car player.
 
 The unchanged UX assertions also check first-station visibility, touch targets,

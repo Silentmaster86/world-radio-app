@@ -12,12 +12,17 @@ export const GlobalStyle = createGlobalStyle`
     --wra-line: ${({ theme }) => theme.colors.line};
     --wra-border: ${({ theme }) => theme.colors.border};
     --wra-live: ${({ theme }) => theme.colors.secondary};
+    --wra-atmosphere: ${({ theme }) => theme.colors.atmosphere};
+    --wra-horizon: ${({ theme }) => theme.colors.horizon};
+    --wra-shadow: ${({ theme }) => theme.colors.shadow};
     --wra-danger: ${({ theme }) => theme.colors.danger};
   }
   *, *::before, *::after { box-sizing: border-box; }
   html { scroll-padding-bottom: calc(var(--radio-player-height, 0px) + 1rem); }
   body {
     margin: 0;
+    min-height: 100dvh;
+    isolation: isolate;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     line-height: 1.5;
     background: ${({ theme }) => theme.colors.background};

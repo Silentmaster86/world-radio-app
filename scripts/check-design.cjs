@@ -40,12 +40,12 @@ async function main() {
   let scenarios = 0;
   try {
     for (const language of ['en', 'pl'])
-      for (const mode of ['light', 'dark'])
+      for (const mode of ['light', 'dark', 'system'])
         for (const width of [320, 390, 1440])
           for (const motion of ['no-preference', 'reduce']) {
             const context = await createAppContext(browser, {
               viewport: { width, height: width === 320 ? 568 : 900 },
-              colorScheme: mode,
+              colorScheme: mode === 'system' ? 'dark' : mode,
               reducedMotion: motion,
             });
             await context.addInitScript(
@@ -92,12 +92,28 @@ async function main() {
             assert.equal(idle.art, width > 640 ? '96px' : '40px');
             assert.equal(
               idle.background,
-              mode === 'dark' ? 'rgb(11, 16, 32)' : 'rgb(245, 244, 250)',
+              mode === 'light' ? 'rgb(244, 245, 250)' : 'rgb(8, 15, 25)',
             );
             await page.locator('[data-station-id="capital-dance"]').click();
             await page.locator('[data-player-status="playing"]').first().waitFor();
             await page.waitForFunction(() => window.__designAudio[0].currentTime > 0.2);
             const source = await page.evaluate(() => window.__designAudio[0].src);
+            if (mode === 'system') {
+              for (const colorScheme of ['light', 'dark']) {
+                await page.emulateMedia({ colorScheme });
+                await page.waitForFunction(
+                  (scheme) => document.documentElement.style.colorScheme === scheme,
+                  colorScheme,
+                );
+                assert.equal(
+                  await page.evaluate(() => getComputedStyle(document.body).backgroundColor),
+                  colorScheme === 'light' ? 'rgb(244, 245, 250)' : 'rgb(8, 15, 25)',
+                );
+                assert.equal(await page.evaluate(() => window.__designAudio.length), 1);
+                assert.equal(await page.evaluate(() => window.__designAudio[0].src), source);
+                assert.equal(await page.evaluate(() => window.__designAudio[0].paused), false);
+              }
+            }
             assert.equal(await page.locator('.station-card[data-playing="true"]').count(), 1);
             const running = await page.evaluate(
               () =>
@@ -198,6 +214,7 @@ async function main() {
           reducedMotion: true,
           noIdleLoops: true,
           themeLanguageDuringPlayback: true,
+          systemThemeDuringPlayback: true,
           sharedAudioAcrossViews: true,
           pauseStopsMotion: true,
         }),

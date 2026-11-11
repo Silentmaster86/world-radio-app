@@ -32,13 +32,7 @@ const PageWrapper = styled.main`
   padding: 1rem;
   padding-bottom: 1rem;
 
-  background:
-    radial-gradient(
-      ellipse at top right,
-      color-mix(in srgb, ${({ theme }) => theme.colors.accent} 7%, transparent),
-      transparent 55%
-    ),
-    ${({ theme }) => theme.colors.background};
+  background: transparent;
 
   color: ${({ theme }) => theme.colors.text};
 

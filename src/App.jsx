@@ -24,7 +24,7 @@ import { RecentStationsProvider } from './context/RecentStationsContext';
 const AppWrapper = styled.div`
   min-height: 100dvh;
   padding-bottom: ${({ $car, $playerHeight }) => ($car ? '0' : `calc(${$playerHeight}px + 1.5rem)`)};
-  background: ${({ theme }) => theme.colors.background};
+  background: transparent;
   color: ${({ theme }) => theme.colors.text};
 `;
 function AppShell() {
