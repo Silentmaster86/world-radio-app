@@ -1,123 +1,11 @@
 import { Link } from 'react-router-dom';
 import ErrorBoundary from '../ErrorBoundary';
 import { lazy, Suspense, useEffect, useId, useRef, useState } from 'react';
-import styled from 'styled-components';
 import { FaGlobeEurope, FaSlidersH, FaArrowLeft, FaCompass } from 'react-icons/fa';
 import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { localizeStoredMessage } from '../../i18n';
 const BackupPanel = lazy(() => import('../Backup/BackupPanel'));
-const Header = styled.header`
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.75rem 0 1.25rem;
-  @media (max-width: 640px) {
-    padding: 0.5rem 0 0.75rem;
-  }
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
-`;
-const Brand = styled.h1`
-  display: flex;
-  flex: 1 1 180px;
-  align-items: center;
-  gap: 0.6rem;
-  overflow-wrap: anywhere;
-  span {
-    min-width: 0;
-  }
-  text-decoration: none;
-  color: inherit;
-  margin: 0;
-  min-width: 0;
-  font-size: clamp(1.1rem, 3vw, 1.5rem);
-  line-height: 1.2;
-  letter-spacing: -0.025em;
-  svg {
-    color: ${({ theme }) => theme.colors.accent};
-    flex-shrink: 0;
-  }
-`;
-const Actions = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-`;
-const Settings = styled.button`
-  display: inline-flex;
-  color: ${({ theme }) => theme.colors.text};
-  text-decoration: none;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  min-width: 44px;
-  min-height: 44px;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: 0.75rem;
-  background: ${({ theme }) => theme.colors.surface};
-  font-size: 0.875rem;
-  flex-shrink: 0;
-  @media (max-width: 640px) {
-    span {
-      display: none;
-    }
-  }
-`;
-const Dialog = styled.dialog`
-  position: fixed;
-  inset: 0;
-  margin: auto;
-  width: min(92vw, 420px);
-  max-height: 85dvh;
-  padding: 1.5rem;
-  overflow: auto;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: 1.25rem;
-  background: ${({ theme }) => theme.colors.surface};
-  color: ${({ theme }) => theme.colors.text};
-  &::backdrop {
-    background: #0009;
-    backdrop-filter: blur(4px);
-  }
-  &:not([open]) {
-    display: none;
-  }
-  h2 {
-    margin: 0 0 1.5rem;
-    font-size: 1.25rem;
-  }
-  label {
-    display: grid;
-    gap: 0.5rem;
-    margin: 1rem 0;
-    font-size: 0.875rem;
-  }
-  select {
-    width: 100%;
-    min-width: 0;
-    min-height: 44px;
-    padding: 0.65rem;
-    border: 1px solid ${({ theme }) => theme.colors.muted};
-    border-radius: 0.65rem;
-    background: ${({ theme }) => theme.colors.background};
-    color: inherit;
-  }
-  footer {
-    display: flex;
-    justify-content: end;
-    margin-top: 1.5rem;
-  }
-  button {
-    min-height: 44px;
-    padding: 0.5rem 1rem;
-    border-radius: 0.65rem;
-    background: ${({ theme }) => theme.colors.accent};
-    color: ${({ theme }) => theme.colors.onAccent};
-  }
-`;
 export default function HomeHeader({ headingAs = 'h1', back = false }) {
   const { mode, setThemeMode, storageMessage } = useTheme();
   const { language, setLanguage, t } = useLanguage();
@@ -140,25 +28,29 @@ export default function HomeHeader({ headingAs = 'h1', back = false }) {
     setBackupOpen(false);
     opener.current?.focus({ preventScroll: true });
   };
+  const Brand = back ? Link : headingAs;
   return (
-    <Header>
-      <Brand as={back ? Link : headingAs} to={back ? '/' : undefined}>
-        {back ? <FaArrowLeft aria-hidden="true" /> : <FaGlobeEurope aria-hidden="true" />}
+    <header className="app-header">
+      <Brand className="app-brand" to={back ? '/' : undefined}>
+        <span className="brand-mark" aria-hidden="true">
+          {back ? <FaArrowLeft /> : <FaGlobeEurope />}
+        </span>
         <span>{back ? t('discover.back') : 'World Radio App'}</span>
       </Brand>
-      <Actions>
+      <div className="header-actions">
         {!back && (
-          <Settings
-            as={Link}
+          <Link
+            className="header-action"
             to="/discover"
             aria-label={t('discover.title')}
             title={t('discover.open')}
           >
             <FaCompass aria-hidden="true" />
-            <span>{t('discover.open')}</span>
-          </Settings>
+            <span className="action-label">{t('discover.open')}</span>
+          </Link>
         )}
-        <Settings
+        <button
+          className="header-action"
           id="open-settings"
           data-settings
           ref={opener}
@@ -168,10 +60,11 @@ export default function HomeHeader({ headingAs = 'h1', back = false }) {
           onClick={() => setOpen(true)}
         >
           <FaSlidersH aria-hidden="true" />
-          <span>{t('settings.title')}</span>
-        </Settings>
-      </Actions>
-      <Dialog
+          <span className="action-label">{t('settings.title')}</span>
+        </button>
+      </div>
+      <dialog
+        className="settings-dialog"
         ref={dialog}
         aria-labelledby={title}
         onKeyDown={(event) => {
@@ -212,9 +105,9 @@ export default function HomeHeader({ headingAs = 'h1', back = false }) {
           </select>
         </label>
         {storageMessage && <p role="status">{localizeStoredMessage(t, storageMessage)}</p>}
-        <Settings as={Link} to="/library" onClick={close} data-open-library>
+        <Link className="dialog-link" to="/library" onClick={close} data-open-library>
           {t('nav.library')}
-        </Settings>
+        </Link>
         <button type="button" data-open-backup onClick={() => setBackupOpen(true)}>
           {t('settings.backup')}
         </button>
@@ -236,7 +129,7 @@ export default function HomeHeader({ headingAs = 'h1', back = false }) {
             {t('settings.done')}
           </button>
         </footer>
-      </Dialog>
-    </Header>
+      </dialog>
+    </header>
   );
 }

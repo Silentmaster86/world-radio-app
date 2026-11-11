@@ -8,6 +8,8 @@ import PlayerStatus from '../components/Player/PlayerStatus';
 import PlayerControls from '../components/Player/PlayerControls';
 import SleepTimer from '../components/Player/SleepTimer';
 import StationLogo from '../components/StationLogo';
+import { stationHue } from '../lib/stationVisuals';
+import SignalBars from '../components/Player/SignalBars';
 import { useLanguage } from '../context/LanguageContext';
 
 const Wrapper = styled.main`
@@ -112,7 +114,7 @@ const Description = styled.p`
 `;
 export default function NowPlaying() {
   const { returnToStations } = usePlayerNavigation();
-  const { currentStation } = useAudio();
+  const { currentStation, status } = useAudio();
   const { t } = useLanguage();
   const heading = useRef(null);
   useLayoutEffect(() => {
@@ -120,8 +122,12 @@ export default function NowPlaying() {
     window.scrollTo(0, 0);
   }, []);
   return (
-    <Wrapper>
-      <PlayerCard aria-label={t('player.carLabel')}>
+    <Wrapper
+      className="now-playing-page"
+      data-state={status}
+      style={{ '--station-hue': stationHue(currentStation.id) }}
+    >
+      <PlayerCard className="now-playing-card" aria-label={t('player.carLabel')}>
         <TopBar>
           <HomeButton type="button" onClick={returnToStations} aria-label={t('player.back')}>
             <FaHome aria-hidden="true" />
@@ -131,7 +137,7 @@ export default function NowPlaying() {
             <FaCarSide aria-hidden="true" /> {t('player.car')}
           </CarBadge>
         </TopBar>
-        <LogoWrapper>
+        <LogoWrapper className="now-playing-artwork">
           <StationLogo station={currentStation} size={168} loading="eager" />
         </LogoWrapper>
         <Details>
@@ -151,7 +157,10 @@ export default function NowPlaying() {
             </span>{' '}
             · {currentStation.genres.map((genre) => t(`genre.${genre}`, {}, genre)).join(', ')}
           </p>
-          <PlayerStatus />
+          <div className="car-playback-status">
+            <SignalBars playing={status === 'playing'} />
+            <PlayerStatus />
+          </div>
         </Details>
         <div data-area="controls">
           <PlayerControls variant="car" />

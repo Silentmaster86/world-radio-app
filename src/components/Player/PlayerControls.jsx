@@ -134,6 +134,7 @@ export default function PlayerControls({
 
   return (
     <Controls
+      className="wra-player-controls"
       $compact={compact}
       $car={variant === 'car'}
       role="group"
@@ -151,6 +152,7 @@ export default function PlayerControls({
       </HideOnMobile>
 
       <PlayButton
+        className="main-play-control"
         $main
         $compact={compact}
         $car={variant === 'car'}

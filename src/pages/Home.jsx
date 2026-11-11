@@ -18,21 +18,6 @@ import useStationFilters from '../hooks/useStationFilters';
 import { useLanguage } from '../context/LanguageContext';
 import { localizeStoredMessage } from '../i18n';
 
-const LibraryIntro = styled.div`
-  margin: 1.5rem 0 0;
-  h2 {
-    font-size: 1.5rem;
-    margin: 0 0 0.25rem;
-    letter-spacing: -0.03em;
-  }
-  p {
-    margin: 0;
-    color: ${({ theme }) => theme.colors.muted};
-  }
-  @media (max-width: 640px) {
-    display: none;
-  }
-`;
 const DiscoveryLink = styled(Link)`
   display: inline-flex;
   align-items: center;
@@ -40,7 +25,7 @@ const DiscoveryLink = styled(Link)`
 `;
 const PageWrapper = styled.main`
   width: 100%;
-  max-width: 1200px;
+  max-width: 1240px;
   margin: auto;
   min-height: auto;
 
@@ -66,7 +51,7 @@ const PageWrapper = styled.main`
 const StationGrid = styled.section`
   display: grid;
   gap: 0.75rem;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
 
   @media (max-width: 640px) {
     grid-template-columns: 1fr;
@@ -132,12 +117,27 @@ export default function Home() {
         : stations.length;
 
   return (
-    <PageWrapper>
+    <PageWrapper className="home-page">
       <HomeHeader />
-      <LibraryIntro>
-        <h2>{t('library.title')}</h2>
-        <p>{t('library.description')}</p>
-      </LibraryIntro>
+      <section className="library-hero" data-playing={status === 'playing'}>
+        <div>
+          <p className="hero-eyebrow">{t('library.eyebrow')}</p>
+          <h2>{t('library.title')}</h2>
+          <p>{t('library.description')}</p>
+        </div>
+        <div className="hero-visual" aria-hidden="true">
+          <div className="hero-orbit">
+            <i />
+            <i />
+            <i />
+          </div>
+          <div className="hero-globe">
+            <span />
+            <span />
+            <span />
+          </div>
+        </div>
+      </section>
 
       <StationControls
         {...browsing}
@@ -177,7 +177,7 @@ export default function Home() {
           onBrowse={browsing.resetFilters}
         />
       )}
-      <StationGrid aria-label="Stations">
+      <StationGrid className="station-grid" aria-label="Stations">
         {visibleStations.map((station) => (
           <StationCard
             key={station.id}
