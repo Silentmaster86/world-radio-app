@@ -212,6 +212,9 @@ export default function HomeHeader({ headingAs = 'h1', back = false }) {
           </select>
         </label>
         {storageMessage && <p role="status">{localizeStoredMessage(t, storageMessage)}</p>}
+        <Settings as={Link} to="/library" onClick={close} data-open-library>
+          {t('nav.library')}
+        </Settings>
         <button type="button" data-open-backup onClick={() => setBackupOpen(true)}>
           {t('settings.backup')}
         </button>

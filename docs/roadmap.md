@@ -38,14 +38,14 @@ production. They are improvements, not a list of confirmed defects.
 1. **HLS playback (shipped in PR #25).** Enable compatible HTTPS HLS stations,
    including verified BBC Radio 1 sources, using the shared player. Keep existing
    favorites, history and Sleep Timer. See [hls.md](hls.md).
-2. **Personal data backup (current branch).** Versioned JSON export/import of added stations,
+2. **Personal data backup (shipped in PR #26).** Versioned JSON export/import of added stations,
    favorites, history and preferences. Validate files, preview and combine data
    with stable ID/URL deduplication; preserve the live player and Sleep Timer.
    Settings import is opt-in; no replacement mode or required account.
    See [library-backup.md](library-backup.md).
-3. **Library management and sharing.** Reorder favorites, remove added stations
-   with safe handling of current playback/history, and add station sharing/direct
-   links with clear behavior when a recipient has not saved that station.
+3. **Library management and sharing (current branch).** Reorder favorites, remove
+   added stations safely, and share direct links with a recipient preview/add flow.
+   See [library-management.md](library-management.md).
 4. **Visual redesign and richer animation.** A coherent visual direction for the
    library, discovery, player and settings; stronger artwork, typography and
    hierarchy. Add purposeful transitions, playback feedback and loading states.

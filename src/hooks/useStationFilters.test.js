@@ -94,3 +94,12 @@ test('Polish search matches translated genre and description without changing st
     ),
   ).toEqual(['deutschlandfunk-kultur']);
 });
+
+test('favorites follow saved order while preserving all refinement filters', () => {
+  expect(
+    ids({ section: 'favorites' }, ['heart-uk', 'missing', 'capital-dance', 'heart-uk']),
+  ).toEqual(['heart-uk', 'capital-dance']);
+  expect(
+    ids({ section: 'favorites', q: 'capital' }, ['heart-uk', 'capital-fm', 'capital-dance']),
+  ).toEqual(['capital-fm', 'capital-dance']);
+});

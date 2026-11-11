@@ -4,11 +4,14 @@ import { render } from '../test/render';
 import { FAVORITES_KEY } from '../lib/favoritesStorage';
 
 function Harness() {
-  const { favoriteIds, toggleFavorite, storageMessage } = useFavorites();
+  const { favoriteIds, toggleFavorite, moveFavorite, storageMessage } = useFavorites();
   return (
     <>
       <output>{JSON.stringify(favoriteIds)}</output>
       <p role="status">{storageMessage}</p>
+      <button id="move-second-up" onClick={() => moveFavorite('heart-uk', -1)}>
+        Move
+      </button>
       <button id="first" onClick={() => toggleFavorite('capital-dance')}>
         First
       </button>
@@ -131,4 +134,32 @@ test('does not delete a later legacy backup after the one-time migration', () =>
   localStorage.setItem('favorites', laterBackup);
   page.click('#second');
   expect(localStorage.getItem('favorites')).toBe(laterBackup);
+});
+
+test('reordering favorites persists and preserves temporarily absent IDs', () => {
+  localStorage.setItem(
+    FAVORITES_KEY,
+    JSON.stringify({ version: 1, stationIds: ['capital-dance', 'missing', 'heart-uk'] }),
+  );
+  const page = mount();
+  page.click('#move-second-up');
+  expect(JSON.parse(localStorage.getItem(FAVORITES_KEY)).stationIds).toEqual([
+    'heart-uk',
+    'missing',
+    'capital-dance',
+  ]);
+  page.unmount();
+  expect(mount().container.querySelector('output').textContent).toBe(
+    '["heart-uk","missing","capital-dance"]',
+  );
+});
+test('future favorite schemas remain intact when session favorites are reordered', () => {
+  const raw = '{"version":8,"preserve":true}';
+  localStorage.setItem(FAVORITES_KEY, raw);
+  const page = mount();
+  page.click('#first');
+  page.click('#second');
+  page.click('#move-second-up');
+  expect(page.container.querySelector('output').textContent).toBe('["heart-uk","capital-dance"]');
+  expect(localStorage.getItem(FAVORITES_KEY)).toBe(raw);
 });

@@ -367,6 +367,11 @@ export function createAudioPlayer({
     play,
     pause,
     selectStation,
+    forgetStation(id) {
+      if (disposed || state.selectedStationId !== id) return;
+      pause();
+      publish({ selectedStationId: stations.find((s) => s.id !== id)?.id || null, status: 'idle' });
+    },
     togglePlay: () => (state.wantsToPlay ? pause() : play()),
     nextStation: () => step(1),
     prevStation: () => step(-1),

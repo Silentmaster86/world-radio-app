@@ -74,7 +74,10 @@ self.addEventListener('fetch', (event) => {
   if (request.mode === 'navigate') {
     event.respondWith(
       (async () => {
-        if (['/', '/now-playing', '/discover'].includes(url.pathname)) {
+        if (
+          ['/', '/now-playing', '/discover', '/library'].includes(url.pathname) ||
+          /^\/station\/[a-z0-9-]{1,128}$/.test(url.pathname)
+        ) {
           // Keep HTML and hashed assets from one installed release together.
           const shell = await saved('/index.html');
           if (shell) return shell;

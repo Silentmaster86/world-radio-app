@@ -1,4 +1,6 @@
 export const pl = {
+  'nav.library': 'Zarządzaj biblioteką',
+  'nav.loadError': 'Nie udało się wczytać widoku. Połącz się z internetem i spróbuj ponownie.',
   'settings.backupError':
     'Nie udało się wczytać kopii biblioteki. Połącz się z internetem i odśwież aplikację, aby spróbować ponownie.',
   'settings.backup': 'Kopia biblioteki',

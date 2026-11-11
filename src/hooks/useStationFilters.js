@@ -47,8 +47,10 @@ export function filterStations(
   const terms = query.split(' ').filter(Boolean);
   const byId = new Map(stations.map((station) => [station.id, station]));
   const collection =
-    section === 'recent'
-      ? [...new Set(recentIds)].map((id) => byId.get(id)).filter(Boolean)
+    section === 'recent' || section === 'favorites'
+      ? [...new Set(section === 'recent' ? recentIds : favoriteIds)]
+          .map((id) => byId.get(id))
+          .filter(Boolean)
       : stations;
   return collection.filter(
     (station) =>

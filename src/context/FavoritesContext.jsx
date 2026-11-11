@@ -32,6 +32,21 @@ export const FavoritesProvider = ({ children }) => {
     <FavoritesContext.Provider
       value={{
         favoriteIds,
+        moveFavorite: (id, offset) => {
+          if (offset !== -1 && offset !== 1) return;
+          setFavoriteIds((previous) => {
+            const visible = previous.filter((key) => stations.some((s) => s.id === key));
+            const from = visible.indexOf(id),
+              to = from + offset;
+            if (from < 0 || to < 0 || to >= visible.length) return previous;
+            const next = previous.slice(),
+              a = next.indexOf(id),
+              b = next.indexOf(visible[to]);
+            [next[a], next[b]] = [next[b], next[a]];
+            return next;
+          });
+          setDirty(true);
+        },
         restoreFavorites: (ids) => {
           setFavoriteIds(ids);
           setDirty(false);
