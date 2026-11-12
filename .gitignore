@@ -9,3 +9,15 @@ test-results/
 !.env.example
 *.log
 .DS_Store
+
+# Android build output and signing material
+android/.gradle/
+android/.local/
+android/artifacts/
+android/local.properties
+android/**/build/
+*.apk
+*.aab
+*.keystore
+*.jks
+signing.properties
