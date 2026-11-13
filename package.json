@@ -15,17 +15,20 @@
     "format:check": "prettier --check .",
     "check:bundle": "node scripts/check-bundle.cjs",
     "check:security": "npm audit --omit=dev --audit-level=high",
-    "check": "npm run lint && npm run format:check && npm test && npm run test:directory && npm run test:streams && npm run test:pwa && npm run build && npm run test:build && npm run check:bundle",
+    "check": "npm run lint && npm run format:check && npm test && npm run test:android && npm run test:directory && npm run test:streams && npm run test:pwa && npm run build && npm run test:build && npm run check:bundle",
     "check:streams": "node scripts/check-streams.cjs",
     "test:streams": "node --test scripts/check-streams.test.cjs",
-    "test:directory": "node --test scripts/radio-directory.test.cjs"
+    "test:directory": "node --test scripts/radio-directory.test.cjs",
+    "android:build": "node scripts/android-preview.cjs build",
+    "android:assetlinks": "node scripts/android-preview.cjs assetlinks",
+    "test:android": "node scripts/android-preview.test.cjs"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Silentmaster86/world-radio-app.git"
   },
   "keywords": [],
-  "author": "Przemysław Pietkun",
+  "author": "Przemys\u0142aw Pietkun",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Silentmaster86/world-radio-app/issues"

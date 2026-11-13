@@ -146,6 +146,12 @@ docs/               Product behavior, technical notes and device observations
 - [Installation, offline access and updates](docs/pwa.md)
 - [Development workflow](docs/tooling.md) · [Contributor rules](AGENTS.md)
 
+## Android preview
+
+A separate [Android TWA preview](android/README.md) builds an installable test
+APK in GitHub Actions. It has a dedicated preview package and disposable signing;
+domain verification and Play Store release setup remain separate steps.
+
 ## Author and license
 
 Created by **[Przemysław Pietkun](https://github.com/Silentmaster86)**.

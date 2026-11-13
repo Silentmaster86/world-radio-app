@@ -1,0 +1,72 @@
+name: Android preview
+
+on:
+  pull_request:
+    paths:
+      - 'android/**'
+      - 'scripts/android-preview*'
+      - 'public/manifest.json'
+      - 'public/icons/**'
+      - '.github/workflows/android-preview.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'android/**'
+      - 'scripts/android-preview*'
+      - 'public/manifest.json'
+      - 'public/icons/**'
+      - '.github/workflows/android-preview.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-preview-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android-preview:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+          cache-dependency-path: |
+            android/**/*.gradle
+            android/gradle.properties
+            android/gradle/wrapper/gradle-wrapper.properties
+      - uses: android-actions/setup-android@v4
+        with:
+          cmdline-tools-version: '13114758'
+          packages: 'platform-tools platforms;android-36 build-tools;36.0.0'
+          log-accepted-android-sdk-licenses: 'false'
+      - name: Check preview identity and certificate handling
+        run: npm run test:android
+      - name: Build and inspect the signed preview APK and unsigned bundle
+        run: npm run android:build
+        env:
+          ANDROID_USER_HOME: ${{ runner.temp }}/world-radio-android-user
+      - uses: actions/upload-artifact@v7
+        with:
+          name: world-radio-android-preview
+          if-no-files-found: error
+          retention-days: 14
+          path: |
+            android/artifacts/WorldRadioPreview.apk
+            android/artifacts/WorldRadioPreview-unsigned.aab
+            android/artifacts/build-info.json
+            android/artifacts/SHA256SUMS
+            android/artifacts/assetlinks-preview.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: android-lint-results
+          path: android/app/build/reports/lint-results-*
