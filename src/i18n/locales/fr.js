@@ -8,11 +8,11 @@ export default {
   'backup.transfer1':
     'Sur l’ancien appareil : Réglages → Sauvegarde → Enregistrer une sauvegarde. Le fichier se trouve généralement dans Téléchargements.',
   'backup.transfer2':
-    'Envoie-toi le fichier par e-mail, stockage cloud ou Bluetooth. Garde-le comme fichier ; inutile de l’ouvrir ou de le modifier.',
+    'Envoie-toi le fichier par e-mail, stockage cloud ou Bluetooth. Télécharge-le ensuite sur le nouvel appareil. Inutile de l’ouvrir ou de le modifier.',
   'backup.transfer3':
     'Sur le nouvel appareil, ouvre World Radio App dans le navigateur prévu. Va dans Réglages → Sauvegarde et choisis le fichier enregistré.',
   'backup.transfer4':
-    'Vérifie l’aperçu puis sélectionne Ajouter depuis la sauvegarde. Les stations et favoris existants sont conservés. Coche les réglages seulement pour copier aussi langue, apparence et volume.',
+    'Vérifie l’aperçu. Pour copier aussi langue, apparence et volume, coche d’abord les réglages. Sélectionne ensuite Ajouter depuis la sauvegarde. Les stations et favoris existants sont conservés.',
   'backup.contentsQ': 'Que contient une sauvegarde ?',
   'backup.contentsA':
     'Les stations ajoutées, favoris et leur ordre, historique, langue, apparence et volume. Elle contient des données de stations, pas d’enregistrements audio. L’animation du fond reste propre à chaque appareil.',

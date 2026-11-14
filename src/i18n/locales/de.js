@@ -8,11 +8,11 @@ export default {
   'backup.transfer1':
     'Auf dem alten Gerät: Einstellungen → Sicherung → Sicherung speichern. Die Datei liegt meist im Download-Ordner.',
   'backup.transfer2':
-    'Sende dir die Datei per E-Mail, Cloudspeicher oder Bluetooth. Behalte sie als Datei; du musst sie nicht öffnen oder bearbeiten.',
+    'Sende dir die Datei per E-Mail, Cloudspeicher oder Bluetooth. Lade sie dann auf dem neuen Gerät herunter. Du musst sie nicht öffnen oder bearbeiten.',
   'backup.transfer3':
     'Öffne World Radio App auf dem neuen Gerät im gewünschten Browser. Gehe zu Einstellungen → Sicherung und wähle die gespeicherte Datei.',
   'backup.transfer4':
-    'Prüfe die Vorschau und wähle Aus Sicherung hinzufügen. Vorhandene Sender und Favoriten bleiben erhalten. Aktiviere die Einstellungsoption nur, um auch Sprache, Darstellung und Lautstärke zu übernehmen.',
+    'Prüfe die Vorschau. Um auch Sprache, Darstellung und Lautstärke zu übernehmen, aktiviere zuerst die Einstellungsoption. Wähle dann Aus Sicherung hinzufügen. Vorhandene Sender und Favoriten bleiben erhalten.',
   'backup.contentsQ': 'Was enthält eine Sicherung?',
   'backup.contentsA':
     'Hinzugefügte Sender, Favoriten und ihre Reihenfolge, Verlauf, Sprache, Darstellung und Lautstärke. Enthalten sind Senderdaten, keine Tonaufnahmen. Die Hintergrundanimation wird pro Gerät eingestellt.',

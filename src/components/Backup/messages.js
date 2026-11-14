@@ -34,11 +34,11 @@ export const en = {
   transfer1:
     'On the old device: Settings → Backup → Save backup. The file is usually saved in Downloads.',
   transfer2:
-    'Send that file to yourself by email, cloud storage or Bluetooth. Keep it as a file; you do not need to open or edit it.',
+    'Send the file to yourself by email, cloud storage or Bluetooth. Then download it on the new device. You do not need to open or edit it.',
   transfer3:
     'On the new device, open World Radio App in the browser you will use. Go to Settings → Backup and choose the saved file.',
   transfer4:
-    'Review the preview and select Add from backup. Existing stations and favorites stay. Tick the settings option only to also copy language, appearance and volume.',
+    'Review the preview. To also copy language, appearance and volume, tick the settings option first. Then select Add from backup. Existing stations and favorites stay.',
   contentsQ: 'What does a backup contain?',
   contentsA:
     'Added stations, favorites and their order, recent stations, language, appearance and volume. It contains station information, not audio recordings. The background-animation preference stays on each device.',
@@ -85,11 +85,11 @@ const pl = {
   transfer1:
     'Na starym urządzeniu: Ustawienia → Kopia zapasowa → Zapisz kopię zapasową. Plik zwykle trafia do folderu Pobrane.',
   transfer2:
-    'Prześlij ten plik sobie e-mailem, przez dysk w chmurze lub Bluetooth. Zachowaj go jako plik — nie musisz go otwierać ani edytować.',
+    'Prześlij plik sobie e-mailem, przez dysk w chmurze lub Bluetooth. Następnie pobierz go na nowym urządzeniu. Nie musisz go otwierać ani edytować.',
   transfer3:
     'Na nowym urządzeniu otwórz World Radio App w przeglądarce, której będziesz używać. Wejdź w Ustawienia → Kopia zapasowa i wybierz zapisany plik.',
   transfer4:
-    'Sprawdź podgląd i wybierz Dodaj z kopii. Obecne stacje i ulubione zostają. Opcję ustawień zaznacz tylko wtedy, gdy chcesz też przenieść język, wygląd i głośność.',
+    'Sprawdź podgląd. Jeśli chcesz też przenieść język, wygląd i głośność, najpierw zaznacz opcję ustawień. Następnie wybierz Dodaj z kopii. Obecne stacje i ulubione zostają.',
   contentsQ: 'Co zawiera kopia zapasowa?',
   contentsA:
     'Dodane stacje, ulubione i ich kolejność, historię, język, wygląd i głośność. Zawiera informacje o stacjach, a nie nagrania dźwięku. Preferencja animacji tła pozostaje osobna na każdym urządzeniu.',
