@@ -17,6 +17,7 @@ import {
 } from '../../lib/libraryBackup';
 import { backupMessage } from './messages';
 import { hasLanguage, loadLanguage } from '../../i18n';
+import BackupHelp from './BackupHelp';
 
 const Panel = styled.section`
   margin-top: 1.25rem;
@@ -247,6 +248,7 @@ export default function BackupPanel() {
           {t(message)}
         </p>
       )}
+      <BackupHelp />
     </Panel>
   );
 }

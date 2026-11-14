@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef } from 'react';
-import { FaCarSide } from 'react-icons/fa';
+import { FaHeadphones } from 'react-icons/fa';
 import { useAudio } from '../../context/AudioContext';
 import { usePlayerNavigation } from '../../context/BrowsingContext';
 import PlayerControls from '../Player/PlayerControls';
@@ -61,7 +61,7 @@ export default function SoundBar({ onHeightChange }) {
           onClick={openPlayer}
           aria-label={t('player.openCar')}
         >
-          <FaCarSide aria-hidden="true" />
+          <FaHeadphones aria-hidden="true" />
         </button>
         <InstallApp />
         <div className="soundbar-status">

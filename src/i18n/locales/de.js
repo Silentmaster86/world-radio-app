@@ -1,4 +1,28 @@
 export default {
+  'settings.help': 'Hilfe & FAQ',
+  'settings.motion': 'Hintergrund animieren',
+  'settings.motionHint':
+    'Du kannst die Wellen anhalten. Reduzierte Bewegung des Systems hat Vorrang.',
+  'backup.faqTitle': 'Hilfe und Bibliothek übertragen',
+  'backup.transferQ': 'Wie übertrage ich meine Sender auf ein anderes Gerät?',
+  'backup.transfer1':
+    'Auf dem alten Gerät: Einstellungen → Sicherung → Sicherung speichern. Die Datei liegt meist im Download-Ordner.',
+  'backup.transfer2':
+    'Sende dir die Datei per E-Mail, Cloudspeicher oder Bluetooth. Lade sie dann auf dem neuen Gerät herunter. Du musst sie nicht öffnen oder bearbeiten.',
+  'backup.transfer3':
+    'Öffne World Radio App auf dem neuen Gerät im gewünschten Browser. Gehe zu Einstellungen → Sicherung und wähle die gespeicherte Datei.',
+  'backup.transfer4':
+    'Prüfe die Vorschau. Um auch Sprache, Darstellung und Lautstärke zu übernehmen, aktiviere zuerst die Einstellungsoption. Wähle dann Aus Sicherung hinzufügen. Vorhandene Sender und Favoriten bleiben erhalten.',
+  'backup.contentsQ': 'Was enthält eine Sicherung?',
+  'backup.contentsA':
+    'Hinzugefügte Sender, Favoriten und ihre Reihenfolge, Verlauf, Sprache, Darstellung und Lautstärke. Enthalten sind Senderdaten, keine Tonaufnahmen. Die Hintergrundanimation wird pro Gerät eingestellt.',
+  'backup.recoveryQ': 'Kann ich meine Bibliothek ohne Sicherung wiederherstellen?',
+  'backup.recoveryA':
+    'Die Bibliothek ist in diesem Browser gespeichert. Es gibt kein Konto und keine automatische Synchronisierung. Beim Löschen der Websitedaten oder Browserwechsel kann der Zugriff verloren gehen. Sichere sie vor einem Gerätewechsel.',
+  'backup.offlineQ': 'Kann ich ohne Internet hören?',
+  'backup.offlineA':
+    'Radio benötigt Internet. Nach Vorbereitung der Offline-Dateien lassen sich gespeicherte Bibliothek und Oberfläche ohne Netz öffnen.',
+
   'backup.language':
     'Die importierte Sprache konnte nicht geladen werden. Es wurde nichts importiert. Stelle die Verbindung wieder her oder importiere ohne Einstellungen.',
   'language.loading': 'Sprache wird geladen…',
@@ -12,7 +36,7 @@ export default {
     'Diese Ansicht konnte nicht geladen werden. Stelle die Verbindung wieder her und versuche es erneut.',
   'settings.backupError':
     'Die Sicherung konnte nicht geladen werden. Stelle die Verbindung wieder her und lade die App neu.',
-  'settings.backup': 'Bibliothek sichern',
+  'settings.backup': 'Sicherung',
   'settings.loading': 'Wird geladen…',
   'discover.unavailableLabel': 'Dieser Stream kann nicht hinzugefügt werden',
   'discover.unsupportedShort': 'Stream nicht unterstützt',
@@ -95,9 +119,9 @@ export default {
   'station.addFavorite': '{station} zu Favoriten hinzufügen',
   'player.radio': 'Radio-Player',
   'player.selected': 'Ausgewählter Sender',
-  'player.openCar': 'Automodus öffnen',
-  'player.car': 'Automodus',
-  'player.carLabel': 'Player im Automodus',
+  'player.openCar': 'Studio öffnen',
+  'player.car': 'Studio',
+  'player.carLabel': 'Studio-Player',
   'player.back': 'Zurück zu den Sendern',
   'player.playback': 'Wiedergabesteuerung',
   'player.previous': 'Vorheriger Sender',
@@ -211,10 +235,10 @@ export default {
   'storage.playerNewer':
     'Player-Einstellungen verwenden ein neueres Format. Die ursprünglichen Daten bleiben erhalten.',
   'storage.playerRecovery': 'Gespeicherte Player-Einstellungen konnten nicht gelesen werden.',
-  'backup.title': 'Bibliothek sichern',
+  'backup.title': 'Sicherung',
   'backup.intro':
-    'Speichere hinzugefügte Sender, Favoriten, Verlauf und Einstellungen in einer JSON-Datei. Die Datei bleibt auf deinem Gerät.',
-  'backup.export': 'Sicherung herunterladen',
+    'Speichere Sender, Favoriten und Einstellungen. Stelle deine Sammlung später wieder her oder übertrage sie auf ein anderes Gerät.',
+  'backup.export': 'Sicherung speichern',
   'backup.file': 'Sicherungsdatei auswählen',
   'backup.reading': 'Sicherung wird gelesen…',
   'backup.preview': 'Importvorschau',
@@ -224,7 +248,7 @@ export default {
   'backup.settings': 'Auch Sprache, Darstellung und Lautstärke importieren',
   'backup.settingsHint':
     'Dies kann die Sprache und Lautstärke ändern. Der aktuelle Sender bleibt ausgewählt.',
-  'backup.apply': 'Importieren und zusammenführen',
+  'backup.apply': 'Aus Sicherung hinzufügen',
   'backup.cancel': 'Vorschau abbrechen',
   'backup.success': 'Sicherung importiert. Deine Bibliothek ist aktuell.',
   'backup.exported':

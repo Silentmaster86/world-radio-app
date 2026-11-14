@@ -75,7 +75,7 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       (async () => {
         if (
-          ['/', '/now-playing', '/discover', '/library'].includes(url.pathname) ||
+          ['/', '/now-playing', '/discover', '/library', '/help'].includes(url.pathname) ||
           /^\/station\/[a-z0-9-]{1,128}$/.test(url.pathname)
         ) {
           // Keep HTML and hashed assets from one installed release together.

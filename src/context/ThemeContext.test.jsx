@@ -2,12 +2,19 @@ import { act } from 'react';
 import { ThemeProviderToggle, THEME_KEY, useTheme } from './ThemeContext';
 import { render } from '../test/render';
 function View() {
-  const { mode, setThemeMode, theme, storageMessage } = useTheme();
+  const { mode, setThemeMode, theme, backgroundMotion, setBackgroundMotion, storageMessage } =
+    useTheme();
   return (
     <>
       <output data-mode={mode}>{theme.colors.mode}</output>
       <button onClick={() => setThemeMode('light')}>Light</button>
       <button onClick={() => setThemeMode('system')}>System</button>
+      <input
+        type="checkbox"
+        aria-label="Background motion"
+        checked={backgroundMotion}
+        onChange={(event) => setBackgroundMotion(event.target.checked)}
+      />
       <p>{storageMessage}</p>
     </>
   );
@@ -44,7 +51,11 @@ test('system appearance follows OS changes, explicit mode detaches the listener 
   expect(page.container.querySelector('output').textContent).toBe('light');
   page.click('button');
   expect(listeners.size).toBe(0);
-  expect(JSON.parse(localStorage.getItem(THEME_KEY))).toEqual({ version: 1, mode: 'light' });
+  expect(JSON.parse(localStorage.getItem(THEME_KEY))).toEqual({
+    version: 1,
+    mode: 'light',
+    backgroundMotion: true,
+  });
   page.unmount();
   query.matches = true;
   page = mount();
@@ -75,4 +86,26 @@ test('invalid preferences fall back and newer schemas are never overwritten', ()
   page.click('button');
   expect(page.container.querySelector('output').textContent).toBe('light');
   expect(localStorage.getItem(THEME_KEY)).toBe(future);
+});
+test('background choice survives theme changes and reload without changing old appearance schemas', () => {
+  localStorage.setItem(
+    THEME_KEY,
+    JSON.stringify({ version: 1, mode: 'dark', backgroundMotion: false }),
+  );
+  let page = mount();
+  expect(page.container.querySelector('input').checked).toBe(false);
+  expect(document.documentElement.dataset.ambientMotion).toBe('off');
+  page.click('button');
+  expect(JSON.parse(localStorage.getItem(THEME_KEY))).toEqual({
+    version: 1,
+    mode: 'light',
+    backgroundMotion: false,
+  });
+  page.unmount();
+  page = mount();
+  expect(page.container.querySelector('input').checked).toBe(false);
+  page.click('input');
+  expect(document.documentElement.dataset.ambientMotion).toBe('on');
+  page.unmount();
+  expect(JSON.parse(localStorage.getItem(THEME_KEY)).backgroundMotion).toBe(true);
 });

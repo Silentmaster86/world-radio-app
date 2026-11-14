@@ -9,13 +9,13 @@ without changing station identity, data or broadcaster metadata.
 
 ## Atmosphere and color
 
-Static radial light pools and an original local SVG radio-wave field span the
-page behind content. Each theme has its own atmosphere, horizon and shadow
-values. The waveform is decorative, ignores pointer input, does not animate,
-and introduces no remote image/font request. Native CSS masks reuse the same
-small SVG in desktop artwork panels; mobile artwork remains compact. The SVG
-is emitted by Vite and cached with the offline shell. In forced-colors mode the
-decorative layers are hidden.
+Radial light pools and two gently moving local SVG wave layers span the page
+behind content. Each theme has its own atmosphere, horizon and shadow values.
+The waves ignore pointer input and use CSS transforms, with a persistent pause
+choice in Settings. They stop in hidden tabs and under reduced-motion settings;
+forced colors hides them. There is no remote background request or GIF. The
+original static radio-field SVG remains a small decorative mask in desktop
+artwork panels; mobile artwork stays compact. See [Studio experience](studio-experience.md).
 
 Cards, the settings sheet and the mini player use opaque theme surfaces with
 subtle tinted depth, rather than placing controls directly over patterned
@@ -25,10 +25,9 @@ recreating Audio, clearing data or restarting a stream.
 
 ## Responsive surfaces
 
-- Header: compact gradient brand mark, consistent 44px navigation/settings
-  controls and a scrollable settings sheet. Language, appearance, library and
-  backup remain accessible. Opening animation translates the sheet without
-  shrinking touch targets.
+- Header: soft 3D radio mark, consistent 44px controls and a scrollable settings
+  sheet. Appearance is in the header from 375px and in Settings at 320–374px.
+  Language, motion pause, library, backup, privacy and Help remain accessible.
 - Home: an editorial heading and original CSS globe illustration on desktop,
   larger artwork cards, and a compact two-row desktop search/filter layout.
   Phones keep the small header, collapsed refinements and horizontal station
@@ -36,8 +35,9 @@ recreating Audio, clearing data or restarting a stream.
   the persistent player.
 - Player: consistent rounded mini player, artwork, control styling and real
   connection/playback feedback. Desktop floating placement, phone safe areas,
-  measured player height and page padding keep content reachable. Car mode
-  retains its short-landscape arrangement and large controls.
+  measured player height and page padding keep content reachable. Studio
+  retains its short-landscape arrangement and large controls, with a record-like
+  artwork ring and state-driven activity bars.
 - Discover, library, recipient and backup views share colors, surfaces, borders,
   spacing and control treatment. Existing route/dialog semantics and keyboard
   focus management remain in place.
@@ -52,7 +52,8 @@ or replaces Audio, changes sources, accesses Web Audio or schedules frame loops.
 The bars are a playback-state illustration, not measured frequency/amplitude or
 current-song metadata.
 
-Persistent playback animation stops on pause/idle. `prefers-reduced-motion:
+Persistent playback animation stops on pause/idle; the two optional background
+waves continue until paused in Settings. `prefers-reduced-motion:
 reduce` disables transitions and animation, including the playback signal/halo;
 selection, accessible status text and controls remain usable. Motion uses small
 transform/opacity effects, with no continuously animated full-page blur, remote
@@ -69,11 +70,11 @@ place and counts all initial chunks.
 
 `node scripts/check-design.cjs` covers 36 combinations of PL/EN, light/dark/system,
 320/390/desktop and normal/reduced motion. It decodes an original MP3 fixture
-through real Audio, verifies active feedback, no idle animation loops, reduced
+through real Audio, verifies active feedback, bounded background motion, reduced
 motion, artwork sizing, and a single uninterrupted audio instance while changing
 language/theme and switching player views. In System mode, OS light/dark changes
 are also verified during uninterrupted playback. Pause must unload the stream and stop
-persistent motion. Screenshots are retained for both the library and car player.
+persistent player motion. Screenshots are retained for the library and Studio.
 
 The unchanged UX assertions also check first-station visibility, touch targets,
 contrast/accessibility, keyboard access, large text and landscape layouts.

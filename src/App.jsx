@@ -16,7 +16,9 @@ import Home from './pages/Home';
 const Discover = lazy(() => import('./pages/Discover'));
 const Library = lazy(() => import('./pages/Library'));
 const SharedStation = lazy(() => import('./pages/SharedStation'));
-import NowPlaying from './pages/NowPlaying';
+const NowPlaying = lazy(() => import('./pages/NowPlaying'));
+const Help = lazy(() => import('./pages/Help'));
+import AmbientBackground from './components/AmbientBackground';
 import { PwaProvider } from './context/PwaContext';
 import { BrowsingProvider } from './context/BrowsingContext';
 import { RecentStationsProvider } from './context/RecentStationsContext';
@@ -52,6 +54,7 @@ function AppShell() {
             <Route path="/library" element={<Library />} />
             <Route path="/station/:id" element={<SharedStation />} />
             <Route path="/now-playing" element={<NowPlaying />} />
+            <Route path="/help" element={<Help />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
@@ -63,6 +66,7 @@ function AppShell() {
 export default function App() {
   return (
     <PwaProvider>
+      <AmbientBackground />
       <RecentStationsProvider>
         <DirectoryClickReporter />
         <Router>

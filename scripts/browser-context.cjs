@@ -23,4 +23,13 @@ async function waitForServiceWorker(page) {
   });
 }
 
-module.exports = { createAppContext, waitForServiceWorker };
+async function selectAppearance(page, mode) {
+  const header = page.locator('#header-appearance');
+  if (await header.isVisible()) {
+    const open = await page.locator('.settings-dialog[open]').count();
+    if (open) await page.locator('#close-settings').click();
+    await header.selectOption(mode);
+    if (open) await page.locator('#open-settings').click();
+  } else await page.locator('#appearance').selectOption(mode);
+}
+module.exports = { createAppContext, waitForServiceWorker, selectAppearance };

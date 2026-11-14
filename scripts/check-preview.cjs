@@ -37,6 +37,7 @@ async function main() {
     '/now-playing',
     '/discover',
     '/library',
+    '/help',
     '/station/capital-dance',
     '/station/rb-a740cc4c-9563-4fbe-a13f-e7f9e89b7441',
   ]) {

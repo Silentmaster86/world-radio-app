@@ -4,7 +4,7 @@ const fs = require('node:fs'),
   path = require('node:path'),
   http = require('node:http');
 const { chromium } = require('playwright');
-const { createAppContext } = require('./browser-context.cjs');
+const { createAppContext, selectAppearance } = require('./browser-context.cjs');
 const output = path.resolve('test-results/design', process.env.WRA_BASE_URL ? 'preview' : 'build');
 fs.mkdirSync(output, { recursive: true });
 const tone = Buffer.from(
@@ -86,8 +86,8 @@ async function main() {
             }));
             assert.equal(
               idle.infinite,
-              0,
-              'Idle screens must not run persistent decorative animations',
+              motion === 'reduce' ? 0 : 2,
+              'Idle motion is limited to the two user-pausable background waves',
             );
             assert.equal(idle.art, width > 640 ? '96px' : '40px');
             assert.equal(
@@ -159,7 +159,7 @@ async function main() {
             await page.locator('#open-settings').click();
             const nextMode = mode === 'dark' ? 'light' : 'dark',
               nextLanguage = language === 'en' ? 'pl' : 'en';
-            await page.locator('#appearance').selectOption(nextMode);
+            await selectAppearance(page, nextMode);
             await page.locator('#language').selectOption(nextLanguage);
             await page.locator('#close-settings').click();
             assert.equal(await page.evaluate(() => window.__designAudio.length), 1);
@@ -190,7 +190,7 @@ async function main() {
                         a.playState === 'running' && a.effect?.getTiming().iterations === Infinity,
                     ).length,
               ),
-              0,
+              motion === 'reduce' ? 0 : 2,
             );
             if (motion === 'reduce')
               assert.equal(
@@ -212,7 +212,7 @@ async function main() {
           responsiveArtwork: true,
           stateDrivenMotion: true,
           reducedMotion: true,
-          noIdleLoops: true,
+          boundedPausableBackground: true,
           themeLanguageDuringPlayback: true,
           systemThemeDuringPlayback: true,
           sharedAudioAcrossViews: true,

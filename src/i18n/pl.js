@@ -1,4 +1,9 @@
 export const pl = {
+  'settings.help': 'Pomoc i FAQ',
+  'settings.motion': 'Animowane tło',
+  'settings.motionHint':
+    'Możesz zatrzymać fale. Systemowe ograniczenie animacji ma zawsze pierwszeństwo.',
+
   'language.loading': 'Wczytywanie języka…',
   'language.failed':
     'Nie udało się wczytać języka. Obecny język i radio działają dalej. Połącz się z internetem lub otwórz aplikację ponownie i spróbuj jeszcze raz.',
@@ -8,7 +13,7 @@ export const pl = {
   'nav.loadError': 'Nie udało się wczytać widoku. Połącz się z internetem i spróbuj ponownie.',
   'settings.backupError':
     'Nie udało się wczytać kopii biblioteki. Połącz się z internetem i odśwież aplikację, aby spróbować ponownie.',
-  'settings.backup': 'Kopia biblioteki',
+  'settings.backup': 'Kopia zapasowa',
   'settings.loading': 'Wczytywanie…',
   'discover.unavailableLabel': 'Nie można dodać tego strumienia',
   'discover.unsupportedShort': 'Nieobsługiwany strumień',
@@ -89,9 +94,9 @@ export const pl = {
   'station.addFavorite': 'Dodaj {station} do ulubionych',
   'player.radio': 'Odtwarzacz radia',
   'player.selected': 'Wybrana stacja',
-  'player.openCar': 'Otwórz tryb samochodowy',
-  'player.car': 'Tryb samochodowy',
-  'player.carLabel': 'Odtwarzacz w trybie samochodowym',
+  'player.openCar': 'Otwórz Studio',
+  'player.car': 'Studio',
+  'player.carLabel': 'Odtwarzacz Studio',
   'player.back': 'Powrót do stacji',
   'player.playback': 'Sterowanie odtwarzaniem',
   'player.previous': 'Poprzednia stacja',

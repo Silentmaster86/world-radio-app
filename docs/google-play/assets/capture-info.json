@@ -10,13 +10,13 @@
     "en-US/phone-01-library-light.png",
     "en-US/phone-02-favorites-dark.png",
     "en-US/phone-03-player-dark.png",
-    "en-US/phone-04-settings-light.png",
+    "en-US/phone-04-help-light.png",
     "en-US/feature-1024x500.png",
     "pl-PL/phone-01-library-light.png",
     "pl-PL/phone-02-favorites-dark.png",
     "pl-PL/phone-03-player-dark.png",
-    "pl-PL/phone-04-settings-light.png",
+    "pl-PL/phone-04-help-light.png",
     "pl-PL/feature-1024x500.png"
   ],
-  "gitBase": "3ef64ac89075e87545d87948535fe8f894d8262c"
+  "gitBase": "da1cca39681a3b9f0bfbde2d8b768490603ed97c"
 }

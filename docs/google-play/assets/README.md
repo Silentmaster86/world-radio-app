@@ -7,7 +7,7 @@
 - `*/phone-02-favorites-dark.png`: dwie stacje faktycznie dodane do ulubionych,
   motyw ciemny.
 - `*/phone-03-player-dark.png`: pełny odtwarzacz w stanie wstrzymanym.
-- `*/phone-04-settings-light.png`: ustawienia języka, motywu, kopii i prywatności.
+- `*/phone-04-help-light.png`: pomoc i FAQ z instrukcją przenoszenia biblioteki.
 
 Zrzuty mają 1080 × 1920, po cztery na język. Nie zmieniano treści ekranu ani
 nie symulowano odtwarzania. Źródłem jest rzeczywisty build aplikacji webowej

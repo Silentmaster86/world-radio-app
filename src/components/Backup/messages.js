@@ -2,10 +2,10 @@ import { translate } from '../../i18n';
 export const en = {
   language:
     'Could not load the imported language. Nothing was imported. Reconnect or import without settings.',
-  title: 'Library backup',
+  title: 'Backup',
   intro:
-    'Save your added stations, favorites, recent stations and settings in a JSON file. The file stays on your device.',
-  export: 'Download backup',
+    'Save your stations, favorites and preferences. Restore your collection later or move it to another device.',
+  export: 'Save backup',
   file: 'Choose a backup file',
   reading: 'Reading backup…',
   preview: 'Import preview',
@@ -15,7 +15,7 @@ export const en = {
   settings: 'Also import language, appearance and volume settings',
   settingsHint:
     'This can change the interface language and playback volume. The current station stays selected.',
-  apply: 'Import and combine',
+  apply: 'Add from backup',
   cancel: 'Cancel preview',
   success: 'Backup imported. Your library is up to date.',
   exported: 'Backup downloaded. Keep the file to restore your library on another device.',
@@ -29,15 +29,34 @@ export const en = {
     'Saving failed and some saved data could not be restored. Download your current library before reloading.',
   read: 'The file could not be read. Choose it again.',
   exportError: 'The backup could not be downloaded. Try again.',
+  faqTitle: 'Help and library transfer',
+  transferQ: 'How do I move my stations to another device?',
+  transfer1:
+    'On the old device: Settings → Backup → Save backup. The file is usually saved in Downloads.',
+  transfer2:
+    'Send the file to yourself by email, cloud storage or Bluetooth. Then download it on the new device. You do not need to open or edit it.',
+  transfer3:
+    'On the new device, open World Radio App in the browser you will use. Go to Settings → Backup and choose the saved file.',
+  transfer4:
+    'Review the preview. To also copy language, appearance and volume, tick the settings option first. Then select Add from backup. Existing stations and favorites stay.',
+  contentsQ: 'What does a backup contain?',
+  contentsA:
+    'Added stations, favorites and their order, recent stations, language, appearance and volume. It contains station information, not audio recordings. The background-animation preference stays on each device.',
+  recoveryQ: 'Can I recover my library without a backup?',
+  recoveryA:
+    'Your library is saved in this browser. There is no account or automatic sync. Clearing site data or changing browsers can remove access to it. Save a backup before changing devices.',
+  offlineQ: 'Can I listen without internet?',
+  offlineA:
+    'Radio audio requires internet. After the app has prepared its offline files, your saved library and interface can open offline.',
   unknown: 'The import failed. Try again.',
 };
 const pl = {
   language:
     'Nie udało się wczytać importowanego języka. Nic nie zaimportowano. Połącz się z internetem lub importuj bez ustawień.',
-  title: 'Kopia biblioteki',
+  title: 'Kopia zapasowa',
   intro:
-    'Zapisz dodane stacje, ulubione, historię i ustawienia w pliku JSON. Plik pozostaje na Twoim urządzeniu.',
-  export: 'Pobierz kopię',
+    'Zachowaj swoje stacje, ulubione i preferencje. Odtwórz kolekcję później lub przenieś ją na inne urządzenie.',
+  export: 'Zapisz kopię zapasową',
   file: 'Wybierz plik kopii',
   reading: 'Wczytywanie kopii…',
   preview: 'Podgląd importu',
@@ -47,7 +66,7 @@ const pl = {
   settings: 'Importuj też język, wygląd i ustawienia głośności',
   settingsHint:
     'Może to zmienić język interfejsu i głośność odtwarzania. Obecna stacja pozostanie wybrana.',
-  apply: 'Importuj i połącz',
+  apply: 'Dodaj z kopii',
   cancel: 'Anuluj podgląd',
   success: 'Kopia zaimportowana. Biblioteka jest aktualna.',
   exported: 'Kopia pobrana. Zachowaj plik, aby odtworzyć bibliotekę na innym urządzeniu.',
@@ -61,6 +80,25 @@ const pl = {
     'Zapis nie powiódł się i części danych nie udało się przywrócić. Pobierz obecną bibliotekę przed odświeżeniem strony.',
   read: 'Nie udało się odczytać pliku. Wybierz go ponownie.',
   exportError: 'Nie udało się pobrać kopii. Spróbuj ponownie.',
+  faqTitle: 'Pomoc i przenoszenie biblioteki',
+  transferQ: 'Jak przenieść swoje stacje na inne urządzenie?',
+  transfer1:
+    'Na starym urządzeniu: Ustawienia → Kopia zapasowa → Zapisz kopię zapasową. Plik zwykle trafia do folderu Pobrane.',
+  transfer2:
+    'Prześlij plik sobie e-mailem, przez dysk w chmurze lub Bluetooth. Następnie pobierz go na nowym urządzeniu. Nie musisz go otwierać ani edytować.',
+  transfer3:
+    'Na nowym urządzeniu otwórz World Radio App w przeglądarce, której będziesz używać. Wejdź w Ustawienia → Kopia zapasowa i wybierz zapisany plik.',
+  transfer4:
+    'Sprawdź podgląd. Jeśli chcesz też przenieść język, wygląd i głośność, najpierw zaznacz opcję ustawień. Następnie wybierz Dodaj z kopii. Obecne stacje i ulubione zostają.',
+  contentsQ: 'Co zawiera kopia zapasowa?',
+  contentsA:
+    'Dodane stacje, ulubione i ich kolejność, historię, język, wygląd i głośność. Zawiera informacje o stacjach, a nie nagrania dźwięku. Preferencja animacji tła pozostaje osobna na każdym urządzeniu.',
+  recoveryQ: 'Czy odzyskam bibliotekę bez kopii?',
+  recoveryA:
+    'Biblioteka jest zapisana w tej przeglądarce. Nie ma konta ani automatycznej synchronizacji. Wyczyszczenie danych witryny lub zmiana przeglądarki może usunąć dostęp do niej. Zapisz kopię przed zmianą urządzenia.',
+  offlineQ: 'Czy mogę słuchać bez internetu?',
+  offlineA:
+    'Dźwięk radia wymaga internetu. Po przygotowaniu plików offline zapisaną bibliotekę i interfejs można otwierać bez sieci.',
   unknown: 'Import nie powiódł się. Spróbuj ponownie.',
 };
 export function backupMessage(language, key, params = {}) {
