@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const http = require('node:http');
 const { chromium } = require('playwright');
-const { createAppContext } = require('./browser-context.cjs');
+const { createAppContext, selectAppearance } = require('./browser-context.cjs');
 const output = path.resolve('test-results/pwa', process.env.WRA_BASE_URL ? 'preview' : 'build');
 fs.mkdirSync(output, { recursive: true });
 const root = path.resolve('build');
@@ -165,7 +165,7 @@ async function main() {
     );
     await page.getByRole('button', { name: 'Add Capital Dance to favorites', exact: true }).click();
     await page.locator('#open-settings').click();
-    await page.locator('#appearance').selectOption('dark');
+    await selectAppearance(page, 'dark');
     await page.locator('#close-settings').click();
     // Confirmed playback uses the controlled fixture, never a real network stream.
     await page.locator('[data-station-id="heart-uk"]').click();

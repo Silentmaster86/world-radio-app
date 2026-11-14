@@ -70,7 +70,7 @@ test('compact catalog preserves audio, navigation, reload and current search res
   page.click('[aria-label="Add Deutschlandfunk Nova to favorites"]');
   expect(JSON.parse(localStorage.getItem(RECENT_KEY)).stationIds[0]).toBe('deutschlandfunk-nova');
   const pauses = audio.pause.mock.calls.length;
-  page.click('#open-player');
+  await act(async () => page.container.querySelector('#open-player').click());
   page.click('[aria-label="Back to stations"]');
   expect(page.container.querySelectorAll('article')).toHaveLength(stations.length);
   expect(window.location.search).toBe('?campaign=demo');
@@ -219,7 +219,7 @@ test('recent stations record confirmed playback, survive reload and clear withou
   ).toEqual(['Heart UK', 'Capital Dance']);
   const firstAudio = window.Audio.mock.results[0].value;
   const firstPauses = firstAudio.pause.mock.calls.length;
-  page.click('#open-player');
+  await act(async () => page.container.querySelector('#open-player').click());
   page.click('[aria-label="Back to stations"]');
   expect(window.location.search).toContain('section=recent');
   expect(firstAudio.pause).toHaveBeenCalledTimes(firstPauses);
@@ -347,7 +347,7 @@ test('the shared player survives route changes and restores the list, scroll and
   const pauseCount = audio.pause.mock.calls.length;
   const open = page.container.querySelector('#open-player');
   open.focus();
-  page.click('#open-player');
+  await act(async () => page.container.querySelector('#open-player').click());
   expect(window.location.pathname).toBe('/now-playing');
   expect(page.container.querySelector('[aria-label="Radio player"]')).toBeNull();
   expect(
@@ -369,9 +369,12 @@ test('the shared player survives route changes and restores the list, scroll and
   expect(audio.pause).toHaveBeenCalledTimes(pauseCount);
 });
 
-test('direct entry to car mode can return to the catalog without autoplay', () => {
+test('direct entry to Studio can return to the catalog without autoplay', async () => {
   window.history.replaceState({}, '', '/now-playing');
-  const page = mount();
+  let page;
+  await act(async () => {
+    page = mount();
+  });
   expect(window.Audio.mock.results[0].value.play).not.toHaveBeenCalled();
   page.click('[aria-label="Back to stations"]');
   expect(page.container.querySelectorAll('[data-station-title]')).toHaveLength(
@@ -387,7 +390,7 @@ test('sleep timer survives navigation to car mode and pauses the same audio elem
     const audio = window.Audio.mock.results[0].value;
     page.click('[data-sleep-timer]');
     page.click('[data-sleep-minutes="15"]');
-    page.click('#open-player');
+    await act(async () => page.container.querySelector('#open-player').click());
     expect(page.container.querySelector('[data-sleep-timer]').getAttribute('aria-pressed')).toBe(
       'true',
     );
@@ -426,7 +429,7 @@ test('the router owns scroll restoration while mounted and releases it on cleanu
   expect(window.history.scrollRestoration).toBe('auto');
 });
 
-test('return scrolling recovers when the list height settles after the first layout', () => {
+test('return scrolling recovers when the list height settles after the first layout', async () => {
   const callbacks = new Map();
   let nextId = 0;
   let availableScroll = 0;
@@ -441,7 +444,7 @@ test('return scrolling recovers when the list height settles after the first lay
   });
   const page = mount();
   window.scrollY = 300;
-  page.click('#open-player');
+  await act(async () => page.container.querySelector('#open-player').click());
   page.click('[aria-label="Back to stations"]');
   expect(window.scrollY).toBe(0);
   availableScroll = 600;

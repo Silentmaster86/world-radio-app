@@ -1,4 +1,28 @@
 export default {
+  'settings.help': 'Aide et FAQ',
+  'settings.motion': 'Animer le fond',
+  'settings.motionHint':
+    'Tu peux arrêter les vagues. La réduction des animations du système reste prioritaire.',
+  'backup.faqTitle': 'Aide et transfert de la bibliothèque',
+  'backup.transferQ': 'Comment transférer mes stations sur un autre appareil ?',
+  'backup.transfer1':
+    'Sur l’ancien appareil : Réglages → Sauvegarde → Enregistrer une sauvegarde. Le fichier se trouve généralement dans Téléchargements.',
+  'backup.transfer2':
+    'Envoie-toi le fichier par e-mail, stockage cloud ou Bluetooth. Garde-le comme fichier ; inutile de l’ouvrir ou de le modifier.',
+  'backup.transfer3':
+    'Sur le nouvel appareil, ouvre World Radio App dans le navigateur prévu. Va dans Réglages → Sauvegarde et choisis le fichier enregistré.',
+  'backup.transfer4':
+    'Vérifie l’aperçu puis sélectionne Ajouter depuis la sauvegarde. Les stations et favoris existants sont conservés. Coche les réglages seulement pour copier aussi langue, apparence et volume.',
+  'backup.contentsQ': 'Que contient une sauvegarde ?',
+  'backup.contentsA':
+    'Les stations ajoutées, favoris et leur ordre, historique, langue, apparence et volume. Elle contient des données de stations, pas d’enregistrements audio. L’animation du fond reste propre à chaque appareil.',
+  'backup.recoveryQ': 'Puis-je récupérer ma bibliothèque sans sauvegarde ?',
+  'backup.recoveryA':
+    'La bibliothèque est enregistrée dans ce navigateur. Il n’y a ni compte ni synchronisation automatique. Effacer les données du site ou changer de navigateur peut en empêcher l’accès. Sauvegarde avant de changer d’appareil.',
+  'backup.offlineQ': 'Puis-je écouter sans internet ?',
+  'backup.offlineA':
+    'L’audio nécessite internet. Après préparation des fichiers hors ligne, la bibliothèque et l’interface peuvent s’ouvrir sans réseau.',
+
   'backup.language':
     'Impossible de charger la langue importée. Rien n’a été importé. Reconnectez-vous ou importez sans les paramètres.',
   'language.loading': 'Chargement de la langue…',
@@ -11,7 +35,7 @@ export default {
   'nav.loadError': 'Impossible de charger cette vue. Reconnectez-vous et réessayez.',
   'settings.backupError':
     'Impossible de charger la sauvegarde. Reconnectez-vous et rechargez l’application.',
-  'settings.backup': 'Sauvegarde de la bibliothèque',
+  'settings.backup': 'Sauvegarde',
   'settings.loading': 'Chargement…',
   'discover.unavailableLabel': 'Impossible d’ajouter ce flux',
   'discover.unsupportedShort': 'Flux non pris en charge',
@@ -95,9 +119,9 @@ export default {
   'station.addFavorite': 'Ajouter {station} aux favoris',
   'player.radio': 'Lecteur radio',
   'player.selected': 'Station sélectionnée',
-  'player.openCar': 'Ouvrir le mode voiture',
-  'player.car': 'Mode voiture',
-  'player.carLabel': 'Lecteur en mode voiture',
+  'player.openCar': 'Ouvrir Studio',
+  'player.car': 'Studio',
+  'player.carLabel': 'Lecteur Studio',
   'player.back': 'Retour aux stations',
   'player.playback': 'Commandes de lecture',
   'player.previous': 'Station précédente',
@@ -215,10 +239,10 @@ export default {
   'storage.playerNewer':
     'Les paramètres du lecteur utilisent un format plus récent. Les données d’origine sont conservées.',
   'storage.playerRecovery': 'Impossible de lire les paramètres enregistrés du lecteur.',
-  'backup.title': 'Sauvegarde de la bibliothèque',
+  'backup.title': 'Sauvegarde',
   'backup.intro':
-    'Enregistrez stations ajoutées, favoris, historique et paramètres dans un fichier JSON. Le fichier reste sur votre appareil.',
-  'backup.export': 'Télécharger la sauvegarde',
+    'Garde tes stations, favoris et préférences. Restaure ta collection ou transfère-la sur un autre appareil.',
+  'backup.export': 'Enregistrer une sauvegarde',
   'backup.file': 'Choisir un fichier de sauvegarde',
   'backup.reading': 'Lecture de la sauvegarde…',
   'backup.preview': 'Aperçu de l’importation',
@@ -229,7 +253,7 @@ export default {
   'backup.settings': 'Importer aussi la langue, l’apparence et le volume',
   'backup.settingsHint':
     'Cela peut modifier la langue de l’interface et le volume. La station actuelle reste sélectionnée.',
-  'backup.apply': 'Importer et fusionner',
+  'backup.apply': 'Ajouter depuis la sauvegarde',
   'backup.cancel': 'Annuler l’aperçu',
   'backup.success': 'Sauvegarde importée. Votre bibliothèque est à jour.',
   'backup.exported':

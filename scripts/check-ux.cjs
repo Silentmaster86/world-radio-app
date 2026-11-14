@@ -5,7 +5,7 @@ const http = require('node:http');
 const path = require('node:path');
 const { chromium } = require('playwright');
 const { AxeBuilder } = require('@axe-core/playwright');
-const { createAppContext } = require('./browser-context.cjs');
+const { createAppContext, selectAppearance } = require('./browser-context.cjs');
 const reportDir = path.resolve('test-results/ux', process.env.WRA_BASE_URL ? 'preview' : 'build');
 fs.mkdirSync(reportDir, { recursive: true });
 const root = path.resolve('build');
@@ -37,7 +37,7 @@ async function geometry(page, car = false) {
     const visible = (element) =>
       element.getClientRects().length && getComputedStyle(element).visibility !== 'hidden';
     const scope = car
-      ? document.querySelector('[aria-label="Car mode player"]')
+      ? document.querySelector('.now-playing-card[aria-label]')
       : document.querySelector('[aria-label="Radio player"]');
     return {
       width: innerWidth,
@@ -143,7 +143,11 @@ async function main() {
             first.y >= 0 && first.y + first.height <= dock + 1,
             `${language}/${mode}: first station hidden: ${JSON.stringify({ viewport, first, dock })}`,
           );
-          for (const selector of ['#open-settings', 'article button']) {
+          for (const selector of [
+            '#open-settings',
+            'article button',
+            ...(viewport.width >= 375 ? ['#header-appearance'] : []),
+          ]) {
             const control = page.locator(selector).first();
             assert.equal(await control.isVisible(), true);
             const box = await control.boundingBox();
@@ -159,7 +163,9 @@ async function main() {
             await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),
           );
           await page.locator('#open-settings').click();
-          for (const selector of ['#language', '#appearance']) {
+          assert.equal(await page.locator('#appearance').isVisible(), viewport.width < 375);
+          assert.equal(await page.locator('#header-appearance').isVisible(), viewport.width >= 375);
+          for (const selector of ['#language', ...(viewport.width < 375 ? ['#appearance'] : [])]) {
             const box = await page.locator(selector).boundingBox();
             assert.ok(
               box.width >= 44 &&
@@ -412,7 +418,7 @@ async function main() {
         .click();
       await page.getByRole('button', { name: 'All stations (12)', exact: true }).click();
       await page.locator('#open-settings').click();
-      await page.locator('#appearance').selectOption(mode === 'dark' ? 'light' : 'dark');
+      await selectAppearance(page, mode === 'dark' ? 'light' : 'dark');
       await page.locator('#close-settings').click();
       await page.reload({ waitUntil: 'networkidle' });
       assert.equal(

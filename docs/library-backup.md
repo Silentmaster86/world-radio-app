@@ -1,8 +1,14 @@
 # Library backup
 
-Open Settings → Library backup to download or import a local JSON file. The
+Open Settings → Backup to save or load a backup file. Inline help and the
+Help & FAQ screen explain how to send that file to another device and load it
+there. The file is a local JSON document; users do not need to open or edit it. The
 feature needs no account, upload endpoint or external service. Both PL/EN
 interfaces and light/dark themes are supported, including the offline app shell.
+
+The optional background-motion choice is device-specific and is not part of the
+version-1 backup schema. Importing appearance settings preserves that choice on
+the receiving device. There is no automatic cloud synchronization.
 
 ## Format and behavior
 

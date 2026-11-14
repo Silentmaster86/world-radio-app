@@ -3,6 +3,9 @@
 Google Play preparation: [store materials, privacy and release steps](docs/google-play/README.md).
 The Android package remains in testing; this is not a Google Play launch announcement.
 
+Using a backup on another device: open **Settings → Help & FAQ** in the app,
+or read [how library backups work](docs/library-backup.md).
+
 Live radio from around the world, with your own station library and a player
 that keeps running as you browse. A responsive, installable web app built with
 React and Vite. No account required.

@@ -10,7 +10,7 @@
   "navigationColorDark": "#000000",
   "navigationDividerColor": "#000000",
   "navigationDividerColorDark": "#000000",
-  "backgroundColor": "#0D1220",
+  "backgroundColor": "#EEF2FA",
   "enableNotifications": false,
   "startUrl": "/",
   "iconUrl": "https://worldradioapp.netlify.app/icons/web-app-manifest-512x512.png",

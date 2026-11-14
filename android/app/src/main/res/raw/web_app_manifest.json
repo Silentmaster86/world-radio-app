@@ -2,14 +2,14 @@
   "id": "/",
   "name": "World Radio App",
   "short_name": "World Radio",
-  "description": "Live internet radio, favorites and car controls.",
+  "description": "Live internet radio, favorites and the Studio player.",
   "lang": "en",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "any",
   "theme_color": "#0d1220",
-  "background_color": "#0d1220",
+  "background_color": "#eef2fa",
   "categories": ["music", "entertainment"],
   "icons": [
     {

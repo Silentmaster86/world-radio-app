@@ -1,14 +1,15 @@
 import { Link } from 'react-router-dom';
 import ErrorBoundary from '../ErrorBoundary';
 import { lazy, Suspense, useEffect, useId, useRef, useState } from 'react';
-import { FaGlobeEurope, FaSlidersH, FaArrowLeft, FaCompass } from 'react-icons/fa';
+import { FaSlidersH, FaArrowLeft, FaCompass } from 'react-icons/fa';
 import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { localizeStoredMessage } from '../../i18n';
 import { LANGUAGE_NAMES } from '../../i18n';
+import ThemeSwitcher from '../ThemeSwitcher';
 const BackupPanel = lazy(() => import('../Backup/BackupPanel'));
 export default function HomeHeader({ headingAs = 'h1', back = false }) {
-  const { mode, setThemeMode, storageMessage } = useTheme();
+  const { mode, setThemeMode, backgroundMotion, setBackgroundMotion, storageMessage } = useTheme();
   const { language, setLanguage, pendingLanguage, languageMessage, t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [backupOpen, setBackupOpen] = useState(false);
@@ -34,7 +35,11 @@ export default function HomeHeader({ headingAs = 'h1', back = false }) {
     <header className="app-header">
       <Brand className="app-brand" to={back ? '/' : undefined}>
         <span className="brand-mark" aria-hidden="true">
-          {back ? <FaArrowLeft /> : <FaGlobeEurope />}
+          {back ? (
+            <FaArrowLeft />
+          ) : (
+            <img src="/icons/favicon-96x96.png" width="34" height="34" alt="" />
+          )}
         </span>
         <span>{back ? t('discover.back') : 'World Radio App'}</span>
       </Brand>
@@ -50,6 +55,7 @@ export default function HomeHeader({ headingAs = 'h1', back = false }) {
             <span className="action-label">{t('discover.open')}</span>
           </Link>
         )}
+        <ThemeSwitcher />
         <button
           className="header-action"
           id="open-settings"
@@ -107,7 +113,7 @@ export default function HomeHeader({ headingAs = 'h1', back = false }) {
         </label>
         {pendingLanguage && <p role="status">{t('language.loading')}</p>}
         {languageMessage && <p role="status">{t(languageMessage)}</p>}
-        <label htmlFor="appearance">
+        <label htmlFor="appearance" className="settings-appearance">
           {t('header.appearance')}
           <select id="appearance" value={mode} onChange={(e) => setThemeMode(e.target.value)}>
             <option value="system">{t('header.system')}</option>
@@ -116,6 +122,18 @@ export default function HomeHeader({ headingAs = 'h1', back = false }) {
           </select>
         </label>
         {storageMessage && <p role="status">{localizeStoredMessage(t, storageMessage)}</p>}
+        <label className="motion-choice">
+          <input
+            type="checkbox"
+            checked={backgroundMotion}
+            onChange={(event) => setBackgroundMotion(event.target.checked)}
+            data-background-motion
+          />
+          <span>
+            {t('settings.motion')}
+            <small>{t('settings.motionHint')}</small>
+          </span>
+        </label>
         <Link className="dialog-link" to="/library" onClick={close} data-open-library>
           {t('nav.library')}
         </Link>
@@ -125,6 +143,9 @@ export default function HomeHeader({ headingAs = 'h1', back = false }) {
         <a className="dialog-link" href="/privacy/" target="_blank" rel="noopener noreferrer">
           {t('settings.privacy')}
         </a>
+        <Link className="dialog-link" to="/help" onClick={close}>
+          {t('settings.help')}
+        </Link>
         {backupOpen && (
           <ErrorBoundary
             fallback={

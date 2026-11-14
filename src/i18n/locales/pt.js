@@ -1,4 +1,28 @@
 export default {
+  'settings.help': 'Ajuda e FAQ',
+  'settings.motion': 'Animar fundo',
+  'settings.motionHint':
+    'Você pode pausar as ondas. A redução de movimento do sistema tem prioridade.',
+  'backup.faqTitle': 'Ajuda e transferência da biblioteca',
+  'backup.transferQ': 'Como levo minhas estações para outro dispositivo?',
+  'backup.transfer1':
+    'No dispositivo antigo: Configurações → Backup → Salvar backup. O arquivo costuma ficar em Downloads.',
+  'backup.transfer2':
+    'Envie o arquivo para você por e-mail, armazenamento na nuvem ou Bluetooth. Mantenha-o como arquivo; não é preciso abrir ou editar.',
+  'backup.transfer3':
+    'No novo dispositivo, abra World Radio App no navegador que usará. Vá a Configurações → Backup e escolha o arquivo salvo.',
+  'backup.transfer4':
+    'Confira a prévia e selecione Adicionar do backup. As estações e favoritos existentes são mantidos. Marque os ajustes apenas para copiar também idioma, aparência e volume.',
+  'backup.contentsQ': 'O que contém um backup?',
+  'backup.contentsA':
+    'Estações adicionadas, favoritos e sua ordem, histórico, idioma, aparência e volume. São dados de estações, não gravações. A animação do fundo é ajustada separadamente em cada dispositivo.',
+  'backup.recoveryQ': 'Posso recuperar a biblioteca sem backup?',
+  'backup.recoveryA':
+    'A biblioteca fica neste navegador. Não há conta nem sincronização automática. Limpar dados do site ou trocar de navegador pode remover o acesso. Salve um backup antes de trocar de dispositivo.',
+  'backup.offlineQ': 'Posso ouvir sem internet?',
+  'backup.offlineA':
+    'O áudio exige internet. Após preparar os arquivos offline, a biblioteca salva e a interface podem abrir sem conexão.',
+
   'backup.language':
     'Não foi possível carregar o idioma importado. Nada foi importado. Reconecte ou importe sem as configurações.',
   'language.loading': 'Carregando idioma…',
@@ -10,7 +34,7 @@ export default {
   'nav.loadError': 'Não foi possível carregar esta tela. Reconecte e tente novamente.',
   'settings.backupError':
     'Não foi possível carregar o backup. Reconecte e recarregue o aplicativo.',
-  'settings.backup': 'Backup da biblioteca',
+  'settings.backup': 'Backup',
   'settings.loading': 'Carregando…',
   'discover.unavailableLabel': 'Não é possível adicionar esta transmissão',
   'discover.unsupportedShort': 'Transmissão incompatível',
@@ -92,9 +116,9 @@ export default {
   'station.addFavorite': 'Adicionar {station} às favoritas',
   'player.radio': 'Reprodutor de rádio',
   'player.selected': 'Estação selecionada',
-  'player.openCar': 'Abrir modo carro',
-  'player.car': 'Modo carro',
-  'player.carLabel': 'Reprodutor no modo carro',
+  'player.openCar': 'Abrir Studio',
+  'player.car': 'Studio',
+  'player.carLabel': 'Reprodutor Studio',
   'player.back': 'Voltar às estações',
   'player.playback': 'Controles de reprodução',
   'player.previous': 'Estação anterior',
@@ -207,10 +231,10 @@ export default {
   'storage.playerNewer':
     'As configurações do reprodutor usam um formato mais recente. Os dados originais foram preservados.',
   'storage.playerRecovery': 'Não foi possível ler as configurações salvas do reprodutor.',
-  'backup.title': 'Backup da biblioteca',
+  'backup.title': 'Backup',
   'backup.intro':
-    'Salve estações adicionadas, favoritas, histórico e configurações em um arquivo JSON. O arquivo fica no seu dispositivo.',
-  'backup.export': 'Baixar backup',
+    'Salve estações, favoritos e preferências. Recupere sua coleção ou transfira para outro dispositivo.',
+  'backup.export': 'Salvar backup',
   'backup.file': 'Escolher arquivo de backup',
   'backup.reading': 'Lendo backup…',
   'backup.preview': 'Prévia da importação',
@@ -221,7 +245,7 @@ export default {
   'backup.settings': 'Importar também idioma, aparência e volume',
   'backup.settingsHint':
     'Isso pode mudar o idioma da interface e o volume. A estação atual permanece selecionada.',
-  'backup.apply': 'Importar e combinar',
+  'backup.apply': 'Adicionar do backup',
   'backup.cancel': 'Cancelar prévia',
   'backup.success': 'Backup importado. Sua biblioteca está atualizada.',
   'backup.exported':

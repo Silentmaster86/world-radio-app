@@ -27,6 +27,7 @@ function readPreference() {
   const future = result.value?.version > 1;
   return {
     mode: result.value?.version === 1 ? result.value.mode : 'system',
+    backgroundMotion: result.value?.version === 1 ? result.value.backgroundMotion !== false : true,
     preserve: future,
     message: future
       ? 'Newer appearance settings are preserved. Changes apply for this session.'
@@ -38,6 +39,7 @@ function readPreference() {
 export function ThemeProviderToggle({ children }) {
   const [initial] = useState(readPreference);
   const [mode, setMode] = useState(initial.mode);
+  const [backgroundMotion, setMotion] = useState(initial.backgroundMotion);
   const [message, setMessage] = useState(initial.message);
   const [systemDark, setSystemDark] = useState(() => systemQuery()?.matches ?? true);
   useEffect(() => {
@@ -67,19 +69,40 @@ export function ThemeProviderToggle({ children }) {
       if (meta && previousColor !== null) meta.setAttribute('content', previousColor);
     };
   }, [theme]);
-  const setThemeMode = (next) => {
-    if (!modes.includes(next)) return;
-    setMode(next);
+  useEffect(() => {
+    document.documentElement.dataset.ambientMotion = backgroundMotion ? 'on' : 'off';
+    return () => {
+      delete document.documentElement.dataset.ambientMotion;
+    };
+  }, [backgroundMotion]);
+  const save = (nextMode, nextMotion) => {
     if (!initial.preserve)
       setMessage(
-        writeStorage(THEME_KEY, { version: 1, mode: next })
+        writeStorage(THEME_KEY, { version: 1, mode: nextMode, backgroundMotion: nextMotion })
           ? ''
           : 'Appearance changes apply for this session because storage is unavailable.',
       );
   };
+  const setThemeMode = (next) => {
+    if (!modes.includes(next)) return;
+    setMode(next);
+    save(next, backgroundMotion);
+  };
+  const setBackgroundMotion = (next) => {
+    setMotion(next);
+    save(mode, next);
+  };
   return (
     <ThemeContext.Provider
-      value={{ mode, setThemeMode, isDarkMode, theme, storageMessage: message }}
+      value={{
+        mode,
+        setThemeMode,
+        backgroundMotion,
+        setBackgroundMotion,
+        isDarkMode,
+        theme,
+        storageMessage: message,
+      }}
     >
       {children}
     </ThemeContext.Provider>

@@ -1,4 +1,28 @@
 export default {
+  'settings.help': 'Ayuda y FAQ',
+  'settings.motion': 'Animar fondo',
+  'settings.motionHint':
+    'Puedes pausar las ondas. Se respeta siempre la reducción de movimiento del sistema.',
+  'backup.faqTitle': 'Ayuda y traslado de la biblioteca',
+  'backup.transferQ': '¿Cómo paso mis emisoras a otro dispositivo?',
+  'backup.transfer1':
+    'En el dispositivo antiguo: Ajustes → Copia de seguridad → Guardar copia. El archivo suele guardarse en Descargas.',
+  'backup.transfer2':
+    'Envíate el archivo por correo, almacenamiento en la nube o Bluetooth. Consérvalo como archivo; no hace falta abrirlo ni editarlo.',
+  'backup.transfer3':
+    'En el nuevo dispositivo, abre World Radio App en el navegador que usarás. Ve a Ajustes → Copia de seguridad y elige el archivo guardado.',
+  'backup.transfer4':
+    'Revisa la vista previa y selecciona Añadir desde copia. Se conservan las emisoras y favoritos actuales. Marca la opción de ajustes solo para copiar también idioma, apariencia y volumen.',
+  'backup.contentsQ': '¿Qué contiene una copia?',
+  'backup.contentsA':
+    'Emisoras añadidas, favoritos y su orden, historial, idioma, apariencia y volumen. Contiene datos de emisoras, no grabaciones. La animación del fondo se configura por dispositivo.',
+  'backup.recoveryQ': '¿Puedo recuperar mi biblioteca sin una copia?',
+  'backup.recoveryA':
+    'La biblioteca se guarda en este navegador. No hay cuenta ni sincronización automática. Borrar los datos del sitio o cambiar de navegador puede impedir el acceso. Guarda una copia antes de cambiar de dispositivo.',
+  'backup.offlineQ': '¿Puedo escuchar sin internet?',
+  'backup.offlineA':
+    'El audio necesita internet. Tras preparar los archivos sin conexión, la biblioteca guardada y la interfaz pueden abrirse sin red.',
+
   'backup.language':
     'No se pudo cargar el idioma importado. No se ha importado nada. Reconecta o importa sin los ajustes.',
   'language.loading': 'Cargando idioma…',
@@ -11,7 +35,7 @@ export default {
   'nav.loadError': 'No se pudo cargar esta vista. Reconecta e inténtalo de nuevo.',
   'settings.backupError':
     'No se pudo cargar la copia de seguridad. Reconecta y recarga la aplicación.',
-  'settings.backup': 'Copia de la biblioteca',
+  'settings.backup': 'Copia de seguridad',
   'settings.loading': 'Cargando…',
   'discover.unavailableLabel': 'No se puede añadir esta emisión',
   'discover.unsupportedShort': 'Emisión no compatible',
@@ -92,9 +116,9 @@ export default {
   'station.addFavorite': 'Añadir {station} a favoritas',
   'player.radio': 'Reproductor de radio',
   'player.selected': 'Emisora seleccionada',
-  'player.openCar': 'Abrir modo coche',
-  'player.car': 'Modo coche',
-  'player.carLabel': 'Reproductor en modo coche',
+  'player.openCar': 'Abrir Studio',
+  'player.car': 'Studio',
+  'player.carLabel': 'Reproductor Studio',
   'player.back': 'Volver a las emisoras',
   'player.playback': 'Controles de reproducción',
   'player.previous': 'Emisora anterior',
@@ -207,10 +231,10 @@ export default {
   'storage.playerNewer':
     'Los ajustes del reproductor usan un formato más reciente. Se conservan los datos originales.',
   'storage.playerRecovery': 'No se pudieron leer los ajustes guardados del reproductor.',
-  'backup.title': 'Copia de la biblioteca',
+  'backup.title': 'Copia de seguridad',
   'backup.intro':
-    'Guarda emisoras añadidas, favoritas, historial y ajustes en un archivo JSON. El archivo permanece en tu dispositivo.',
-  'backup.export': 'Descargar copia',
+    'Guarda emisoras, favoritos y preferencias. Recupera tu colección o llévala a otro dispositivo.',
+  'backup.export': 'Guardar copia',
   'backup.file': 'Elegir archivo de copia',
   'backup.reading': 'Leyendo copia…',
   'backup.preview': 'Vista previa de importación',
@@ -221,7 +245,7 @@ export default {
   'backup.settings': 'Importar también idioma, apariencia y volumen',
   'backup.settingsHint':
     'Esto puede cambiar el idioma de la interfaz y el volumen. La emisora actual sigue seleccionada.',
-  'backup.apply': 'Importar y combinar',
+  'backup.apply': 'Añadir desde copia',
   'backup.cancel': 'Cancelar vista previa',
   'backup.success': 'Copia importada. Tu biblioteca está actualizada.',
   'backup.exported':

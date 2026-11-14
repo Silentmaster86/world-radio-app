@@ -1,4 +1,8 @@
 export const en = {
+  'settings.help': 'Help & FAQ',
+  'settings.motion': 'Animate background',
+  'settings.motionHint': 'You can pause the waves. Reduced-motion settings are always respected.',
+
   'language.loading': 'Loading language…',
   'language.failed':
     'Could not load this language. Your current language and radio are unchanged. Reconnect or reopen the app, then try again.',
@@ -7,7 +11,7 @@ export const en = {
   'nav.library': 'Manage library',
   'nav.loadError': 'This view could not load. Reconnect and try again.',
   'settings.backupError': 'Backup could not load. Reconnect and reload the app to try again.',
-  'settings.backup': 'Library backup',
+  'settings.backup': 'Backup',
   'settings.loading': 'Loading…',
   'discover.unavailableLabel': 'Cannot add this stream',
   'discover.unsupportedShort': 'Stream not supported',
@@ -88,9 +92,9 @@ export const en = {
   'station.addFavorite': 'Add {station} to favorites',
   'player.radio': 'Radio player',
   'player.selected': 'Selected station',
-  'player.openCar': 'Open car mode',
-  'player.car': 'Car Mode',
-  'player.carLabel': 'Car mode player',
+  'player.openCar': 'Open Studio',
+  'player.car': 'Studio',
+  'player.carLabel': 'Studio player',
   'player.back': 'Back to stations',
   'player.playback': 'Playback controls',
   'player.previous': 'Previous station',

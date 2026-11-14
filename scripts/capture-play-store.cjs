@@ -1,3 +1,4 @@
+const { selectAppearance } = require('./browser-context.cjs');
 // Render real app screens; run after npm run build with the CI browser tools.
 const assert = require('node:assert/strict'),
   fs = require('node:fs'),
@@ -70,7 +71,7 @@ async function main() {
       await page.locator('.station-card').nth(0).locator('.station-favorite').click();
       await page.locator('.station-card').nth(2).locator('.station-favorite').click();
       await page.locator('#open-settings').click();
-      await page.locator('#appearance').selectOption('dark');
+      await selectAppearance(page, 'dark');
       await page.locator('#close-settings').click();
       await page
         .getByRole('button', {
@@ -84,8 +85,11 @@ async function main() {
       await capture('phone-03-player-dark.png');
       await page.goto(base, { waitUntil: 'networkidle' });
       await page.locator('#open-settings').click();
-      await page.locator('#appearance').selectOption('light');
-      await capture('phone-04-settings-light.png');
+      await selectAppearance(page, 'light');
+      await page.locator('#close-settings').click();
+      await page.goto(base + '/help', { waitUntil: 'networkidle' });
+      await page.locator('[data-backup-help]').waitFor();
+      await capture('phone-04-help-light.png');
       await context.close();
       const feature = await browser.newPage({
         viewport: { width: 1024, height: 500 },

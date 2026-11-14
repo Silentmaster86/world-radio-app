@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { FaHome, FaCarSide } from 'react-icons/fa';
+import { FaHome, FaHeadphones } from 'react-icons/fa';
 import { usePlayerNavigation } from '../context/BrowsingContext';
 import { useAudio } from '../context/AudioContext';
 import { getCountryFlag, getCountryName } from '../lib/stationUtils';
@@ -134,7 +134,7 @@ export default function NowPlaying() {
           </HomeButton>
           <SleepTimer compact />
           <CarBadge className="car-badge">
-            <FaCarSide aria-hidden="true" /> {t('player.car')}
+            <FaHeadphones aria-hidden="true" /> {t('player.car')}
           </CarBadge>
         </TopBar>
         <LogoWrapper className="now-playing-artwork">
@@ -160,6 +160,14 @@ export default function NowPlaying() {
           <div className="car-playback-status">
             <SignalBars playing={status === 'playing'} />
             <PlayerStatus />
+          </div>
+          <div className="studio-spectrum" aria-hidden="true">
+            {[30, 58, 80, 45, 100, 62, 85, 38, 72, 48, 90, 33].map((height, index) => (
+              <i
+                key={index}
+                style={{ '--bar-height': `${height}%`, '--bar-delay': `${index * -0.13}s` }}
+              />
+            ))}
           </div>
         </Details>
         <div data-area="controls">
