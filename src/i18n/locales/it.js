@@ -15,6 +15,7 @@ export default {
   'discover.unavailableLabel': 'Impossibile aggiungere questo flusso',
   'discover.unsupportedShort': 'Flusso non supportato',
   'discover.heading': 'Scopri stazioni',
+  'settings.privacy': 'Informativa sulla privacy',
   'settings.title': 'Impostazioni',
   'settings.done': 'Fine',
   'library.title': 'La tua radio, a modo tuo',

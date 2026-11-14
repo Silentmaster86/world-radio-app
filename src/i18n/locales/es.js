@@ -16,6 +16,7 @@ export default {
   'discover.unavailableLabel': 'No se puede añadir esta emisión',
   'discover.unsupportedShort': 'Emisión no compatible',
   'discover.heading': 'Descubrir emisoras',
+  'settings.privacy': 'Política de privacidad',
   'settings.title': 'Ajustes',
   'settings.done': 'Listo',
   'library.title': 'Tu radio, a tu manera',

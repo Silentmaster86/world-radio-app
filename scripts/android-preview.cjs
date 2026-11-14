@@ -191,4 +191,4 @@ if (require.main === module) {
     process.exitCode = 1;
   }
 }
-module.exports = { normalizeFingerprint, validateConfig, assetLinks };
+module.exports = { normalizeFingerprint, validateConfig, assetLinks, run, executable };

@@ -1,5 +1,8 @@
 # World Radio App — Android Preview
 
+Wariant docelowy sklepu i podpisywanie: [Google Play](PLAY.md).
+Materiały sklepu i deklaracje: [pakiet publikacji](../docs/google-play/README.md).
+
 To jest testowy pakiet **Trusted Web Activity (TWA)** uruchamiający
 `https://worldradioapp.netlify.app/`. Nazwa w telefonie: **World Radio Preview**.
 Identyfikator: `io.github.silentmaster86.worldradioapp.preview`.

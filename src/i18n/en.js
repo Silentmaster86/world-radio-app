@@ -12,6 +12,7 @@ export const en = {
   'discover.unavailableLabel': 'Cannot add this stream',
   'discover.unsupportedShort': 'Stream not supported',
   'discover.heading': 'Discover stations',
+  'settings.privacy': 'Privacy policy',
   'settings.title': 'Settings',
   'settings.done': 'Done',
   'library.title': 'Your radio, your way',

@@ -3,6 +3,8 @@
   Service-Worker-Allowed: /
 /manifest.json
   Cache-Control: no-cache
+/privacy/*
+  Cache-Control: no-cache
 /index.html
   Cache-Control: no-cache
 /

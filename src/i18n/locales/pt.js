@@ -15,6 +15,7 @@ export default {
   'discover.unavailableLabel': 'Não é possível adicionar esta transmissão',
   'discover.unsupportedShort': 'Transmissão incompatível',
   'discover.heading': 'Descobrir estações',
+  'settings.privacy': 'Política de privacidade',
   'settings.title': 'Configurações',
   'settings.done': 'Concluído',
   'library.title': 'Sua rádio, do seu jeito',
