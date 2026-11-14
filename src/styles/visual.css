@@ -313,7 +313,7 @@ body::after {
 .settings-dialog select {
   width: 100%;
   min-width: 0;
-  min-height: 44px;
+  min-height: 46px;
   padding: 0.65rem 0.75rem;
   border: 1px solid var(--wra-border);
   border-radius: 12px;

@@ -172,6 +172,7 @@ async function main() {
                 box.height >= 44 &&
                 box.x >= 0 &&
                 box.x + box.width <= viewport.width,
+              `${language}/${mode}/${viewport.width}: invalid settings target ${selector}: ${JSON.stringify(box)}`,
             );
           }
           await accessible(page, `${language}-${mode}-settings-${viewport.width}`);
