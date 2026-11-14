@@ -15,6 +15,7 @@ export default {
   'discover.unavailableLabel': 'Цей потік не можна додати',
   'discover.unsupportedShort': 'Потік не підтримується',
   'discover.heading': 'Знайти нові станції',
+  'settings.privacy': 'Політика конфіденційності',
   'settings.title': 'Налаштування',
   'settings.done': 'Готово',
   'library.title': 'Ваше радіо, ваш вибір',

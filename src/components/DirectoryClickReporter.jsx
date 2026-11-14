@@ -11,7 +11,7 @@ export default function DirectoryClickReporter() {
     const uuid = playingStation?.directoryId;
     if (status !== 'playing' || !uuid || recorded.current === uuid) return;
     recorded.current = uuid;
-    // Radio Browser requests anonymous station click reports. Never block playback.
+    // Radio Browser requests station-level click reports. Never block playback.
     fetch(`/.netlify/functions/radio-directory?click=${uuid}`, { method: 'POST' }).catch(() => {});
   }, [status, wantsToPlay, playingStation]);
   return null;

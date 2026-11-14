@@ -1,5 +1,9 @@
 # Domain verification and signing
 
+The separate Play target is configured in `play-config.json`; see [PLAY.md](PLAY.md)
+for its owner-controlled upload signing and `npm run play:assetlinks` command.
+The preview command below remains restricted to the `.preview` package.
+
 A verified TWA needs both directions of the relationship:
 
 1. The Android package declares `https://worldradioapp.netlify.app` in its native

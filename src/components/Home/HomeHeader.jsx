@@ -122,6 +122,9 @@ export default function HomeHeader({ headingAs = 'h1', back = false }) {
         <button type="button" data-open-backup onClick={() => setBackupOpen(true)}>
           {t('settings.backup')}
         </button>
+        <a className="dialog-link" href="/privacy/" target="_blank" rel="noopener noreferrer">
+          {t('settings.privacy')}
+        </a>
         {backupOpen && (
           <ErrorBoundary
             fallback={

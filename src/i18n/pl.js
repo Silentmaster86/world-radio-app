@@ -13,6 +13,7 @@ export const pl = {
   'discover.unavailableLabel': 'Nie można dodać tego strumienia',
   'discover.unsupportedShort': 'Nieobsługiwany strumień',
   'discover.heading': 'Odkrywaj stacje',
+  'settings.privacy': 'Polityka prywatności',
   'settings.title': 'Ustawienia',
   'settings.done': 'Gotowe',
   'library.title': 'Twoje radio. Twój wybór.',

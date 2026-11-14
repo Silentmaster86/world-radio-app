@@ -16,6 +16,7 @@ export default {
   'discover.unavailableLabel': 'Impossible d’ajouter ce flux',
   'discover.unsupportedShort': 'Flux non pris en charge',
   'discover.heading': 'Découvrir des stations',
+  'settings.privacy': 'Politique de confidentialité',
   'settings.title': 'Paramètres',
   'settings.done': 'Terminé',
   'library.title': 'Votre radio, à votre façon',

@@ -17,6 +17,7 @@ export default {
   'discover.unavailableLabel': 'Dieser Stream kann nicht hinzugefügt werden',
   'discover.unsupportedShort': 'Stream nicht unterstützt',
   'discover.heading': 'Sender entdecken',
+  'settings.privacy': 'Datenschutzerklärung',
   'settings.title': 'Einstellungen',
   'settings.done': 'Fertig',
   'library.title': 'Dein Radio, dein Stil',

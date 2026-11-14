@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Privacy policy / Polityka prywatności — World Radio App</title>
+    <meta
+      name="description"
+      content="How World Radio App handles local settings, radio searches, streaming connections and privacy requests."
+    />
+    <style>
+      :root {
+        font-family: system-ui, sans-serif;
+        color: #17233b;
+        background: #f4f5fa;
+        line-height: 1.65;
+        color-scheme: light dark;
+      }
+      body {
+        max-width: 56rem;
+        margin: auto;
+        padding: 1rem clamp(1rem, 4vw, 3rem) 4rem;
+      }
+      a {
+        color: #3949ab;
+        text-underline-offset: 0.2em;
+        overflow-wrap: anywhere;
+      }
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1.5rem;
+      }
+      nav a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+      }
+      article {
+        margin-top: 2rem;
+        scroll-margin-top: 1rem;
+      }
+      h1,
+      h2,
+      h3 {
+        line-height: 1.3;
+      }
+      h1 {
+        font-size: clamp(1.8rem, 5vw, 2.8rem);
+      }
+      h2 {
+        margin-top: 2rem;
+      }
+      :focus-visible {
+        outline: 3px solid #6573e8;
+        outline-offset: 4px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          color: #edf2fa;
+          background: #080f19;
+        }
+        a {
+          color: #76e6d5;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav aria-label="Page navigation">
+      <a href="/">World Radio App</a>
+      <a href="#english" lang="en">English</a>
+      <a href="#polski" lang="pl">Polski</a>
+    </nav>
+    <h1>Privacy policy / <span lang="pl">Polityka prywatności</span></h1>
+    <p>World Radio App · Silentmaster Apps · 2026-11-14</p>
+    <article id="english" lang="en" aria-labelledby="en-title">
+      <h2 id="en-title">English</h2>
+      <p>
+        This policy covers the World Radio App website/PWA at worldradioapp.netlify.app and its
+        Android browser wrapper. The operator is Przemysław Pietkun, publishing as Silentmaster
+        Apps. Contact:
+        <a href="mailto:przemyslaw.pietkun@gmail.com">przemyslaw.pietkun@gmail.com</a>.
+      </p>
+      <h3>Data kept on your device</h3>
+      <p>
+        Favorites and their order, added stations, recent station history, the selected station,
+        volume/mute, language and appearance preferences are stored in your browser's local storage.
+        The Sleep Timer runs locally. The service worker stores app files and dictionaries for
+        offline use. There is no app account or automatic cloud synchronization of your library.
+      </p>
+      <p>
+        These local records remain until you remove them, clear the site's storage or the browser
+        removes it. You can clear recent history in the app, remove favorite/added stations
+        individually, or clear all site data in your browser/Android site settings. The Android
+        wrapper uses the selected browser's website storage; uninstalling the wrapper alone may
+        leave that storage intact.
+      </p>
+      <h3>Network requests and external services</h3>
+      <ul>
+        <li>
+          <strong>Hosting:</strong> Netlify delivers the website and runs its radio-directory
+          function. Network requests expose technical information such as IP address, user agent,
+          requested URL and request time to the hosting infrastructure. Search URLs can contain your
+          station query and country filter. The app does not add its own persistent user identifier
+          or explicitly log request bodies in its function.
+        </li>
+        <li>
+          <strong>Station discovery:</strong> when you search, your station-name query, selected
+          country and result page are sent through the Netlify function to Radio Browser. Opening a
+          shared directory station sends its station UUID. The function does not deliberately
+          forward your IP address or browser identifier in its own upstream headers; Netlify still
+          receives the original request.
+        </li>
+        <li>
+          <strong>Station start reports:</strong> after a Radio Browser station begins playing, the
+          app sends its station UUID through Netlify to Radio Browser's station-click endpoint. This
+          supports directory usage statistics and is not a copy of your full listening history or
+          favorites. Technical request information may still be processed by the hosting service.
+          The current app has no separate switch for these reports.
+        </li>
+        <li>
+          <strong>Radio playback:</strong> audio is requested directly from the chosen broadcaster
+          or streaming/CDN provider. They receive your connection's IP address, requested stream and
+          technical browser information, and may redirect the stream to another provider. Streams
+          may include the broadcaster's advertising. Their own privacy and retention practices
+          apply; the app does not record the broadcast for later offline playback.
+        </li>
+      </ul>
+      <p>
+        App requests use HTTPS, including supported HLS playlists and segments. This protects
+        transport, but does not prevent the destination provider from processing the request.
+        Hosting, directory and stream services may process data outside your country. Their log
+        retention, locations and independent uses are governed by their service terms and privacy
+        information; no common retention period is promised by this app.
+      </p>
+      <p>
+        References:
+        <a href="https://www.netlify.com/privacy/" rel="noreferrer">Netlify privacy policy</a> and
+        <a href="https://www.radio-browser.info/" rel="noreferrer">Radio Browser</a>. Broadcaster
+        information is available from the relevant station's official website.
+      </p>
+      <h3>Exports, sharing and contact</h3>
+      <p>
+        Library backup creates a JSON file on your device. Import reads the file you select locally;
+        the app does not upload that file to its server. Sharing sends a station link to the app or
+        destination you choose through the system share sheet or clipboard. Those destinations have
+        their own practices. Delete exported files separately if you no longer want to retain them.
+      </p>
+      <p>
+        If you email support, your address and message are processed to respond to your request. Do
+        not include passwords or identity documents. Support messages are kept while the request is
+        handled and only as long as needed afterwards for follow-up or applicable obligations.
+        GitHub issues are public: do not post personal information there.
+      </p>
+      <h3>Permissions, purposes and your choices</h3>
+      <p>
+        The current app has no login, payment, advertising SDK, third-party analytics SDK or
+        automatic crash-reporting SDK. It does not request microphone, contacts or Android location
+        permission. Selecting a country filters stations; it does not read the device's location. A
+        lack of location permission does not stop external services from seeing an IP address or
+        inferring an approximate region.
+      </p>
+      <p>
+        Data is used to provide streaming, search, local preferences, directory usage statistics,
+        service security and support. Where applicable, you can ask about access, correction,
+        deletion, restriction or objection concerning personal data handled by the operator by
+        emailing the contact above, and contact your competent data-protection authority. Local-only
+        records can be removed on your device; we cannot retrieve a copy of that library from a
+        cloud account. Independent providers handle requests concerning their own data.
+      </p>
+      <p>
+        Internet radio content is selected by broadcasters and is not curated as a children's
+        service. This policy will be updated if app behavior or providers change; the date above
+        identifies this version.
+      </p>
+    </article>
+    <article id="polski" lang="pl" aria-labelledby="pl-title">
+      <h2 id="pl-title">Polski</h2>
+      <p>
+        Polityka obejmuje stronę/PWA World Radio App pod adresem worldradioapp.netlify.app oraz jej
+        przeglądarkowy pakiet Android. Operatorem jest Przemysław Pietkun, publikujący jako
+        Silentmaster Apps. Kontakt:
+        <a href="mailto:przemyslaw.pietkun@gmail.com">przemyslaw.pietkun@gmail.com</a>.
+      </p>
+      <h3>Dane zapisane na urządzeniu</h3>
+      <p>
+        Ulubione i ich kolejność, dodane stacje, historia ostatnich stacji, wybrana stacja,
+        głośność/wyciszenie, język i wygląd są zapisywane w pamięci lokalnej przeglądarki. Wyłącznik
+        czasowy działa lokalnie. Service worker przechowuje pliki aplikacji i słowniki do działania
+        offline. Aplikacja nie ma kont użytkowników ani automatycznej synchronizacji biblioteki z
+        chmurą.
+      </p>
+      <p>
+        Dane lokalne pozostają do ich usunięcia przez Ciebie, wyczyszczenia danych witryny lub
+        usunięcia ich przez przeglądarkę. Historię można wyczyścić w aplikacji, ulubione i dodane
+        stacje usuwać pojedynczo, a całość danych witryny wyczyścić w ustawieniach
+        przeglądarki/witryny na Androidzie. Pakiet Android używa pamięci witryny w wybranej
+        przeglądarce; samo odinstalowanie pakietu może jej nie usunąć.
+      </p>
+      <h3>Połączenia sieciowe i usługi zewnętrzne</h3>
+      <ul>
+        <li>
+          <strong>Hosting:</strong> Netlify dostarcza stronę i obsługuje funkcję katalogu stacji.
+          Infrastruktura otrzymuje informacje techniczne, m.in. adres IP, user agent, adres żądania
+          i jego czas. Adres wyszukiwania może zawierać wpisaną nazwę stacji i filtr kraju.
+          Aplikacja nie dodaje własnego trwałego identyfikatora użytkownika ani jawnego logowania
+          treści żądań w swojej funkcji.
+        </li>
+        <li>
+          <strong>Wyszukiwanie:</strong> wpisana nazwa stacji, wybrany kraj i numer strony wyników
+          trafiają przez funkcję Netlify do Radio Browser. Otwarcie udostępnionej stacji z katalogu
+          wysyła jej UUID. Funkcja nie przekazuje celowo Twojego IP ani identyfikatora przeglądarki
+          we własnych nagłówkach do katalogu; Netlify otrzymuje jednak pierwotne żądanie.
+        </li>
+        <li>
+          <strong>Zgłoszenie uruchomienia stacji:</strong> po rozpoczęciu odtwarzania stacji z Radio
+          Browser aplikacja przesyła jej UUID przez Netlify do endpointu zliczającego uruchomienia.
+          Służy to statystykom katalogu i nie jest kopią całej historii ani ulubionych. Hosting może
+          przetwarzać informacje techniczne żądania. Obecnie nie ma osobnego przełącznika tych
+          zgłoszeń.
+        </li>
+        <li>
+          <strong>Odtwarzanie:</strong> dźwięk jest pobierany bezpośrednio od nadawcy lub dostawcy
+          streamingu/CDN. Otrzymują oni IP Twojego połączenia, adres streamu i informacje techniczne
+          przeglądarki; mogą przekierować transmisję do innego dostawcy. Transmisja może zawierać
+          reklamy nadawcy. Obowiązują ich własne zasady prywatności i przechowywania danych.
+          Aplikacja nie nagrywa audycji do późniejszego słuchania offline.
+        </li>
+      </ul>
+      <p>
+        Żądania aplikacji korzystają z HTTPS, także obsługiwane playlisty i segmenty HLS.
+        Szyfrowanie transmisji nie uniemożliwia przetwarzania żądania przez jego odbiorcę. Dostawcy
+        hostingu, katalogu i transmisji mogą przetwarzać dane poza Twoim krajem. Ich okresy
+        przechowywania logów, lokalizacje i niezależne zastosowania wynikają z ich warunków i
+        informacji o prywatności; aplikacja nie obiecuje jednego wspólnego okresu retencji.
+      </p>
+      <p>
+        Informacje:
+        <a href="https://www.netlify.com/privacy/" rel="noreferrer">polityka Netlify</a> oraz
+        <a href="https://www.radio-browser.info/" rel="noreferrer">Radio Browser</a>. Informacji o
+        nadawcy szukaj na oficjalnej stronie danej stacji.
+      </p>
+      <h3>Kopie, udostępnianie i kontakt</h3>
+      <p>
+        Eksport biblioteki tworzy plik JSON na Twoim urządzeniu. Import odczytuje wybrany plik
+        lokalnie; aplikacja nie wysyła go na serwer. Udostępnienie przekazuje link stacji do
+        wybranej aplikacji lub odbiorcy przez systemowe udostępnianie albo schowek. Obowiązują
+        zasady wybranego odbiorcy. Wyeksportowane pliki usuń osobno, jeśli nie chcesz ich dalej
+        przechowywać.
+      </p>
+      <p>
+        Kontakt e-mail oznacza przetwarzanie adresu i treści wiadomości w celu odpowiedzi. Nie
+        wysyłaj haseł ani dokumentów tożsamości. Wiadomości są przechowywane podczas obsługi sprawy
+        i później tylko tak długo, jak wymaga dalszy kontakt lub obowiązujące zobowiązania.
+        Zgłoszenia na GitHubie są publiczne — nie wpisuj tam danych osobowych.
+      </p>
+      <h3>Uprawnienia, cele i Twoje możliwości</h3>
+      <p>
+        Obecna aplikacja nie ma logowania, płatności, reklamowego SDK, zewnętrznego SDK
+        analitycznego ani automatycznego SDK raportowania awarii. Nie prosi o mikrofon, kontakty ani
+        uprawnienie lokalizacji Androida. Wybór kraju filtruje stacje i nie odczytuje lokalizacji
+        urządzenia. Brak uprawnienia lokalizacji nie blokuje poznania IP ani przybliżonego regionu
+        przez zewnętrznych dostawców.
+      </p>
+      <p>
+        Dane służą odtwarzaniu, wyszukiwaniu, ustawieniom lokalnym, statystykom katalogu,
+        bezpieczeństwu usług i pomocy użytkownikom. W odpowiednich przypadkach możesz zwrócić się na
+        powyższy e-mail w sprawie dostępu, sprostowania, usunięcia, ograniczenia lub sprzeciwu wobec
+        przetwarzania danych przez operatora oraz do właściwego organu ochrony danych. Dane
+        wyłącznie lokalne usuwa się na urządzeniu; nie mamy ich kopii na koncie w chmurze.
+        Niezależni dostawcy obsługują wnioski dotyczące ich własnych danych.
+      </p>
+      <p>
+        Treści radia wybierają nadawcy; aplikacja nie jest usługą dobierającą program specjalnie dla
+        dzieci. Polityka będzie aktualizowana przy zmianach działania aplikacji lub dostawców; data
+        u góry wskazuje jej wersję.
+      </p>
+    </article>
+  </body>
+</html>

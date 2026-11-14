@@ -1,0 +1,22 @@
+{
+  "source": "Actual production build rendered in desktop Chromium with mobile viewport, not an Android device capture",
+  "viewport": {
+    "width": 360,
+    "height": 640,
+    "deviceScaleFactor": 3
+  },
+  "audio": "Paused; no fabricated playback state or stream fixtures",
+  "screenshots": [
+    "en-US/phone-01-library-light.png",
+    "en-US/phone-02-favorites-dark.png",
+    "en-US/phone-03-player-dark.png",
+    "en-US/phone-04-settings-light.png",
+    "en-US/feature-1024x500.png",
+    "pl-PL/phone-01-library-light.png",
+    "pl-PL/phone-02-favorites-dark.png",
+    "pl-PL/phone-03-player-dark.png",
+    "pl-PL/phone-04-settings-light.png",
+    "pl-PL/feature-1024x500.png"
+  ],
+  "gitBase": "3ef64ac89075e87545d87948535fe8f894d8262c"
+}

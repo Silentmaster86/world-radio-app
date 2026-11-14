@@ -20,7 +20,21 @@ plugins {
     id 'com.android.application'
 }
 
+def buildTarget = providers.gradleProperty('worldRadioTarget').getOrElse('preview')
+if (!(buildTarget in ['preview', 'play'])) {
+    throw new GradleException('worldRadioTarget must be preview or play')
+}
 def config = new groovy.json.JsonSlurper().parse(rootProject.file("twa-manifest.json"))
+if (buildTarget == 'play') {
+    config.putAll(new groovy.json.JsonSlurper().parse(rootProject.file('play-config.json')))
+}
+def codeNamespace = 'io.github.silentmaster86.worldradioapp'
+def signedUpload = providers.gradleProperty('worldRadioSigned').getOrElse('false') == 'true'
+def signingFields = ['WORLD_RADIO_KEYSTORE', 'WORLD_RADIO_KEY_ALIAS',
+                     'WORLD_RADIO_STORE_PASSWORD', 'WORLD_RADIO_KEY_PASSWORD']
+if (signedUpload && (buildTarget != 'play' || signingFields.any { !System.getenv(it) })) {
+    throw new GradleException('Signed Play builds require all four WORLD_RADIO signing variables')
+}
 
 def twaManifest = [
     applicationId: config.packageId,
@@ -55,7 +69,7 @@ def twaManifest = [
 android {
     compileSdkVersion 36
     buildToolsVersion "36.0.0"
-    namespace config.packageId
+    namespace codeNamespace
     defaultConfig {
         applicationId config.packageId
         minSdkVersion config.minSdkVersion
@@ -161,6 +175,14 @@ android {
             keyAlias 'preview'
             keyPassword 'android'
         }
+        if (signedUpload) {
+            upload {
+                storeFile file(System.getenv('WORLD_RADIO_KEYSTORE'))
+                storePassword System.getenv('WORLD_RADIO_STORE_PASSWORD')
+                keyAlias System.getenv('WORLD_RADIO_KEY_ALIAS')
+                keyPassword System.getenv('WORLD_RADIO_KEY_PASSWORD')
+            }
+        }
     }
     buildTypes {
         debug {
@@ -168,6 +190,8 @@ android {
         }
         release {
             minifyEnabled true
+            debuggable false
+            if (signedUpload) signingConfig signingConfigs.upload
         }
     }
     compileOptions {
@@ -205,7 +229,7 @@ task generateShorcutsFile {
                     'intent'(
                             'android:action': 'android.intent.action.MAIN',
                             'android:targetPackage': twaManifest.applicationId,
-                            'android:targetClass': twaManifest.applicationId + '.LauncherActivity',
+                            'android:targetClass': codeNamespace + '.LauncherActivity',
                             'android:data': s.url)
                     'categories'('android:name': 'android.intent.category.LAUNCHER')
                 }
