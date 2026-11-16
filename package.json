@@ -52,15 +52,15 @@
     "@babel/preset-env": "^7.29.7",
     "@babel/preset-react": "^7.29.7",
     "@eslint/js": "^10.0.1",
-    "@vitejs/plugin-react": "^6.2.1",
+    "@vitejs/plugin-react": "^6.3.0",
     "babel-jest": "^30.5.2",
     "eslint": "^10.14.0",
     "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-react-x": "^5.28.8",
+    "eslint-plugin-react-x": "^5.30.2",
     "globals": "^17.14.0",
     "jest": "^30.5.2",
     "jest-environment-jsdom": "^30.5.2",
-    "prettier": "^3.9.10",
-    "vite": "^8.3.6"
+    "prettier": "^3.10.1",
+    "vite": "^8.3.8"
   }
 }
