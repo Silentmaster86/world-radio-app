@@ -141,6 +141,7 @@ export default {
   'status.playing': 'Live-Wiedergabe',
   'status.playingBackup': 'Live-Wiedergabe (Ersatzstream)',
   'status.buffering': 'Puffern…',
+  'status.interrupted': 'Extern pausiert. Wiedergabe drücken.',
   'status.paused': 'Pausiert',
   'status.error': 'Der Sender ist derzeit nicht verfügbar.',
   'status.offlineWaiting': 'Offline. Warte auf eine Verbindung…',

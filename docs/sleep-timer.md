@@ -7,8 +7,10 @@ minutes/seconds. Open it again to choose a new duration or **Cancel timer**.
 The timer pauses the shared player and releases its live source. It survives
 station changes and navigation between the catalog and car mode. Setting a timer
 does not start playback; cancelling the timer leaves current playback running.
-Pausing playback, including through system media controls, cancels an active
-timer. If the deadline passes while offline, a later reconnection cannot resume
+Explicitly pausing playback, including through system media controls, cancels
+an active timer. An unidentified browser/device interruption keeps the original
+deadline so a later device resume does not extend listening. Automatic reconnect
+and native device resume check that deadline before reopening a stream. If the deadline passes while offline, a later reconnection cannot resume
 playback. Reloading/closing the app clears the timer; it is never saved alongside
 favorites or player preferences.
 

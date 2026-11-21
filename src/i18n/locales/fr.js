@@ -141,6 +141,7 @@ export default {
   'status.playing': 'Lecture en direct',
   'status.playingBackup': 'Lecture en direct (flux de secours)',
   'status.buffering': 'Mise en mémoire tampon…',
+  'status.interrupted': 'Pause système. Appuyez sur Lecture.',
   'status.paused': 'En pause',
   'status.error': 'La station est actuellement indisponible.',
   'status.offlineWaiting': 'Hors ligne. En attente d’une connexion…',

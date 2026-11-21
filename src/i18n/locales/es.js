@@ -138,6 +138,7 @@ export default {
   'status.playing': 'Reproduciendo en directo',
   'status.playingBackup': 'Reproduciendo en directo (emisión alternativa)',
   'status.buffering': 'Cargando audio…',
+  'status.interrupted': 'Pausa externa. Pulsa Reproducir.',
   'status.paused': 'En pausa',
   'status.error': 'La emisora no está disponible en este momento.',
   'status.offlineWaiting': 'Sin conexión. Esperando una conexión…',

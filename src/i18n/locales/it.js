@@ -136,6 +136,7 @@ export default {
   'status.playing': 'In diretta',
   'status.playingBackup': 'In diretta (flusso alternativo)',
   'status.buffering': 'Caricamento audio…',
+  'status.interrupted': 'Pausa esterna. Premi Riproduci.',
   'status.paused': 'In pausa',
   'status.error': 'La stazione non è al momento disponibile.',
   'status.offlineWaiting': 'Offline. In attesa di una connessione…',

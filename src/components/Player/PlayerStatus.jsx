@@ -22,6 +22,7 @@ const Status = styled.div`
 export default function PlayerStatus({ announce = true }) {
   const {
     status,
+    interrupted,
     wantsToPlay,
     online,
     retryAttempt,
@@ -41,7 +42,7 @@ export default function PlayerStatus({ announce = true }) {
         : t('status.connecting'),
     playing: streamSourceIndex ? t('status.playingBackup') : t('status.playing'),
     buffering: t('status.buffering'),
-    paused: t('status.paused'),
+    paused: t(interrupted ? 'status.interrupted' : 'status.paused'),
     error: error?.code
       ? t(`error.${error.code}`, {}, error.message)
       : error?.message || t('status.error'),
