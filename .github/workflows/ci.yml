@@ -61,8 +61,6 @@ jobs:
         run: NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-backup.cjs
       - name: Check library ordering, sharing and safe deletion
         run: NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-library.cjs
-      - name: Check playback animation and reduced motion
-        run: NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-design.cjs
       - name: Check offline access and safe PWA updates
         run: NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-pwa.cjs
       - name: Check privacy access without interrupting audio
@@ -81,7 +79,6 @@ jobs:
           NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-hls.cjs
           NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-backup.cjs
           NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-library.cjs
-          NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-design.cjs
           NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-privacy.cjs
       - uses: actions/upload-artifact@v7
         if: always()
@@ -92,7 +89,6 @@ jobs:
             test-results/discovery
             test-results/backup
             test-results/library
-            test-results/design
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -164,6 +160,8 @@ jobs:
           "$RUNNER_TEMP/wra-browser/node_modules/.bin/playwright" install chromium
       - name: Check responsive theme controls, motion and transfer between devices
         run: NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-studio.cjs
+      - name: Check playback animation and reduced motion
+        run: NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-design.cjs
       - name: Check Studio on the current Netlify preview
         if: github.event_name == 'pull_request'
         env:
@@ -173,11 +171,53 @@ jobs:
         run: |
           node scripts/check-preview.cjs
           NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-studio.cjs
+          NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-design.cjs
       - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: studio-browser-results
-          path: test-results/studio
+          path: |
+            test-results/studio
+            test-results/design
+
+  recovery-browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      CI: true
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: wra-browsers-${{ runner.os }}-ubuntu24.04-playwright-1.56.1
+      - name: Install isolated recovery check tools
+        timeout-minutes: 4
+        run: |
+          npm install --prefix "$RUNNER_TEMP/wra-browser" --prefer-offline --no-audit --no-fund --package-lock=false playwright@1.56.1 @axe-core/playwright@4.10.2
+          "$RUNNER_TEMP/wra-browser/node_modules/.bin/playwright" install chromium
+      - name: Check real stream transport recovery and pause priority
+        run: NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-recovery.cjs
+      - name: Check recovery on the current Netlify preview
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          WRA_BASE_URL: https://deploy-preview-${{ github.event.pull_request.number }}--worldradioapp.netlify.app
+        run: |
+          node scripts/check-preview.cjs
+          NODE_PATH="$RUNNER_TEMP/wra-browser/node_modules" node scripts/check-recovery.cjs
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: recovery-browser-results
+          path: test-results/recovery
 
   performance:
     if: github.event_name == 'pull_request'

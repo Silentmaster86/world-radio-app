@@ -27,19 +27,40 @@ first instance before creating the next one.
 
 ## Recovery
 
-The connection/buffering deadline is 15 seconds. Recoverable failures use at most
-three automatic retries with delays of 1, 2 and 4 seconds during a requested
-playback session. Stations may optionally provide a small set of broadcaster-sourced
-`fallbackUrls`. After a recoverable failure, the next configured endpoint is tried
-using the **same** audio element and the existing total retry budget. The status
-indicates backup playback without exposing a server URL. A manual play/retry or
-a different selection starts again from the primary endpoint and resets the budget.
-Autoplay and codec errors remain terminal, and Pause, sleep timer expiry,
-station changes and disposal cancel queued fallback attempts. A 200 response
-alone does not establish identity or device playback support.
-Blocked autoplay, unsupported formats and decoding failures need user action.
-Offline waits preserve intent; explicit pause and disposal cancel that wait.
-Stalled events with enough buffered data do not incorrectly stop playback.
+The connection/buffering deadline is 15 seconds. After confirmed playback, a
+liveness watchdog also checks whether the media clock still advances. Real
+`timeupdate` progress renews that deadline; a deadline callback samples
+`currentTime` before reconnecting so background-throttled events alone do not
+restart healthy audio. Frozen playback can recover even if `navigator.onLine`
+stays true and no `waiting`/`error` event arrives. Offline waits preserve intent;
+returning online rearms the watchdog or reconnects a waiting attempt.
+
+Recoverable failures use at most **five automatic retries**, with delays of
+1, 2, 4, 8 and 15 seconds (30 seconds of backoff plus connection deadlines),
+**across one requested playback session**. Successful retries do not reset the
+budget. A manual play/retry or a different selection resets it. Stations may
+provide a small set of broadcaster-sourced `fallbackUrls`; these use the same
+audio element and total budget. The status indicates backup playback without
+exposing a server URL. Autoplay denial and decoding errors remain terminal.
+An unsupported initial source is also terminal; after successful playback in
+that session, source-unavailable/unsupported errors during reconnect are treated
+as transient, still within the bounded budget. A 200 response alone does not
+establish identity or device playback support.
+
+Actual browser/device pause clears playback intent and cancels recovery. The UI
+says **Paused by device. Press Play.** without claiming to detect a phone call.
+A paused confirmed resource is retained, as with system media controls. If the
+browser later emits an actual native `play` event on that retained interrupted
+resource, the controller reconnects the live stream on the same audio element.
+It never infers that a call ended from a timeout, focus or network event. Android
+may only mute audio, pause it, dispatch Media Session actions or withhold resume;
+web APIs do not offer a reliable call-ended signal. Manual Play remains available.
+
+Explicit app/Media Session pause, sleep-timer expiry, station changes and disposal
+cancel queued retries. An unidentified outside pause keeps the original sleep
+deadline. Before automatic reconnect or native device resume, the deadline is
+checked; expiry releases the source and blocks that resume. See
+[mobile recovery verification](mobile-recovery.md) for browser and device checks.
 
 `PlayerStatus` explains these states and provides a manual retry. Transport
 controls offer cancellation during connection, and station cards distinguish

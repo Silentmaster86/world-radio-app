@@ -1,5 +1,21 @@
 # Real-device playback verification
 
+## New interruption report — 21 November 2026
+
+The user now reports stops on Wi-Fi → cellular handover and after answering or
+declining an incoming call on a Samsung Android phone. Exact model (S20/S24/S25),
+Android/One UI, Chrome version and Chrome/PWA/APK variant remain unconfirmed.
+The app stays responsive; tapping the same station restores playback without
+reloading. The paused/error status has not yet been observed. This new report
+means the older handover pass below does not establish current reliability.
+
+The recovery patch has controlled regression checks, but a physical-device
+recheck is **pending**. Browser pause/Play simulation is not a real call test.
+Follow [mobile-recovery.md](mobile-recovery.md), record the exact device and app
+variant, and report behavior for both answered and declined calls.
+
+## Historical report — 7 November 2026
+
 These results were reported on 7 November 2026 from a Samsung Android device.
 The exact model and Android/One UI version have not been confirmed. The observations
 are manual, not automated or universal compatibility claims.

@@ -181,7 +181,8 @@ test('changing station while a backup is pending never starts the old backup', a
   });
   expect(await player.play()).toBe(false);
   await player.selectStation('second');
-  jest.runAllTimers();
+  // Healthy playback now owns a recurring liveness deadline.
+  jest.advanceTimersByTime(1000);
   expect(player.getSnapshot()).toMatchObject({
     selectedStationId: 'second',
     playingStationId: 'second',
@@ -306,6 +307,143 @@ test('recognizes buffering and recovery without treating buffered stalled as fai
   expect(audio.play).toHaveBeenCalledTimes(1);
 });
 
+test('recovers a frozen playing stream even while online and readyState stay healthy', async () => {
+  const { audio, player, createAudio } = setup();
+  audio.advanceTime = false;
+  await player.play();
+  audio.emit('stalled');
+  expect(player.getSnapshot().status).toBe('playing');
+  jest.advanceTimersByTime(100);
+  expect(player.getSnapshot()).toMatchObject({
+    status: 'connecting',
+    wantsToPlay: true,
+    retryAttempt: 1,
+  });
+  jest.advanceTimersByTime(10);
+  expect(player.getSnapshot()).toMatchObject({ status: 'playing', selectedStationId: 'first' });
+  expect(audio.play).toHaveBeenCalledTimes(2);
+  expect(createAudio).toHaveBeenCalledTimes(1);
+});
+
+test('healthy media-clock progress prevents false recovery when timeupdate events are delayed', async () => {
+  const { audio, player } = setup();
+  await player.play();
+  jest.advanceTimersByTime(500);
+  expect(audio.play).toHaveBeenCalledTimes(1);
+  expect(player.getSnapshot().status).toBe('playing');
+});
+
+test('only advancing timeupdate events extend the liveness deadline', async () => {
+  const { audio, player } = setup();
+  audio.advanceTime = false;
+  await player.play();
+  jest.advanceTimersByTime(90);
+  audio.emit('timeupdate', { currentTime: 1 });
+  jest.advanceTimersByTime(90);
+  expect(audio.play).toHaveBeenCalledTimes(1);
+  audio.emit('timeupdate', { currentTime: 1 });
+  jest.advanceTimersByTime(20);
+  expect(audio.play).toHaveBeenCalledTimes(2);
+});
+
+test('time progress can confirm recovery from buffering without a second playing event', async () => {
+  const { audio, player } = setup();
+  await player.play();
+  audio.emit('waiting', { readyState: 2 });
+  audio.emit('timeupdate', { currentTime: 1, readyState: 4 });
+  expect(player.getSnapshot().status).toBe('playing');
+  expect(audio.play).toHaveBeenCalledTimes(1);
+});
+
+test('going back online rearms a playing stream that has silently frozen', async () => {
+  const { audio, player } = setup();
+  audio.advanceTime = false;
+  await player.play();
+  player.setOnline(false);
+  jest.advanceTimersByTime(500);
+  expect(audio.play).toHaveBeenCalledTimes(1);
+  player.setOnline(true);
+  jest.advanceTimersByTime(110);
+  expect(audio.play).toHaveBeenCalledTimes(2);
+});
+
+test('an actual external pause wins over liveness and online signals, including a missing pause event', async () => {
+  const { audio, player } = setup();
+  await player.play();
+  audio.paused = true;
+  jest.advanceTimersByTime(100);
+  player.setOnline(false);
+  player.setOnline(true);
+  jest.runAllTimers();
+  expect(player.getSnapshot()).toMatchObject({
+    status: 'paused',
+    interrupted: true,
+    wantsToPlay: false,
+  });
+  expect(audio.play).toHaveBeenCalledTimes(1);
+  await player.play();
+  expect(player.getSnapshot()).toMatchObject({ status: 'playing', interrupted: false });
+});
+
+test('manual pause cancels silent-stall recovery and ignores late progress', async () => {
+  const { audio, player } = setup();
+  audio.advanceTime = false;
+  await player.play();
+  jest.advanceTimersByTime(100);
+  player.pause();
+  audio.emit('timeupdate', { currentTime: 2 });
+  jest.runAllTimers();
+  expect(player.getSnapshot()).toMatchObject({
+    status: 'paused',
+    interrupted: false,
+    wantsToPlay: false,
+  });
+  expect(audio.play).toHaveBeenCalledTimes(1);
+});
+
+test('an overdue sleep deadline can cancel an automatic reconnect before any new play', async () => {
+  let controller;
+  const beforeReconnect = jest.fn(() => controller.pause());
+  const { audio, player } = setup({ beforeReconnect });
+  controller = player;
+  audio.advanceTime = false;
+  await player.play();
+  jest.advanceTimersByTime(110);
+  expect(beforeReconnect).toHaveBeenCalledTimes(1);
+  expect(audio.play).toHaveBeenCalledTimes(1);
+  expect(player.getSnapshot().status).toBe('paused');
+});
+
+test('default handover retries have a bounded 30-second backoff window', async () => {
+  const { audio, player } = setup({ retryDelays: undefined });
+  audio.advanceTime = false;
+  await player.play();
+  jest.runAllTimers();
+  expect(audio.play).toHaveBeenCalledTimes(6);
+  expect(player.getSnapshot()).toMatchObject({
+    status: 'error',
+    wantsToPlay: false,
+    retryAttempt: 5,
+  });
+});
+
+test('a temporarily unreachable previously playing stream is not immediately declared unsupported', async () => {
+  const { audio, player } = setup();
+  await player.play();
+  audio.emit('error', { error: { code: 2 } });
+  audio.play.mockRejectedValueOnce(new DOMException('No supported source', 'NotSupportedError'));
+  jest.advanceTimersByTime(10);
+  await flush();
+  expect(player.getSnapshot()).toMatchObject({
+    status: 'connecting',
+    wantsToPlay: true,
+    retryAttempt: 2,
+  });
+  jest.advanceTimersByTime(20);
+  expect(player.getSnapshot().status).toBe('playing');
+  expect(audio.play).toHaveBeenCalledTimes(3);
+});
+
 test('an ended stream reconnects within the same bounded retry budget', async () => {
   const { audio, player } = setup();
   await player.play();
@@ -347,6 +485,51 @@ test('an external pause cancels the playback intention', async () => {
   await player.play();
   audio.emit('pause', { paused: true });
   expect(player.getSnapshot()).toMatchObject({ status: 'paused', wantsToPlay: false });
+});
+
+test('a real device Play request resumes a retained system pause without a second audio element', async () => {
+  const { audio, player, createAudio } = setup();
+  await player.play();
+  audio.emit('pause', { paused: true });
+  expect(player.getSnapshot()).toMatchObject({ wantsToPlay: false, interrupted: true });
+  audio.emit('play', { paused: false });
+  expect(player.getSnapshot()).toMatchObject({
+    status: 'playing',
+    wantsToPlay: true,
+    interrupted: false,
+  });
+  expect(createAudio).toHaveBeenCalledTimes(1);
+  expect(audio.play).toHaveBeenCalledTimes(2);
+});
+
+test('device Play events cannot reopen a source released by manual pause or disposal', async () => {
+  const { audio, player } = setup();
+  await player.play();
+  player.pause();
+  audio.emit('play', { paused: false });
+  expect(player.getSnapshot().wantsToPlay).toBe(false);
+  expect(audio.play).toHaveBeenCalledTimes(1);
+  player.dispose();
+  audio.emit('play', { paused: false });
+  expect(audio.play).toHaveBeenCalledTimes(1);
+});
+
+test('an overdue deadline can cancel a device resume on a retained source', async () => {
+  let expired = false,
+    controller;
+  const { audio, player } = setup({
+    beforeReconnect: () => {
+      if (expired) controller.pause();
+    },
+  });
+  controller = player;
+  await player.play();
+  audio.emit('pause', { paused: true });
+  expired = true;
+  audio.emit('play', { paused: false });
+  expect(player.getSnapshot()).toMatchObject({ wantsToPlay: false, status: 'paused' });
+  expect(audio.src).toBe('');
+  expect(audio.play).toHaveBeenCalledTimes(1);
 });
 
 test('ignores queued pause/playing/error events from a previous resource', async () => {

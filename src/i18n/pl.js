@@ -116,6 +116,7 @@ export const pl = {
   'status.playing': 'Radio na żywo',
   'status.playingBackup': 'Radio na żywo (źródło zapasowe)',
   'status.buffering': 'Buforowanie…',
+  'status.interrupted': 'Pauza z urządzenia. Naciśnij Play.',
   'status.paused': 'Wstrzymano',
   'status.error': 'Stacja jest obecnie niedostępna.',
   'status.offlineWaiting': 'Brak internetu. Oczekiwanie na połączenie…',

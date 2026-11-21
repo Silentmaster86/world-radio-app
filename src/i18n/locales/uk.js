@@ -133,6 +133,7 @@ export default {
   'status.playing': 'Відтворення наживо',
   'status.playingBackup': 'Відтворення наживо (резервний потік)',
   'status.buffering': 'Буферизація…',
+  'status.interrupted': 'Системна пауза. Натисни Відтворити.',
   'status.paused': 'Призупинено',
   'status.error': 'Станція зараз недоступна.',
   'status.offlineWaiting': 'Немає мережі. Очікування з’єднання…',

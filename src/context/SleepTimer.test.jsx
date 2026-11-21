@@ -91,6 +91,57 @@ test('returning to a suspended page enforces an overdue deadline', async () => {
   expect(page.container.querySelector('[data-status]').textContent).toBe('paused');
 });
 
+test('online recovery checks an overdue timer before reopening the stream', async () => {
+  const page = mount();
+  await clickAsync(page, '#play');
+  page.click('#timer');
+  const audio = window.Audio.mock.results[0].value;
+  act(() => {
+    window.dispatchEvent(new Event('offline'));
+    audio.emit('waiting', { readyState: 2 });
+    jest.setSystemTime(Date.now() + 16 * 60_000);
+    window.dispatchEvent(new Event('online'));
+  });
+  expect(page.container.querySelector('[data-status]').textContent).toBe('paused');
+  expect(page.container.querySelector('[data-deadline]').textContent).toBe('null');
+  expect(audio.play).toHaveBeenCalledTimes(1);
+  expect(audio.src).toBe('');
+});
+
+test('an outside pause and device resume preserve the original sleep deadline', async () => {
+  const page = mount();
+  await clickAsync(page, '#play');
+  page.click('#timer');
+  const audio = window.Audio.mock.results[0].value;
+  const deadline = page.container.querySelector('[data-deadline]').textContent;
+  act(() => audio.emit('pause', { paused: true }));
+  expect(page.container.querySelector('[data-status]').textContent).toBe('paused');
+  expect(page.container.querySelector('[data-deadline]').textContent).toBe(deadline);
+  act(() => audio.emit('play', { paused: false }));
+  expect(page.container.querySelector('[data-status]').textContent).toBe('playing');
+  expect(page.container.querySelector('[data-deadline]').textContent).toBe(deadline);
+  act(() => jest.advanceTimersByTime(15 * 60_000));
+  expect(page.container.querySelector('[data-status]').textContent).toBe('paused');
+  expect(audio.src).toBe('');
+  expect(window.Audio).toHaveBeenCalledTimes(1);
+});
+
+test('an overdue timer prevents a browser resume after an interruption', async () => {
+  const page = mount();
+  await clickAsync(page, '#play');
+  page.click('#timer');
+  const audio = window.Audio.mock.results[0].value;
+  act(() => {
+    audio.emit('pause', { paused: true });
+    jest.setSystemTime(Date.now() + 16 * 60_000);
+    audio.emit('play', { paused: false });
+  });
+  expect(page.container.querySelector('[data-deadline]').textContent).toBe('null');
+  expect(page.container.querySelector('[data-status]').textContent).toBe('paused');
+  expect(audio.play).toHaveBeenCalledTimes(1);
+  expect(audio.src).toBe('');
+});
+
 test('system media pause cancels the shared timer', async () => {
   const previous = Object.getOwnPropertyDescriptor(navigator, 'mediaSession');
   const handlers = {};

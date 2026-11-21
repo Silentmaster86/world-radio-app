@@ -114,6 +114,7 @@ export const en = {
   'status.playing': 'Playing live',
   'status.playingBackup': 'Playing live (backup stream)',
   'status.buffering': 'Buffering…',
+  'status.interrupted': 'Paused by device. Press Play.',
   'status.paused': 'Paused',
   'status.error': 'The station is currently unavailable.',
   'status.offlineWaiting': 'Offline. Waiting for a connection…',

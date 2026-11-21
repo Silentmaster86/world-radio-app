@@ -36,6 +36,7 @@ export function AudioProvider({ children }) {
 
   useEffect(() => {
     const player = createAudioPlayer({
+      beforeReconnect: () => timerRef.current?.check(),
       stations,
       initialOnline: navigator.onLine,
       initialStationId: settings.stationId,
@@ -47,9 +48,12 @@ export function AudioProvider({ children }) {
     timerRef.current = timer;
     const unsubscribeTimer = timer.subscribe(setSleepTimerDeadline);
     let wantedPlayback = player.getSnapshot().wantsToPlay;
+    let wasInterrupted = false;
     const unsubscribe = player.subscribe((state) => {
-      if (wantedPlayback && !state.wantsToPlay) timer.cancel();
+      if ((wantedPlayback || wasInterrupted) && !state.wantsToPlay && !state.interrupted)
+        timer.cancel();
       wantedPlayback = state.wantsToPlay;
+      wasInterrupted = state.interrupted;
       setSnapshot(state);
     });
     setSnapshot(player.getSnapshot());

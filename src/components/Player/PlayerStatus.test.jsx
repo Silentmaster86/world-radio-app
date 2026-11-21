@@ -63,3 +63,14 @@ test('shows waiting for the network only while the user still wants playback', (
   );
   expect(page.container.textContent).toContain('Waiting for a connection');
 });
+
+test('explains an outside pause without claiming to detect a phone call', () => {
+  useAudio.mockReturnValue({ status: 'paused', interrupted: true, online: true });
+  const page = render(
+    <ThemeProvider theme={darkTheme}>
+      <PlayerStatus />
+    </ThemeProvider>,
+  );
+  expect(page.container.querySelector('[role=status]').textContent).toContain('Paused by device');
+  expect(page.container.querySelector('button')).toBeNull();
+});

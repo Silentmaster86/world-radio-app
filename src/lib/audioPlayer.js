@@ -26,6 +26,7 @@ export function createInitialPlayerState(stations, options = {}) {
     playingStationId: null,
     status: 'idle',
     wantsToPlay: false,
+    interrupted: false,
     error: null,
     retryAttempt: 0,
     streamSourceIndex: 0,
@@ -38,7 +39,7 @@ export function createInitialPlayerState(stations, options = {}) {
   };
 }
 
-function playbackError(error) {
+function playbackError(error, playedBefore) {
   if (error?.name === 'NotAllowedError') {
     return {
       code: 'blocked',
@@ -46,7 +47,7 @@ function playbackError(error) {
       recoverable: false,
     };
   }
-  if (error?.name === 'NotSupportedError' || error?.code === 4) {
+  if (!playedBefore && (error?.name === 'NotSupportedError' || error?.code === 4)) {
     return {
       code: 'unsupported',
       message: 'This stream is unavailable or its format is not supported.',
@@ -74,7 +75,7 @@ export function createAudioPlayer({
   stations,
   createAudio = () => new Audio(),
   connectionTimeoutMs = 15000,
-  retryDelays = [1000, 2000, 4000],
+  retryDelays = [1000, 2000, 4000, 8000, 15000],
   loadHls = () => import('./hlsPlayback'),
   ...options
 }) {
@@ -89,6 +90,7 @@ export function createAudioPlayer({
   let failures = 0;
   let sourceIndex = 0;
   let hlsSource = null;
+  let playedBefore = false;
   const listeners = new Set();
 
   function publish(patch) {
@@ -139,7 +141,7 @@ export function createAudioPlayer({
 
   function fail(attempt, error) {
     if (disposed || active !== attempt || !state.wantsToPlay) return;
-    const problem = playbackError(error);
+    const problem = playbackError(error, playedBefore);
     invalidate();
     releaseSource();
     if (!state.online) {
@@ -160,19 +162,43 @@ export function createAudioPlayer({
       });
       retryTimer = setTimeout(() => {
         retryTimer = null;
-        if (state.wantsToPlay && !disposed) startAttempt();
+        reconnect();
       }, delay);
       return;
     }
     publish({ status: 'error', playingStationId: null, wantsToPlay: false, error: problem });
   }
 
+  function sampleProgress(attempt) {
+    const time = audio.currentTime;
+    if (!Number.isFinite(time) || time === attempt.time) return false;
+    attempt.time = time;
+    return true;
+  }
+
   function armTimeout(attempt) {
     if (timeout !== null) return;
     timeout = setTimeout(() => {
       timeout = null;
+      if (disposed || active !== attempt || !state.wantsToPlay) return;
+      if (attempt.hasPlayed) {
+        if (audio.paused) {
+          pause({ retainSource: true, interrupted: true });
+          return;
+        }
+        if (sampleProgress(attempt)) {
+          armTimeout(attempt);
+          return;
+        }
+      }
       fail(attempt, { code: 'timeout' });
     }, connectionTimeoutMs);
+  }
+
+  function reconnect() {
+    if (disposed || !state.wantsToPlay) return;
+    options.beforeReconnect?.();
+    if (!disposed && state.wantsToPlay) return startAttempt();
   }
 
   function startAttempt() {
@@ -197,6 +223,7 @@ export function createAudioPlayer({
       resolve,
       result,
       hasPlayed: false,
+      time: audio.currentTime,
       removeListeners: () => {},
     };
     active = attempt;
@@ -214,6 +241,9 @@ export function createAudioPlayer({
       clearTimeout(timeout);
       timeout = null;
       attempt.hasPlayed = true;
+      playedBefore = true;
+      attempt.time = audio.currentTime;
+      if (state.online) armTimeout(attempt);
       publish({ status: 'playing', playingStationId: station.id, error: null });
       resolve(true);
     };
@@ -226,6 +256,13 @@ export function createAudioPlayer({
       playing: confirmPlaying,
       waiting: waitForData,
       stalled: waitForData,
+      timeupdate: () => {
+        if (!isCurrent() || !attempt.hasPlayed || audio.paused || !sampleProgress(attempt)) return;
+        clearTimeout(timeout);
+        timeout = null;
+        if (state.online) armTimeout(attempt);
+        if (state.status !== 'playing') confirmPlaying();
+      },
       error: () => {
         if (isCurrent() && audio.error) fail(attempt, audio.error);
       },
@@ -234,7 +271,7 @@ export function createAudioPlayer({
       },
       pause: () => {
         if (isCurrent() && attempt.hasPlayed && audio.paused && !audio.ended && !audio.error)
-          pause({ retainSource: true });
+          pause({ retainSource: true, interrupted: true });
       },
     };
     Object.entries(events).forEach(([name, handler]) => audio.addEventListener(name, handler));
@@ -288,17 +325,25 @@ export function createAudioPlayer({
     if (!state.selectedStationId) return Promise.resolve(false);
     failures = 0;
     sourceIndex = 0;
-    publish({ wantsToPlay: true, retryAttempt: 0, streamSourceIndex: 0, error: null });
+    playedBefore = false;
+    publish({
+      wantsToPlay: true,
+      interrupted: false,
+      retryAttempt: 0,
+      streamSourceIndex: 0,
+      error: null,
+    });
     return startAttempt();
   }
 
-  function pause({ retainSource = false } = {}) {
+  function pause({ retainSource = false, interrupted = false } = {}) {
     if (disposed) return;
     const hadPlayingSource = state.playingStationId !== null;
     invalidate();
     sourceIndex = 0;
     publish({
       wantsToPlay: false,
+      interrupted,
       status: 'paused',
       playingStationId: null,
       error: null,
@@ -323,11 +368,13 @@ export function createAudioPlayer({
     invalidate();
     failures = 0;
     sourceIndex = 0;
+    playedBefore = false;
     publish({
       selectedStationId: id,
       playingStationId: null,
       status: state.online ? 'connecting' : 'buffering',
       wantsToPlay: true,
+      interrupted: false,
       retryAttempt: 0,
       streamSourceIndex: 0,
       error: null,
@@ -347,15 +394,32 @@ export function createAudioPlayer({
     if (!online) {
       clearTimeouts();
       if (state.wantsToPlay && state.status !== 'playing') publish({ status: 'buffering' });
-    } else if (state.wantsToPlay && state.status !== 'playing') {
-      startAttempt();
+    } else if (state.wantsToPlay) {
+      if (active?.hasPlayed && audio.paused) pause({ retainSource: true, interrupted: true });
+      else if (state.status !== 'playing') reconnect();
+      else if (active) armTimeout(active);
     }
   }
 
   function syncVolume() {
     publish({ volume: audio.volume, muted: audio.muted });
   }
+  // Follow an actual browser/device Play request on a retained paused resource.
+  // This is not a timer-based guess that a phone call has ended.
+  function resumeFromDevice() {
+    if (
+      disposed ||
+      state.wantsToPlay ||
+      !state.interrupted ||
+      audio.paused ||
+      audio.getAttribute('src') === null
+    )
+      return;
+    options.beforeReconnect?.();
+    if (!disposed && !audio.paused && audio.getAttribute('src') !== null) play();
+  }
   audio.addEventListener('volumechange', syncVolume);
+  audio.addEventListener('play', resumeFromDevice);
 
   return {
     getSnapshot: () => state,
@@ -402,6 +466,7 @@ export function createAudioPlayer({
       invalidate();
       listeners.clear();
       audio.removeEventListener('volumechange', syncVolume);
+      audio.removeEventListener('play', resumeFromDevice);
       releaseSource();
     },
   };
