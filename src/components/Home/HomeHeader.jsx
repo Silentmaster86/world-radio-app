@@ -4,15 +4,13 @@ import { lazy, Suspense, useEffect, useId, useRef, useState } from 'react';
 import { FaSlidersH, FaArrowLeft, FaCompass } from 'react-icons/fa';
 import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
-import { localizeStoredMessage } from '../../i18n';
 import { LANGUAGE_NAMES } from '../../i18n';
 import ThemeSwitcher from '../ThemeSwitcher';
-const BackupPanel = lazy(() => import('../Backup/BackupPanel'));
+const SettingsExtras = lazy(() => import('../SettingsExtras'));
 export default function HomeHeader({ headingAs = 'h1', back = false }) {
-  const { mode, setThemeMode, backgroundMotion, setBackgroundMotion, storageMessage } = useTheme();
+  const { mode, setThemeMode } = useTheme();
   const { language, setLanguage, pendingLanguage, languageMessage, t } = useLanguage();
   const [open, setOpen] = useState(false);
-  const [backupOpen, setBackupOpen] = useState(false);
   const dialog = useRef(null);
   const opener = useRef(null);
   const title = useId();
@@ -27,7 +25,6 @@ export default function HomeHeader({ headingAs = 'h1', back = false }) {
     if (dialog.current.close && dialog.current.open) dialog.current.close();
     else dialog.current.removeAttribute('open');
     setOpen(false);
-    setBackupOpen(false);
     opener.current?.focus({ preventScroll: true });
   };
   const Brand = back ? Link : headingAs;
@@ -121,41 +118,10 @@ export default function HomeHeader({ headingAs = 'h1', back = false }) {
             <option value="dark">{t('header.dark')}</option>
           </select>
         </label>
-        {storageMessage && <p role="status">{localizeStoredMessage(t, storageMessage)}</p>}
-        <label className="motion-choice">
-          <input
-            type="checkbox"
-            checked={backgroundMotion}
-            onChange={(event) => setBackgroundMotion(event.target.checked)}
-            data-background-motion
-          />
-          <span>
-            {t('settings.motion')}
-            <small>{t('settings.motionHint')}</small>
-          </span>
-        </label>
-        <Link className="dialog-link" to="/library" onClick={close} data-open-library>
-          {t('nav.library')}
-        </Link>
-        <button type="button" data-open-backup onClick={() => setBackupOpen(true)}>
-          {t('settings.backup')}
-        </button>
-        <a className="dialog-link" href="/privacy/" target="_blank" rel="noopener noreferrer">
-          {t('settings.privacy')}
-        </a>
-        <Link className="dialog-link" to="/help" onClick={close}>
-          {t('settings.help')}
-        </Link>
-        {backupOpen && (
-          <ErrorBoundary
-            fallback={
-              <p role="alert" data-backup-load-error>
-                {t('settings.backupError')}
-              </p>
-            }
-          >
+        {open && (
+          <ErrorBoundary fallback={<p role="alert">{t('nav.loadError')}</p>}>
             <Suspense fallback={<p role="status">{t('settings.loading')}</p>}>
-              <BackupPanel />
+              <SettingsExtras onNavigate={close} />
             </Suspense>
           </ErrorBoundary>
         )}
