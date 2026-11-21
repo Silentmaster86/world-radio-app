@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
+const { createHash } = require('node:crypto');
 const http = require('node:http');
 const https = require('node:https');
 const { execFileSync } = require('node:child_process');
@@ -105,12 +106,27 @@ async function main() {
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
   await new Promise((resolve) => streamServer.listen(0, '127.0.0.1', resolve));
   const base = process.env.WRA_BASE_URL || `http://127.0.0.1:${server.address().port}`;
-  const browser = await chromium.launch();
+  const certificates = [path.join(certDir, 'cert.pem'), process.env.WRA_BROWSER_CA_CERT].filter(
+    Boolean,
+  );
+  const trustedKeys = certificates.map((file) => {
+    const publicKey = execFileSync('openssl', ['x509', '-pubkey', '-noout', '-in', file]);
+    const spki = execFileSync('openssl', ['pkey', '-pubin', '-outform', 'DER'], {
+      input: publicKey,
+    });
+    return createHash('sha256').update(spki).digest('base64');
+  });
+  // Trust only these explicit fixture/proxy certificate keys, keeping other TLS
+  // checks enabled. A remote preview needs permission to reach local test media.
+  const browser = await chromium.launch({
+    args: [`--ignore-certificate-errors-spki-list=${trustedKeys.join(',')}`],
+  });
   const context = await createAppContext(browser, {
     viewport: { width: 390, height: 844 },
-    ignoreHTTPSErrors: true,
+    permissions: ['local-network-access'],
   });
   let page;
+  const transportErrors = [];
   try {
     await context.addInitScript(
       ({ uuid, fixtureUrl }) => {
@@ -151,6 +167,12 @@ async function main() {
     page = await context.newPage();
     const errors = [];
     page.on('pageerror', (error) => errors.push(error.message));
+    page.on('console', (message) => {
+      if (message.type() === 'error') transportErrors.push(message.text());
+    });
+    page.on('requestfailed', (request) => {
+      if (request.url() === fixtureUrl) transportErrors.push(request.failure()?.errorText);
+    });
     await page.goto(base + '/?q=Recovery+fixture', { waitUntil: 'networkidle' });
     await waitForServiceWorker(page);
     await page.locator('article button[aria-pressed]').click();
@@ -256,7 +278,7 @@ async function main() {
             })),
           }))
           .catch(() => null),
-        { requests, rejected },
+        { requests, rejected, transportErrors },
       );
     }
     throw error;

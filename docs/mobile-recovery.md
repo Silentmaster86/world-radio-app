@@ -11,6 +11,10 @@ recovery on one audio element, unchanged favorites/history, a retained sleep
 deadline, native device pause/Play simulation, expiry blocking resume, and manual
 pause cancelling recovery. The ephemeral localhost TLS certificate is created in
 a temporary directory and removed after the run; no keys enter the repository.
+The test grants local-network access only in its isolated browser context and
+trusts the ephemeral fixture certificate by public-key fingerprint. If running
+behind an environment TLS proxy, set `WRA_BROWSER_CA_CERT` to its public CA
+certificate file; app/worker certificate validation otherwise remains enabled.
 
 The recovery CI job runs against both the build and the exact-commit Netlify
 preview. Existing HLS, UX, languages, Studio and PWA jobs remain required.
