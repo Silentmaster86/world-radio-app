@@ -1378,9 +1378,6 @@ body a {
   .station-search-row input {
     font-size: 1rem;
   }
-  .mobile-toolbar {
-    display: none;
-  }
   .station-controls .station-refinements[data-open='true'] {
     grid-column: 1/-1;
   }

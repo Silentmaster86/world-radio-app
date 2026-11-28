@@ -225,6 +225,23 @@ async function main() {
               await context.close();
             }
           }
+    // An active refinement must retain its reset action in landscape too.
+    const filters = await createAppContext(browser, {
+      viewport: { width: 568, height: 320 },
+      serviceWorkers: 'block',
+    });
+    await init(filters);
+    const filtering = await filters.newPage();
+    await filtering.goto(base, { waitUntil: 'networkidle' });
+    await filtering.locator('#station-search').fill('Capital');
+    const reset = filtering.locator('.mobile-toolbar button');
+    await reset.waitFor();
+    const resetBox = await reset.boundingBox();
+    assert.ok(resetBox.width >= 44 && resetBox.height >= 44);
+    await reset.click();
+    await filtering.waitForFunction(() => document.getElementById('station-search').value === '');
+    assert.equal(await filtering.locator('#station-search').inputValue(), '');
+    await filters.close();
     // Switch actual UI while native audio decodes, without a second audio element.
     const context = await createAppContext(browser, { viewport: { width: 390, height: 844 } });
     await init(context);
