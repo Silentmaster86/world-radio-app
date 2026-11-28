@@ -354,13 +354,13 @@ async function main() {
       } else {
         await pages[0].locator('.station-favorite').first().click();
         await pages[0].waitForFunction(
-          () => JSON.parse(localStorage.getItem('wra:favorites:v1')).stationIds.length === 1,
+          () => JSON.parse(localStorage.getItem('wra:favorites:v1'))?.stationIds?.length === 1,
         );
         await pages[1].locator('.station-favorite').nth(1).click();
       }
       for (const p of pages) {
         await p.waitForFunction(
-          () => JSON.parse(localStorage.getItem('wra:favorites:v1')).stationIds.length === 2,
+          () => JSON.parse(localStorage.getItem('wra:favorites:v1'))?.stationIds?.length === 2,
         );
         await p.waitForFunction(
           () => document.querySelectorAll('.station-favorite[aria-pressed=true]').length === 2,
@@ -396,7 +396,7 @@ async function main() {
         }
       for (const p of pages)
         await p.waitForFunction(
-          () => JSON.parse(localStorage.getItem('wra:stations:v1')).stations.length === 2,
+          () => JSON.parse(localStorage.getItem('wra:stations:v1'))?.stations?.length === 2,
         );
       await tabs.close();
     }
