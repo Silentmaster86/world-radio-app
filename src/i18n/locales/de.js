@@ -15,7 +15,7 @@ export default {
     'Prüfe die Vorschau. Um auch Sprache, Darstellung und Lautstärke zu übernehmen, aktiviere zuerst die Einstellungsoption. Wähle dann Aus Sicherung hinzufügen. Vorhandene Sender und Favoriten bleiben erhalten.',
   'backup.contentsQ': 'Was enthält eine Sicherung?',
   'backup.contentsA':
-    'Hinzugefügte Sender, Favoriten und ihre Reihenfolge, Verlauf, Sprache, Darstellung und Lautstärke. Enthalten sind Senderdaten, keine Tonaufnahmen. Die Hintergrundanimation wird pro Gerät eingestellt.',
+    'Hinzugefügte Sender, Favoriten und ihre Reihenfolge, Verlauf, Sprache, Darstellung und Lautstärke. Enthalten sind Senderdaten, keine Tonaufnahmen. App-Design und Einstellung der Hintergrundanimation sind ebenfalls enthalten.',
   'backup.recoveryQ': 'Kann ich meine Bibliothek ohne Sicherung wiederherstellen?',
   'backup.recoveryA':
     'Die Bibliothek ist in diesem Browser gespeichert. Es gibt kein Konto und keine automatische Synchronisierung. Beim Löschen der Websitedaten oder Browserwechsel kann der Zugriff verloren gehen. Sichere sie vor einem Gerätewechsel.',
@@ -24,7 +24,7 @@ export default {
     'Radio benötigt Internet. Nach Vorbereitung der Offline-Dateien lassen sich gespeicherte Bibliothek und Oberfläche ohne Netz öffnen.',
 
   'backup.language':
-    'Die importierte Sprache konnte nicht geladen werden. Es wurde nichts importiert. Stelle die Verbindung wieder her oder importiere ohne Einstellungen.',
+    'Die importierte Sprache oder das Design konnte nicht geladen werden. Es wurde nichts importiert. Stelle die Verbindung wieder her oder importiere ohne Einstellungen.',
   'language.loading': 'Sprache wird geladen…',
   'language.failed':
     'Diese Sprache konnte nicht geladen werden. Sprache und Radio bleiben unverändert. Stelle die Verbindung wieder her oder öffne die App erneut und versuche es noch einmal.',

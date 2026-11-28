@@ -15,7 +15,7 @@ export default {
     'Revisa la vista previa. Para copiar también idioma, apariencia y volumen, marca primero la opción de ajustes. Después selecciona Añadir desde copia. Se conservan las emisoras y favoritos actuales.',
   'backup.contentsQ': '¿Qué contiene una copia?',
   'backup.contentsA':
-    'Emisoras añadidas, favoritos y su orden, historial, idioma, apariencia y volumen. Contiene datos de emisoras, no grabaciones. La animación del fondo se configura por dispositivo.',
+    'Emisoras añadidas, favoritos y su orden, historial, idioma, apariencia y volumen. Contiene datos de emisoras, no grabaciones. También incluye el diseño y la preferencia de animación del fondo.',
   'backup.recoveryQ': '¿Puedo recuperar mi biblioteca sin una copia?',
   'backup.recoveryA':
     'La biblioteca se guarda en este navegador. No hay cuenta ni sincronización automática. Borrar los datos del sitio o cambiar de navegador puede impedir el acceso. Guarda una copia antes de cambiar de dispositivo.',
@@ -24,7 +24,7 @@ export default {
     'El audio necesita internet. Tras preparar los archivos sin conexión, la biblioteca guardada y la interfaz pueden abrirse sin red.',
 
   'backup.language':
-    'No se pudo cargar el idioma importado. No se ha importado nada. Reconecta o importa sin los ajustes.',
+    'No se pudo cargar el idioma o el diseño importado. No se ha importado nada. Reconecta o importa sin los ajustes.',
   'language.loading': 'Cargando idioma…',
   'language.failed':
     'No se pudo cargar este idioma. El idioma actual y la radio siguen funcionando. Reconecta o vuelve a abrir la aplicación e inténtalo de nuevo.',

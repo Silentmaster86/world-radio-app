@@ -15,7 +15,7 @@ export default {
     'Vérifie l’aperçu. Pour copier aussi langue, apparence et volume, coche d’abord les réglages. Sélectionne ensuite Ajouter depuis la sauvegarde. Les stations et favoris existants sont conservés.',
   'backup.contentsQ': 'Que contient une sauvegarde ?',
   'backup.contentsA':
-    'Les stations ajoutées, favoris et leur ordre, historique, langue, apparence et volume. Elle contient des données de stations, pas d’enregistrements audio. L’animation du fond reste propre à chaque appareil.',
+    'Les stations ajoutées, favoris et leur ordre, historique, langue, apparence et volume. Elle contient des données de stations, pas d’enregistrements audio. Le style et le réglage de l’animation du fond sont également inclus.',
   'backup.recoveryQ': 'Puis-je récupérer ma bibliothèque sans sauvegarde ?',
   'backup.recoveryA':
     'La bibliothèque est enregistrée dans ce navigateur. Il n’y a ni compte ni synchronisation automatique. Effacer les données du site ou changer de navigateur peut en empêcher l’accès. Sauvegarde avant de changer d’appareil.',
@@ -24,7 +24,7 @@ export default {
     'L’audio nécessite internet. Après préparation des fichiers hors ligne, la bibliothèque et l’interface peuvent s’ouvrir sans réseau.',
 
   'backup.language':
-    'Impossible de charger la langue importée. Rien n’a été importé. Reconnectez-vous ou importez sans les paramètres.',
+    'Impossible de charger la langue ou le style importé. Rien n’a été importé. Reconnectez-vous ou importez sans les paramètres.',
   'language.loading': 'Chargement de la langue…',
   'language.failed':
     'Impossible de charger cette langue. La langue actuelle et la radio restent inchangées. Reconnectez-vous ou rouvrez l’application, puis réessayez.',

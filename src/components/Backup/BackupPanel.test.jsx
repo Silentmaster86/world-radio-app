@@ -216,3 +216,27 @@ test('a newer oversized file cancels a pending read and cannot be overwritten by
   expect(page.container.textContent).not.toContain('Reading backup');
   expect(page.container.querySelector('[role=alert]').textContent).toContain('1 MB');
 });
+
+test('confirmation reads fresh disk data and does not resurrect another tab’s deletions', async () => {
+  const page = mount();
+  act(() => {
+    api.stations.addStation({
+      stationuuid: added.directoryId,
+      name: added.name,
+      url: added.url,
+      hls: 1,
+    });
+    api.favorites.toggleFavorite('capital-dance');
+  });
+  const incoming = payload();
+  incoming.stations = [];
+  incoming.favoriteIds = [];
+  incoming.recentIds = [];
+  await choose(page, incoming);
+  // Deliberately withhold the storage event: the React snapshot is still stale.
+  localStorage.setItem('wra:stations:v1', JSON.stringify({ version: 1, stations: [] }));
+  localStorage.setItem('wra:favorites:v1', JSON.stringify({ version: 1, stationIds: [] }));
+  page.click('[data-backup-apply]');
+  expect(JSON.parse(localStorage.getItem('wra:favorites:v1')).stationIds).toEqual([]);
+  expect(api.stations.stations.some((station) => station.id === added.id)).toBe(false);
+});

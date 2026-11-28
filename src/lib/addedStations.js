@@ -63,7 +63,7 @@ export function loadAddedStations() {
       seen.add(station.id);
     }
   }
-  return { stations, canPersist: true };
+  return { stations, canPersist: record.status !== 'unavailable' };
 }
 export function saveAddedStations(stations) {
   return writeStorage(ADDED_KEY, { version: 1, stations: stations.slice(0, ADDED_LIMIT) });

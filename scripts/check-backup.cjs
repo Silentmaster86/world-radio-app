@@ -206,6 +206,7 @@ async function main() {
           await page.locator('[data-backup-preview]').waitFor();
           await page.locator('[data-backup-settings]').check();
           await page.locator('[data-backup-apply]').click();
+          await page.locator('[data-backup-preview]').waitFor({ state: 'hidden' });
           assert.equal(await page.locator('#language').inputValue(), nextLanguage);
           assert.equal(await page.locator('#appearance').inputValue(), nextTheme);
           assert.equal(await page.evaluate(() => window.__backupAudio[0].paused), false);

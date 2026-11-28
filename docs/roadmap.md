@@ -30,6 +30,11 @@ history; their original follow-up lists are no longer the current backlog.
 
 ## Current delivery plan
 
+Five selectable app designs keep Classic as the default and add Orbit, Pulse,
+Analog and Signal. See [app-designs.md](app-designs.md) for scope and verification.
+Future work should prioritize physical-device acceptance and search/discovery
+quality before adding further visual variants.
+
 Worldwide Radio Browser discovery, saved added stations, PL/EN settings and the
 compact mobile layout have shipped. The next stages are complete product
 increments, each with a preview, regression checks and manual acceptance before
@@ -53,7 +58,7 @@ production. They are improvements, not a list of confirmed defects.
    access and reduced-motion support. Check actual mobile performance before
    adding persistent effects or large animation dependencies.
    See [visual-design.md](visual-design.md).
-5. **Additional interface languages (current branch).** First batch: eight
+5. **Additional interface languages (shipped).** First batch: eight
    languages, adding DE/ES/FR/PT/IT/UK to EN/PL, including backup/library/error
    text. Separate cached dictionaries, atomic selection, translated search,
    country names and offline switching. See [language.md](language.md).

@@ -166,6 +166,11 @@ async function main() {
             assert.equal(await page.evaluate(() => window.__designAudio[0].src), source);
             assert.equal(await page.evaluate(() => window.__designAudio[0].paused), false);
             await page.locator('.station-card').first().locator('.station-favorite').click();
+            await page
+              .locator('.station-card')
+              .first()
+              .locator('.station-favorite[aria-pressed=true]')
+              .waitFor();
             assert.equal(
               await page
                 .locator('.station-card')

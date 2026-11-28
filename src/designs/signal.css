@@ -1,0 +1,214 @@
+:root[data-design='signal'] body {
+  background-image:
+    linear-gradient(var(--wra-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--wra-line) 1px, transparent 1px);
+  background-size: 100px 100px;
+}
+:root[data-design='signal'] .ambient-background {
+  display: none;
+}
+:root[data-design='signal'] .design-navigation {
+  padding: 0;
+  gap: 0;
+  border: 2px solid var(--wra-text);
+  background: var(--wra-surface);
+}
+:root[data-design='signal'] .design-navigation a {
+  border-right: 1px solid var(--wra-text);
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+:root[data-design='signal'] .design-navigation a:last-child {
+  border: 0;
+}
+:root[data-design='signal'] .app-header {
+  border-bottom: 2px solid var(--wra-text);
+  padding-bottom: 0.7rem;
+}
+:root[data-design='signal'] .app-brand {
+  text-transform: uppercase;
+  font-weight: 900;
+  letter-spacing: -0.06em;
+}
+.signal-hero {
+  border: 2px solid var(--wra-text);
+  padding: 1.2rem;
+  background: var(--wra-surface);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 130px;
+  gap: 1rem;
+  align-items: end;
+}
+.signal-index {
+  font-family: ui-monospace, monospace;
+  font-size: 0.85rem;
+  align-self: start;
+}
+.signal-hero .design-copy h2 {
+  text-transform: uppercase;
+  font-weight: 950;
+  font-size: clamp(2rem, 5vw, 4.5rem);
+}
+.signal-wave {
+  height: 150px;
+  display: flex;
+  align-items: end;
+  gap: 5px;
+  overflow: hidden;
+}
+.signal-wave i {
+  flex: 1;
+  background: var(--wra-accent);
+  transform-origin: bottom;
+}
+.signal-hero[data-playing='true'] .signal-wave i {
+  animation: signal-step 1s steps(4, end) infinite alternate;
+}
+@keyframes signal-step {
+  to {
+    transform: scaleY(0.35);
+  }
+}
+:root[data-design='signal'] .station-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+  border: 2px solid var(--wra-text);
+}
+:root[data-design='signal'] .station-card {
+  border: 0;
+  border-bottom: 1px solid var(--wra-text);
+  background: var(--wra-surface);
+  border-radius: 0;
+  box-shadow: none;
+  padding-left: 48px;
+}
+:root[data-design='signal'] .station-card:last-child {
+  border-bottom: 0;
+}
+:root[data-design='signal'] .station-card::before {
+  content: counter(station, decimal-leading-zero);
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font:
+    700 0.85rem ui-monospace,
+    monospace;
+  color: var(--wra-muted);
+}
+:root[data-design='signal'] .station-card[data-selected='true'] {
+  background: var(--wra-raised);
+}
+:root[data-design='signal'] .station-card .station-button {
+  display: flex;
+  text-align: left;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 3rem 0.5rem 0.5rem;
+}
+:root[data-design='signal'] .station-card .station-artwork {
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  border-radius: 0;
+  flex-shrink: 0;
+  background: var(--wra-raised);
+}
+:root[data-design='signal'] .station-artwork > [data-station-logo] {
+  width: 36px;
+  height: 36px;
+  border-radius: 0;
+}
+:root[data-design='signal'] .station-info h2 {
+  text-transform: uppercase;
+  font-size: 1rem;
+  letter-spacing: -0.03em;
+}
+:root[data-design='signal'] .station-favorite {
+  top: 50%;
+  transform: translateY(-50%);
+}
+:root[data-design='signal'] .soundbar {
+  border: 2px solid var(--wra-text);
+  border-radius: 0;
+  background: var(--wra-surface);
+  box-shadow: 6px 6px 0 var(--wra-text);
+}
+:root[data-design='signal'] .soundbar .main-play-control,
+:root[data-design='signal'] .now-playing-card .main-play-control {
+  border-radius: 0;
+}
+:root[data-design='signal'] .now-playing-card {
+  border: 2px solid var(--wra-text);
+  border-radius: 0;
+  box-shadow: 10px 10px 0 var(--wra-accent);
+}
+:root[data-design='signal'] .now-playing-artwork {
+  border: 2px solid var(--wra-text);
+  border-radius: 0;
+  padding: 1rem;
+  background: var(--wra-raised);
+}
+:root[data-design='signal'] .now-playing-artwork::before,
+:root[data-design='signal'] .now-playing-artwork::after {
+  display: none;
+}
+:root[data-design='signal'] button,
+:root[data-design='signal'] input,
+:root[data-design='signal'] select,
+:root[data-design='signal'] .dialog-link,
+:root[data-design='signal'] .settings-dialog {
+  border-radius: 0;
+}
+@media (max-width: 640px) {
+  .signal-hero {
+    grid-template-columns: minmax(0, 1fr) 70px;
+    gap: 0.5rem;
+    padding: 0.8rem;
+  }
+  .signal-index {
+    display: none;
+  }
+  .signal-wave {
+    height: 90px;
+    gap: 3px;
+  }
+  .signal-hero .design-copy h2 {
+    font-size: 1.7rem;
+  }
+  :root[data-design='signal'] .station-card {
+    padding-left: 32px;
+  }
+  :root[data-design='signal'] .station-card::before {
+    left: 0.4rem;
+    font-size: 0.7rem;
+  }
+  :root[data-design='signal'] .station-card .station-button {
+    gap: 0.5rem;
+  }
+  :root[data-design='signal'] .station-info h2 {
+    font-size: 0.9rem;
+  }
+}
+@media (max-height: 650px) {
+  .signal-hero .design-copy h2 {
+    font-size: 1.5rem;
+  }
+  .signal-wave {
+    height: 45px;
+  }
+}
+:root[data-design='signal'] .station-card .station-button {
+  flex-direction: row;
+}
+:root[data-design='signal'] .station-play-indicator {
+  width: 18px;
+  height: 18px;
+  right: -2px;
+  bottom: -2px;
+}
+:root[data-design='signal'] .station-play-indicator > svg {
+  width: 7px;
+  height: 7px;
+}

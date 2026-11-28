@@ -1,7 +1,7 @@
 import { translate } from '../../i18n';
 export const en = {
   language:
-    'Could not load the imported language. Nothing was imported. Reconnect or import without settings.',
+    'Could not load the imported language or design. Nothing was imported. Reconnect or import without settings.',
   title: 'Backup',
   intro:
     'Save your stations, favorites and preferences. Restore your collection later or move it to another device.',
@@ -41,7 +41,7 @@ export const en = {
     'Review the preview. To also copy language, appearance and volume, tick the settings option first. Then select Add from backup. Existing stations and favorites stay.',
   contentsQ: 'What does a backup contain?',
   contentsA:
-    'Added stations, favorites and their order, recent stations, language, appearance and volume. It contains station information, not audio recordings. The background-animation preference stays on each device.',
+    'Added stations, favorites and their order, recent stations, language, appearance and volume. It contains station information, not audio recordings. The app design and background-animation preference are also included.',
   recoveryQ: 'Can I recover my library without a backup?',
   recoveryA:
     'Your library is saved in this browser. There is no account or automatic sync. Clearing site data or changing browsers can remove access to it. Save a backup before changing devices.',
@@ -92,7 +92,7 @@ const pl = {
     'Sprawdź podgląd. Jeśli chcesz też przenieść język, wygląd i głośność, najpierw zaznacz opcję ustawień. Następnie wybierz Dodaj z kopii. Obecne stacje i ulubione zostają.',
   contentsQ: 'Co zawiera kopia zapasowa?',
   contentsA:
-    'Dodane stacje, ulubione i ich kolejność, historię, język, wygląd i głośność. Zawiera informacje o stacjach, a nie nagrania dźwięku. Preferencja animacji tła pozostaje osobna na każdym urządzeniu.',
+    'Dodane stacje, ulubione i ich kolejność, historię, język, wygląd i głośność. Zawiera informacje o stacjach, a nie nagrania dźwięku. Kopia zawiera też styl aplikacji i ustawienie animacji tła.',
   recoveryQ: 'Czy odzyskam bibliotekę bez kopii?',
   recoveryA:
     'Biblioteka jest zapisana w tej przeglądarce. Nie ma konta ani automatycznej synchronizacji. Wyczyszczenie danych witryny lub zmiana przeglądarki może usunąć dostęp do niej. Zapisz kopię przed zmianą urządzenia.',

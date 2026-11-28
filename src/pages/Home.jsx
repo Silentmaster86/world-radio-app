@@ -1,6 +1,6 @@
+import { DesignSlot } from '../context/DesignContext';
 import { Link } from 'react-router-dom';
 // src/pages/Home.js
-import styled from 'styled-components';
 import { useLayoutEffect, useRef } from 'react';
 
 import { useStations } from '../context/StationsContext';
@@ -17,71 +17,6 @@ import EmptyState from '../components/Home/EmptyState';
 import useStationFilters from '../hooks/useStationFilters';
 import { useLanguage } from '../context/LanguageContext';
 import { localizeStoredMessage } from '../i18n';
-
-const DiscoveryLink = styled(Link)`
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-`;
-const PageWrapper = styled.main`
-  width: 100%;
-  max-width: 1240px;
-  margin: auto;
-  min-height: auto;
-
-  padding: 1rem;
-  padding-bottom: 1rem;
-
-  background: transparent;
-
-  color: ${({ theme }) => theme.colors.text};
-
-  @media (max-width: 640px) {
-    padding: 0.85rem;
-    padding-bottom: 0.75rem;
-  }
-`;
-
-const StationGrid = styled.section`
-  display: grid;
-  gap: 0.75rem;
-  grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
-
-  @media (max-width: 640px) {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
-  }
-`;
-
-const Results = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin: 0 0 0.75rem;
-  p {
-    margin: 0;
-  }
-  button {
-    min-height: 44px;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid currentColor;
-    border-radius: 0.65rem;
-    background: transparent;
-    font: inherit;
-  }
-`;
-const More = styled.button`
-  display: block;
-  min-height: 44px;
-  margin: 1rem auto 0;
-  padding: 0.65rem 1rem;
-  border: 1px solid ${({ theme }) => theme.colors.muted};
-  border-radius: 0.65rem;
-  background: ${({ theme }) => theme.colors.surface};
-  font: inherit;
-`;
 
 export default function Home() {
   const { stations } = useStations();
@@ -111,27 +46,29 @@ export default function Home() {
         : stations.length;
 
   return (
-    <PageWrapper className="home-page">
+    <main className="home-page">
       <HomeHeader />
-      <section className="library-hero" data-playing={status === 'playing'}>
-        <div>
-          <p className="hero-eyebrow">{t('library.eyebrow')}</p>
-          <h2>{t('library.title')}</h2>
-          <p>{t('library.description')}</p>
-        </div>
-        <div className="hero-visual" aria-hidden="true">
-          <div className="hero-orbit">
-            <i />
-            <i />
-            <i />
+      <DesignSlot part="Hero">
+        <section className="library-hero" data-playing={status === 'playing'}>
+          <div>
+            <p className="hero-eyebrow">{t('library.eyebrow')}</p>
+            <h2>{t('library.title')}</h2>
+            <p>{t('library.description')}</p>
           </div>
-          <div className="hero-globe">
-            <span />
-            <span />
-            <span />
+          <div className="hero-visual" aria-hidden="true">
+            <div className="hero-orbit">
+              <i />
+              <i />
+              <i />
+            </div>
+            <div className="hero-globe">
+              <span />
+              <span />
+              <span />
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </DesignSlot>
 
       <StationControls
         {...browsing}
@@ -145,7 +82,7 @@ export default function Home() {
       {filters.section === 'recent' && historyMessage && (
         <p role="status">{localizeStoredMessage(t, historyMessage)}</p>
       )}
-      <Results>
+      <div className="station-results">
         <p role="status" aria-live="polite">
           {t('home.results', { visible: visibleStations.length, total: searchedStations.length })}
           {searchedStations.length !== collectionCount &&
@@ -162,7 +99,7 @@ export default function Home() {
             {t('home.clearHistory')}
           </button>
         )}
-      </Results>
+      </div>
       {searchedStations.length === 0 && (
         <EmptyState
           emptyFavorites={filters.section === 'favorites' && favoriteCount === 0}
@@ -171,7 +108,7 @@ export default function Home() {
           onBrowse={browsing.resetFilters}
         />
       )}
-      <StationGrid className="station-grid" aria-label="Stations">
+      <section className="station-grid" aria-label="Stations">
         {visibleStations.map((station) => (
           <StationCard
             key={station.id}
@@ -184,12 +121,15 @@ export default function Home() {
             onFavorite={() => toggleFavorite(station.id)}
           />
         ))}
-      </StationGrid>
+      </section>
       <p>
-        <DiscoveryLink to="/discover">{t('discover.title')}</DiscoveryLink>
+        <Link className="discovery-link" to="/discover">
+          {t('discover.title')}
+        </Link>
       </p>
       {visibleStations.length < searchedStations.length && (
-        <More
+        <button
+          className="station-more"
           type="button"
           onClick={() => {
             nextPageFocus.current = searchedStations[visibleStations.length].id;
@@ -197,8 +137,8 @@ export default function Home() {
           }}
         >
           {t('home.more', { count: searchedStations.length - visibleStations.length })}
-        </More>
+        </button>
       )}
-    </PageWrapper>
+    </main>
   );
 }

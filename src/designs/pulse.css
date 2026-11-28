@@ -1,0 +1,266 @@
+:root[data-design='pulse'] .design-navigation {
+  background: var(--wra-surface);
+  border: 1px solid var(--wra-line);
+  border-radius: 99px;
+}
+:root[data-design='pulse'] .design-navigation a {
+  border-radius: 99px;
+}
+:root[data-design='pulse'] .app-brand {
+  font-weight: 900;
+  letter-spacing: -0.06em;
+}
+.pulse-hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 48px 48px 48px 8px;
+  background: var(--wra-accent);
+  color: var(--wra-on-accent);
+  padding: 1.5rem;
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  align-items: center;
+}
+.pulse-hero .design-copy h2 {
+  font-weight: 950;
+  font-size: clamp(2rem, 5vw, 4.5rem);
+}
+.pulse-art {
+  width: 100%;
+  aspect-ratio: 1;
+  position: relative;
+  display: grid;
+  place-items: center;
+  max-width: 230px;
+  justify-self: center;
+}
+.pulse-art i {
+  width: 70%;
+  height: 88%;
+  position: absolute;
+  border: 12px solid currentColor;
+  border-radius: 65% 35% 50% 50% / 35% 55% 45% 65%;
+  opacity: 0.65;
+  transform: rotate(-25deg);
+}
+.pulse-art i:nth-child(2) {
+  transform: rotate(25deg);
+  opacity: 0.4;
+  width: 88%;
+  height: 70%;
+}
+.pulse-art i:nth-child(3) {
+  transform: rotate(75deg);
+  opacity: 0.25;
+  width: 66%;
+  height: 95%;
+}
+.pulse-art button {
+  width: 64px;
+  height: 64px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 50%;
+  background: var(--wra-on-accent);
+  color: var(--wra-accent);
+  z-index: 1;
+}
+.pulse-hero[data-playing='true'] .pulse-art i {
+  animation: pulse-morph 5s ease-in-out infinite alternate;
+}
+@keyframes pulse-morph {
+  to {
+    transform: rotate(135deg);
+    border-radius: 35% 65% 45% 55% / 60% 35% 65% 40%;
+  }
+}
+:root[data-design='pulse'] .station-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+:root[data-design='pulse'] .station-card {
+  border-radius: 32px 32px 8px 32px;
+  background: var(--wra-surface);
+}
+:root[data-design='pulse'] .station-card:nth-child(2n) {
+  border-radius: 8px 32px 32px 32px;
+}
+:root[data-design='pulse'] .station-card:nth-child(3n) {
+  border-radius: 32px 8px 32px 32px;
+}
+:root[data-design='pulse'] .station-card .station-button {
+  display: grid;
+  padding: 1rem;
+  gap: 0.6rem;
+}
+:root[data-design='pulse'] .station-artwork {
+  width: 100%;
+  height: 95px;
+  margin: 0;
+  border-radius: 24px;
+  background: var(--wra-raised);
+}
+:root[data-design='pulse'] .station-artwork > [data-station-logo] {
+  width: 64px;
+  height: 64px;
+  border-radius: 30% 60% 40% 50%;
+}
+:root[data-design='pulse'] .station-favorite {
+  background: var(--wra-surface);
+  border-radius: 50%;
+}
+:root[data-design='pulse'] .soundbar {
+  border-radius: 32px 32px 0 0;
+  background: var(--wra-surface);
+}
+:root[data-design='pulse'] .now-playing-card {
+  border-radius: 48px 48px 12px 48px;
+}
+:root[data-design='pulse'] .now-playing-artwork {
+  background: var(--wra-accent);
+  padding: 1.5rem;
+  border-radius: 50% 50% 8px 50%;
+  width: 240px;
+  height: 240px;
+  color: var(--wra-on-accent);
+}
+:root[data-design='pulse'] .now-playing-artwork::before {
+  border: 14px solid currentColor;
+  border-radius: 60% 30% 50% 40%;
+  width: 90%;
+  height: 90%;
+}
+:root[data-design='pulse'] .now-playing-artwork > [data-station-logo] {
+  width: 120px;
+  height: 120px;
+  border-radius: 40%;
+}
+:root[data-design='pulse'] input:not([type]),
+:root[data-design='pulse'] input[type='search'],
+:root[data-design='pulse'] select,
+:root[data-design='pulse'] .dialog-link {
+  border-radius: 99px;
+}
+@media (max-width: 640px) {
+  .pulse-hero {
+    padding: 1rem;
+    gap: 0.5rem;
+    border-radius: 28px 28px 28px 6px;
+  }
+  .pulse-hero .design-copy h2 {
+    font-size: clamp(1.4rem, 7vw, 2.4rem);
+  }
+  .pulse-art {
+    max-width: 130px;
+  }
+  .pulse-art i {
+    border-width: 7px;
+  }
+  .pulse-art button {
+    width: 44px;
+    height: 44px;
+  }
+  :root[data-design='pulse'] .station-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+  :root[data-design='pulse'] .station-card .station-button {
+    padding: 0.75rem 0.5rem;
+    gap: 0.3rem;
+  }
+  :root[data-design='pulse'] .station-artwork {
+    height: 55px;
+  }
+  :root[data-design='pulse'] .station-artwork > [data-station-logo] {
+    width: 44px;
+    height: 44px;
+  }
+  :root[data-design='pulse'] .station-info h2 {
+    font-size: 0.85rem;
+  }
+}
+@media (max-height: 650px) {
+  .pulse-hero {
+    padding: 0.6rem 1rem;
+    grid-template-columns: 1fr 64px;
+  }
+  .pulse-art {
+    width: 64px;
+  }
+  .pulse-hero .design-copy h2 {
+    font-size: 1.5rem;
+  }
+  :root[data-design='pulse'] .station-card .station-artwork {
+    height: 44px;
+  }
+  :root[data-design='pulse'] .station-card .station-meta {
+    display: none;
+  }
+}
+@media (min-width: 641px) {
+  .pulse-hero {
+    grid-template-columns: minmax(0, 1fr) 160px;
+    padding: 1rem 1.5rem;
+  }
+  .pulse-hero .design-copy h2 {
+    font-size: clamp(2rem, 3.8vw, 3rem);
+    margin: 0.3rem 0 0.5rem;
+  }
+  .pulse-hero .design-copy p {
+    margin: 0;
+  }
+  .pulse-art {
+    max-width: 140px;
+  }
+  :root[data-design='pulse'] .station-card .station-button {
+    padding: 0.75rem;
+    gap: 0.3rem;
+  }
+  :root[data-design='pulse'] .station-artwork {
+    height: 64px;
+  }
+  :root[data-design='pulse'] .station-artwork > [data-station-logo] {
+    width: 48px;
+    height: 48px;
+  }
+}
+@media (min-width: 641px) and (max-height: 950px) {
+  .pulse-hero .design-copy h2 {
+    font-size: 2.4rem;
+  }
+  .pulse-art {
+    max-width: 110px;
+  }
+}
+@media (max-height: 450px) {
+  :root[data-design='pulse'] .station-card .station-artwork {
+    display: none;
+  }
+}
+@media (max-height: 650px) {
+  :root[data-design='pulse'] .station-grid {
+    grid-template-columns: 1fr;
+  }
+  :root[data-design='pulse'] .station-card .station-button {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.5rem 3rem 0.5rem 0.5rem;
+    text-align: left;
+  }
+  :root[data-design='pulse'] .station-card .station-artwork {
+    width: 44px;
+    height: 44px;
+    margin: 0;
+    flex-shrink: 0;
+  }
+}
+:root[data-design='pulse'] .ambient-background {
+  display: none;
+}
+:root[data-design='pulse'] body::before {
+  background:
+    radial-gradient(ellipse at 5% 10%, var(--wra-atmosphere) 10%, transparent 55%),
+    radial-gradient(ellipse at 95% 90%, var(--wra-horizon) 10%, transparent 60%);
+}

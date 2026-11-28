@@ -388,7 +388,7 @@ test('sleep timer survives navigation to car mode and pauses the same audio elem
   try {
     await act(async () => page.container.querySelector('[aria-label="Play"]').click());
     const audio = window.Audio.mock.results[0].value;
-    page.click('[data-sleep-timer]');
+    await act(async () => page.click('[data-sleep-timer]'));
     page.click('[data-sleep-minutes="15"]');
     await act(async () => page.container.querySelector('#open-player').click());
     expect(page.container.querySelector('[data-sleep-timer]').getAttribute('aria-pressed')).toBe(

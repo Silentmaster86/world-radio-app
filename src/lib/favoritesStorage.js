@@ -65,6 +65,7 @@ export function loadFavorites() {
   const invalid = current.exists || legacy.exists;
   return {
     ...defaults,
+    canPersist: !unavailable,
     message: unavailable ? SESSION_ONLY_MESSAGE : invalid ? RECOVERY_MESSAGE : '',
   };
 }
