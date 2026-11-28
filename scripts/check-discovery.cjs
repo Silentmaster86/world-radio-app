@@ -112,6 +112,7 @@ async function main() {
             .filter({ has: page.getByRole('heading', { name: 'World Jazz', exact: true }) });
           if (!(await result.locator('button').isDisabled()))
             await result.locator('button').click();
+          await result.locator('button:disabled').waitFor();
           assert.equal(await result.locator('button').isDisabled(), true);
           assert.equal(
             await page
@@ -131,6 +132,12 @@ async function main() {
             assert.equal(await bbc.isDisabled(), false);
             await bbc.click();
           }
+          await page.waitForFunction(
+            () =>
+              [...document.querySelectorAll('article')]
+                .find((node) => node.querySelector('h2')?.textContent === 'BBC Radio 1 (128k)')
+                ?.querySelector('button')?.disabled,
+          );
           assert.equal(await bbc.isDisabled(), true);
           const hls = await page.evaluate(() =>
             JSON.parse(localStorage.getItem('wra:stations:v1')).stations.find(
@@ -147,9 +154,11 @@ async function main() {
           assert.equal(await page.locator('article').count(), 1);
           assert.equal(await page.locator('[data-station-title]').innerText(), 'World Jazz');
           await page.locator('article button[aria-pressed]').click();
+          await page.locator('article button[aria-pressed=true]').waitFor();
           await page.reload({ waitUntil: 'networkidle' });
           assert.equal(await page.locator('article button[aria-pressed="true"]').count(), 1);
           await page.locator('article button[aria-pressed]').click();
+          await page.locator('article button[aria-pressed=false]').waitFor();
           count++;
         }
         assert.equal(requests, 3);

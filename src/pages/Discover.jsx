@@ -1,3 +1,4 @@
+import { afterLibraryAction } from '../lib/libraryTransaction';
 import HomeHeader from '../components/Home/HomeHeader';
 import { countryOptions } from '../lib/countries';
 import { useEffect, useRef, useState } from 'react';
@@ -252,7 +253,9 @@ export default function Discover() {
               disabled={!station || !!existing}
               aria-label={!station ? t('discover.unavailableLabel') : undefined}
               onClick={() => {
-                if (!addStation(row)) setError(t('discover.limit'));
+                afterLibraryAction(addStation(row), (added) => {
+                  if (!added) setError(t('discover.limit'));
+                });
               }}
             >
               {t(!station ? 'discover.unavailable' : existing ? 'discover.added' : 'discover.add')}

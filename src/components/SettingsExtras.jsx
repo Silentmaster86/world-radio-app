@@ -1,3 +1,4 @@
+import DesignPicker from '../designs/DesignPicker';
 import { lazy, Suspense, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ErrorBoundary from './ErrorBoundary';
@@ -13,6 +14,7 @@ export default function SettingsExtras({ onNavigate }) {
   const [backupOpen, setBackupOpen] = useState(false);
   return (
     <>
+      <DesignPicker />
       {storageMessage && <p role="status">{localizeStoredMessage(t, storageMessage)}</p>}
       <label className="motion-choice">
         <input

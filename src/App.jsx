@@ -1,3 +1,4 @@
+import { DesignSlot } from './context/DesignContext';
 import DirectoryClickReporter from './components/DirectoryClickReporter';
 import { lazy, Suspense, useState } from 'react';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -10,7 +11,6 @@ import {
   Navigate,
   Link,
 } from 'react-router-dom';
-import styled from 'styled-components';
 import SoundBar from './components/Layout/SoundBar';
 import Home from './pages/Home';
 const Discover = lazy(() => import('./pages/Discover'));
@@ -23,19 +23,17 @@ import { PwaProvider } from './context/PwaContext';
 import { BrowsingProvider } from './context/BrowsingContext';
 import { RecentStationsProvider } from './context/RecentStationsContext';
 
-const AppWrapper = styled.div`
-  min-height: 100dvh;
-  padding-bottom: ${({ $car, $playerHeight }) => ($car ? '0' : `calc(${$playerHeight}px + 1.5rem)`)};
-  background: transparent;
-  color: ${({ theme }) => theme.colors.text};
-`;
 function AppShell() {
   const location = useLocation();
   const { t } = useLanguage();
   const isCar = location.pathname === '/now-playing';
   const [playerHeight, setPlayerHeight] = useState(176);
   return (
-    <AppWrapper $car={isCar} $playerHeight={playerHeight}>
+    <div
+      className="app-wrapper"
+      style={{ paddingBottom: isCar ? 0 : `calc(${playerHeight}px + 1.5rem)` }}
+    >
+      {!isCar && <DesignSlot part="Navigation" />}
       <ErrorBoundary
         key={location.pathname}
         fallback={
@@ -60,7 +58,7 @@ function AppShell() {
         </Suspense>
       </ErrorBoundary>
       {!isCar && <SoundBar onHeightChange={setPlayerHeight} />}
-    </AppWrapper>
+    </div>
   );
 }
 export default function App() {

@@ -6,6 +6,7 @@ import {
 } from './addedStations';
 import { FAVORITES_KEY, loadFavorites } from './favoritesStorage';
 import { RECENT_KEY, RECENT_LIMIT, loadRecent } from './recentStorage';
+import { DESIGN_KEY, DESIGNS } from '../context/DesignContext';
 import { PLAYER_KEY } from './playerPreferences';
 import { LANGUAGE_KEY, SUPPORTED_LANGUAGES } from '../i18n';
 
@@ -70,7 +71,9 @@ export function validateBackup(value) {
     !Number.isFinite(settings.volume) ||
     settings.volume < 0 ||
     settings.volume > 1 ||
-    typeof settings.muted !== 'boolean'
+    typeof settings.muted !== 'boolean' ||
+    (settings.design !== undefined && !DESIGNS.includes(settings.design)) ||
+    (settings.backgroundMotion !== undefined && typeof settings.backgroundMotion !== 'boolean')
   )
     fail('invalid');
   return {
@@ -84,6 +87,10 @@ export function validateBackup(value) {
       theme: settings.theme,
       volume: settings.volume,
       muted: settings.muted,
+      ...(settings.design !== undefined ? { design: settings.design } : {}),
+      ...(settings.backgroundMotion !== undefined
+        ? { backgroundMotion: settings.backgroundMotion }
+        : {}),
     },
   };
 }
@@ -157,7 +164,19 @@ export function persistImport(plan, { includeSettings = false, stationId } = {},
     ...(includeSettings
       ? [
           [LANGUAGE_KEY, { version: 1, language: plan.settings.language }],
-          [THEME_KEY, { version: 1, mode: plan.settings.theme }],
+          [
+            THEME_KEY,
+            {
+              version: 1,
+              mode: plan.settings.theme,
+              ...(plan.settings.backgroundMotion !== undefined
+                ? { backgroundMotion: plan.settings.backgroundMotion }
+                : {}),
+            },
+          ],
+          ...(plan.settings.design !== undefined
+            ? [[DESIGN_KEY, { version: 1, design: plan.settings.design }]]
+            : []),
           [
             PLAYER_KEY,
             { version: 1, stationId, volume: plan.settings.volume, muted: plan.settings.muted },
@@ -178,6 +197,13 @@ export function persistImport(plan, { includeSettings = false, stationId } = {},
         /* Preserve unreadable data on rollback too. */
       }
       if (value?.version > 1) fail('newer');
+      if (
+        key === THEME_KEY &&
+        plan.settings.backgroundMotion === undefined &&
+        value?.version === 1 &&
+        typeof value.backgroundMotion === 'boolean'
+      )
+        entries.find(([name]) => name === THEME_KEY)[1].backgroundMotion = value.backgroundMotion;
     }
   } catch (error) {
     if (error.message === 'newer') throw error;

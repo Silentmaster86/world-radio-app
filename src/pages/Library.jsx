@@ -1,3 +1,4 @@
+import { afterLibraryAction } from '../lib/libraryTransaction';
 import { useLayoutEffect, useRef, useState } from 'react';
 import HomeHeader from '../components/Home/HomeHeader';
 import { LibraryPage } from '../components/Library/LibraryPage';
@@ -123,12 +124,14 @@ export default function Library() {
                     type="button"
                     data-confirm-remove
                     onClick={() => {
-                      if (audio.removeStation(station.id)) {
-                        setRemoving(null);
-                        setMessage('removed');
-                        setError('');
-                        heading.current?.focus();
-                      } else setError('failed');
+                      afterLibraryAction(audio.removeStation(station.id), (removed) => {
+                        if (removed) {
+                          setRemoving(null);
+                          setMessage('removed');
+                          setError('');
+                          heading.current?.focus();
+                        } else setError('failed');
+                      });
                     }}
                   >
                     {t('yes')}

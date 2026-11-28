@@ -1,4 +1,7 @@
-# Radio studio visual design
+# Classic radio studio visual design
+
+The existing design remains the default. See [selectable app designs](app-designs.md)
+for Orbit, Pulse, Analog and Signal and the independent appearance setting.
 
 The application now uses a shared studio-inspired visual language: midnight navy and
 aqua in dark mode, porcelain/indigo with a soft mint horizon in light mode.

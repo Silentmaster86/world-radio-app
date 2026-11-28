@@ -1,0 +1,242 @@
+.design-navigation {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.5rem;
+  width: min(1100px, calc(100% - 2rem));
+  margin: 1rem auto 0;
+}
+.design-navigation a {
+  min-width: 44px;
+  min-height: 48px;
+  padding: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  color: var(--wra-text);
+  text-decoration: none;
+  flex: 1;
+  font-weight: 650;
+}
+.design-navigation a[aria-current='page'] {
+  background: var(--wra-accent);
+  color: var(--wra-on-accent);
+}
+.design-hero {
+  min-width: 0;
+  margin: 1rem 0;
+  overflow-wrap: anywhere;
+}
+.design-copy {
+  min-width: 0;
+}
+.design-copy h2 {
+  margin: 0.5rem 0 1rem;
+  font-size: clamp(2rem, 4vw, 3.8rem);
+  line-height: 1.05;
+  letter-spacing: -0.05em;
+}
+.design-copy p {
+  margin: 0.5rem 0;
+  max-width: 48ch;
+}
+.design-kicker {
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  font-weight: 750;
+  text-transform: uppercase;
+}
+:root[data-design]:not([data-design='classic']) .station-grid {
+  counter-reset: station;
+}
+:root[data-design]:not([data-design='classic']) .station-card {
+  counter-increment: station;
+}
+:root[data-design]:not([data-design='classic']) .station-button {
+  min-height: 76px;
+}
+:root[data-design]:not([data-design='classic']) .now-playing-artwork {
+  display: grid;
+  place-items: center;
+}
+:root[data-design]:not([data-design='classic']) .settings-dialog {
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
+}
+@media (max-width: 640px) {
+  :root[data-design]:not([data-design='classic']) .design-navigation {
+    width: calc(100% - 1rem);
+    margin-top: 0.5rem;
+    gap: 0;
+  }
+  .design-navigation a {
+    padding: 0.5rem 0.25rem;
+  }
+  .design-navigation a span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    clip-path: inset(50%);
+    overflow: hidden;
+  }
+  .design-copy h2 {
+    font-size: clamp(1.65rem, 8vw, 2.8rem);
+  }
+  .design-copy p:not(.design-kicker) {
+    font-size: 0.8rem;
+  }
+  :root[data-design]:not([data-design='classic']) .design-hero {
+    margin: 0.7rem 0;
+  }
+}
+@media (max-height: 650px) {
+  .design-copy p:not(.design-kicker),
+  .design-kicker {
+    display: none;
+  }
+  .design-copy h2 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+}
+:root[data-ambient-motion='off'] .design-hero *,
+:root[data-page-visible='false'] .design-hero *,
+:root[data-ambient-motion='off'] .now-playing-artwork *,
+:root[data-page-visible='false'] .now-playing-artwork * {
+  animation-play-state: paused !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .design-hero *,
+  .now-playing-artwork * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+/* Prioritize the station actions over decorative art on short phone screens. */
+@media (max-height: 650px) {
+  :root[data-design]:not([data-design='classic']) .design-hero {
+    display: none;
+  }
+}
+:root[data-ambient-motion='off'] .now-playing-artwork::before,
+:root[data-ambient-motion='off'] .now-playing-artwork::after,
+:root[data-page-visible='false'] .now-playing-artwork::before,
+:root[data-page-visible='false'] .now-playing-artwork::after {
+  animation-play-state: paused !important;
+}
+@media (min-width: 641px) {
+  .design-navigation a {
+    font-size: 0.75rem;
+  }
+}
+:root[data-design]:not([data-design='classic']) .header-actions > a[href='/discover'] {
+  display: none;
+}
+@media (min-width: 641px) and (max-height: 800px) {
+  :root[data-design]:not([data-design='classic']) .design-hero {
+    display: none;
+  }
+}
+@media (max-height: 450px) {
+  :root[data-design]:not([data-design='classic']) .design-navigation {
+    margin-top: 0.25rem;
+    padding: 0;
+    min-height: 44px;
+  }
+  :root[data-design]:not([data-design='classic']) .design-navigation a {
+    min-height: 44px;
+    padding: 0.2rem;
+  }
+  :root[data-design]:not([data-design='classic']) .home-page {
+    padding-top: 0.25rem;
+  }
+}
+@media (max-height: 450px) and (min-width: 520px) {
+  :root[data-design]:not([data-design='classic']) body {
+    padding-left: 56px;
+  }
+  :root[data-design]:not([data-design='classic']) .design-navigation {
+    position: fixed;
+    inset: 4px auto auto 4px;
+    width: 48px;
+    height: auto;
+    margin: 0;
+    flex-direction: column;
+    padding: 0;
+    border-radius: 16px;
+    z-index: 2;
+  }
+  :root[data-design]:not([data-design='classic']) .design-navigation a {
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+    border: 0;
+  }
+  :root[data-design]:not([data-design='classic']) .design-navigation a span {
+    display: none;
+  }
+}
+@media (max-width: 640px) and (min-height: 451px) {
+  :root[data-design]:not([data-design='classic']) .home-page {
+    padding: 0.75rem;
+  }
+}
+@media (max-width: 640px) and (max-height: 650px) and (min-height: 451px) {
+  :root[data-design]:not([data-design='classic']) .design-navigation {
+    padding: 0.25rem;
+    margin-top: 0.25rem;
+  }
+  :root[data-design]:not([data-design='classic']) .design-navigation a {
+    min-height: 44px;
+    padding: 0.25rem;
+  }
+}
+@media (max-height: 700px) {
+  :root[data-design]:not([data-design='classic']) .now-playing-artwork {
+    width: 140px;
+    height: 140px;
+    padding: 0.6rem;
+  }
+  :root[data-design]:not([data-design='classic']) .now-playing-artwork > [data-station-logo] {
+    width: 104px;
+    height: 104px;
+  }
+  :root[data-design]:not([data-design='classic']) .now-playing-artwork::before {
+    width: 110%;
+    height: 110%;
+  }
+}
+@media (max-height: 450px) {
+  :root[data-design]:not([data-design='classic']) .now-playing-card {
+    padding: 0.5rem;
+    gap: 0.4rem 1rem;
+  }
+  :root[data-design]:not([data-design='classic']) .now-playing-artwork {
+    width: 120px;
+    height: 120px;
+  }
+  :root[data-design]:not([data-design='classic']) .now-playing-artwork > [data-station-logo] {
+    width: 80px;
+    height: 80px;
+  }
+}
+@media (max-width: 519px) and (max-height: 650px) {
+  :root[data-design]:not([data-design='classic']) .now-playing-artwork {
+    width: 96px;
+    height: 96px;
+    padding: 0.4rem;
+  }
+  :root[data-design]:not([data-design='classic']) .now-playing-artwork > [data-station-logo] {
+    width: 72px;
+    height: 72px;
+  }
+}
+.design-navigation svg {
+  flex-shrink: 0;
+}
+@media (min-width: 801px) {
+  :root[data-design='orbit'] body:has(.now-playing-page) {
+    padding-left: 0;
+  }
+}

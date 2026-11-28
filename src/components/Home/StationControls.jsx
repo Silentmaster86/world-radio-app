@@ -1,121 +1,8 @@
 import { FaFilter } from 'react-icons/fa';
-import styled from 'styled-components';
 import { useFilterDisclosure } from '../../context/BrowsingContext';
 import { getCountryName } from '../../lib/stationUtils';
 import { useLanguage } from '../../context/LanguageContext';
 
-const Controls = styled.section`
-  margin: 1.5rem 0;
-  display: grid;
-  gap: 1rem;
-  @media (max-width: 640px) {
-    margin: 0.65rem 0;
-    gap: 0.5rem;
-  }
-`;
-const Row = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  align-items: end;
-  gap: 0.75rem;
-`;
-const CollectionRow = styled(Row)`
-  @media (max-width: 640px) {
-    flex-wrap: nowrap;
-    background: ${({ theme }) => theme.colors.surface};
-    padding: 0.25rem;
-    border-radius: 0.8rem;
-    gap: 0.25rem;
-    > button {
-      border: 0;
-      flex: 1;
-      min-width: 0;
-      padding: 0.25rem;
-      font-size: 0.8rem;
-      line-height: 1.3;
-      overflow-wrap: anywhere;
-    }
-  }
-`;
-const Field = styled.label`
-  display: grid;
-  gap: 0.4rem;
-  flex: 1 1 150px;
-  min-width: 0;
-  font-size: 0.875rem;
-  input,
-  select {
-    width: 100%;
-    min-height: 44px;
-    padding: 0.65rem 0.75rem;
-    border-radius: 0.65rem;
-    border: 1px solid ${({ theme }) => theme.colors.muted};
-    background: ${({ theme }) => theme.colors.surface || theme.colors.background};
-    color: ${({ theme }) => theme.colors.text};
-  }
-  input::placeholder {
-    color: ${({ theme }) => theme.colors.muted};
-    opacity: 1;
-  }
-`;
-const SearchRow = styled(Row)`
-  flex-wrap: nowrap;
-  align-items: end;
-  gap: 0.5rem;
-`;
-const SearchField = styled(Field)`
-  flex: 1;
-  input {
-    border-radius: 0.8rem;
-  }
-`;
-const SectionButton = styled.button`
-  min-height: 44px;
-  padding: 0.6rem 1rem;
-  border-radius: 0.65rem;
-  border: 1px solid ${({ theme }) => theme.colors.muted};
-  background: ${({ $active, theme }) => ($active ? theme.colors.accent : 'transparent')};
-  color: ${({ $active, theme }) => ($active ? theme.colors.onAccent || '#fff' : theme.colors.text)};
-  cursor: pointer;
-`;
-const Reset = styled(SectionButton)`
-  border-radius: 0.65rem;
-`;
-const FilterButton = styled(Reset)`
-  display: none;
-  @media (max-width: 640px) {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 44px;
-    height: 44px;
-    padding: 0.5rem;
-    span {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      overflow: hidden;
-      clip-path: inset(50%);
-      white-space: nowrap;
-    }
-  }
-`;
-const MobileToolbar = styled(Row)`
-  display: none;
-  @media (max-width: 640px) {
-    display: flex;
-  }
-`;
-const DesktopReset = styled(Reset)`
-  @media (max-width: 640px) {
-    display: none;
-  }
-`;
-const Refinements = styled(Row)`
-  @media (max-width: 640px) {
-    display: ${({ $open }) => ($open ? 'flex' : 'none')};
-  }
-`;
 export default function StationControls({
   filters,
   options,
@@ -129,36 +16,36 @@ export default function StationControls({
   const { t } = useLanguage();
   const activeCount = [filters.country, filters.genre, filters.language].filter(Boolean).length;
   return (
-    <Controls className="station-controls" aria-label={t('filters.find')}>
-      <CollectionRow className="collection-tabs" role="group" aria-label={t('filters.collection')}>
-        <SectionButton
+    <section className="station-controls" aria-label={t('filters.find')}>
+      <div className="collection-tabs" role="group" aria-label={t('filters.collection')}>
+        <button
+          className="section-button"
           type="button"
-          $active={filters.section === 'all'}
           aria-pressed={filters.section === 'all'}
           onClick={() => updateFilters({ section: 'all' })}
         >
           {t('filters.all', { count: total })}
-        </SectionButton>
-        <SectionButton
+        </button>
+        <button
+          className="section-button"
           type="button"
-          $active={filters.section === 'favorites'}
           aria-pressed={filters.section === 'favorites'}
           onClick={() => updateFilters({ section: 'favorites' })}
         >
           {t('filters.favorites', { count: favoriteCount })}
-        </SectionButton>
-        <SectionButton
+        </button>
+        <button
+          className="section-button"
           id="recent-collection"
           type="button"
-          $active={filters.section === 'recent'}
           aria-pressed={filters.section === 'recent'}
           onClick={() => updateFilters({ section: 'recent' })}
         >
           {t('filters.recent', { count: recentCount })}
-        </SectionButton>
-      </CollectionRow>
-      <SearchRow className="station-search-row">
-        <SearchField htmlFor="station-search">
+        </button>
+      </div>
+      <div className="station-search-row">
+        <label className="filter-field search-field" htmlFor="station-search">
           <span>{t('filters.search')}</span>
           <input
             id="station-search"
@@ -167,8 +54,9 @@ export default function StationControls({
             value={filters.q}
             onChange={(event) => updateFilters({ q: event.target.value })}
           />
-        </SearchField>
-        <FilterButton
+        </label>
+        <button
+          className="filter-button"
           type="button"
           aria-expanded={expanded}
           aria-controls="station-refinements"
@@ -178,17 +66,17 @@ export default function StationControls({
           <span>
             {activeCount ? t('filters.active', { count: activeCount }) : t('filters.filters')}
           </span>
-        </FilterButton>
-      </SearchRow>
+        </button>
+      </div>
       {(activeCount > 0 || filters.q || filters.section !== 'all') && (
-        <MobileToolbar>
-          <Reset type="button" onClick={resetFilters}>
+        <div className="mobile-toolbar">
+          <button className="section-button" type="button" onClick={resetFilters}>
             {t('filters.reset')}
-          </Reset>
-        </MobileToolbar>
+          </button>
+        </div>
       )}
-      <Refinements id="station-refinements" $open={expanded}>
-        <Field htmlFor="station-country">
+      <div className="station-refinements" id="station-refinements" data-open={expanded}>
+        <label className="filter-field" htmlFor="station-country">
           {t('filters.country')}
           <select
             id="station-country"
@@ -202,8 +90,8 @@ export default function StationControls({
               </option>
             ))}
           </select>
-        </Field>
-        <Field htmlFor="station-genre">
+        </label>
+        <label className="filter-field" htmlFor="station-genre">
           {t('filters.genre')}
           <select
             id="station-genre"
@@ -217,8 +105,8 @@ export default function StationControls({
               </option>
             ))}
           </select>
-        </Field>
-        <Field htmlFor="station-language">
+        </label>
+        <label className="filter-field" htmlFor="station-language">
           {t('filters.language')}
           <select
             id="station-language"
@@ -232,11 +120,11 @@ export default function StationControls({
               </option>
             ))}
           </select>
-        </Field>
-        <DesktopReset type="button" onClick={resetFilters}>
+        </label>
+        <button className="section-button desktop-reset" type="button" onClick={resetFilters}>
           {t('filters.reset')}
-        </DesktopReset>
-      </Refinements>
-    </Controls>
+        </button>
+      </div>
+    </section>
   );
 }

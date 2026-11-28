@@ -163,3 +163,59 @@ test('future favorite schemas remain intact when session favorites are reordered
   expect(page.container.querySelector('output').textContent).toBe('["heart-uk","capital-dance"]');
   expect(localStorage.getItem(FAVORITES_KEY)).toBe(raw);
 });
+
+test('another mounted tab is merged before adding and storage events synchronize removals', () => {
+  const a = mount(),
+    b = mount();
+  a.click('#first');
+  b.click('#second');
+  expect(JSON.parse(localStorage.getItem(FAVORITES_KEY)).stationIds).toEqual([
+    'capital-dance',
+    'heart-uk',
+  ]);
+  act(() => window.dispatchEvent(new StorageEvent('storage', { key: FAVORITES_KEY })));
+  expect(a.container.querySelector('output').textContent).toBe('["capital-dance","heart-uk"]');
+  b.click('#first');
+  a.click('#second');
+  expect(JSON.parse(localStorage.getItem(FAVORITES_KEY)).stationIds).toEqual([]);
+});
+
+test('Web Locks serialize overlapping favorites actions against fresh storage', async () => {
+  const previous = Object.getOwnPropertyDescriptor(navigator, 'locks');
+  let queue = Promise.resolve();
+  Object.defineProperty(navigator, 'locks', {
+    configurable: true,
+    value: {
+      request: jest.fn((_key, work) => {
+        const result = queue.then(work);
+        queue = result.catch(() => {});
+        return result;
+      }),
+    },
+  });
+  try {
+    const a = mount(),
+      b = mount();
+    await act(async () => {
+      a.container.querySelector('#first').click();
+      b.container.querySelector('#second').click();
+      await queue;
+    });
+    expect(JSON.parse(localStorage.getItem(FAVORITES_KEY)).stationIds).toEqual([
+      'capital-dance',
+      'heart-uk',
+    ]);
+    await act(async () => {
+      a.container.querySelector('#first').click();
+      a.container.querySelector('#first').click();
+      await queue;
+    });
+    expect(JSON.parse(localStorage.getItem(FAVORITES_KEY)).stationIds).toEqual([
+      'heart-uk',
+      'capital-dance',
+    ]);
+  } finally {
+    if (previous) Object.defineProperty(navigator, 'locks', previous);
+    else delete navigator.locks;
+  }
+});

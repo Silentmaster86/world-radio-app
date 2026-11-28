@@ -37,15 +37,14 @@ stations/favorites. The combined added catalog is limited to 100; overflow is
 rejected rather than silently dropping stations. Existing recent history comes
 first and the combined list retains the existing 20-station cap.
 
-Importing language, theme and volume is a separate, initially unchecked option.
+Importing language, theme, app design, animation preference and volume is a separate, initially unchecked option. Old backups without design/motion keep those device preferences.
 The selected station, actual audio source and Sleep Timer stay active. Neither
 import nor reload starts playback automatically. Last-selected station and timer
 deadlines are not copied from another device.
 
 ## Persistence and failure handling
 
-The preview and confirmation combine in-memory data with the latest readable
-saved library, so another tab's additions before confirmation are preserved.
+The preview and confirmation read fresh provider snapshots, combining current disk data with unsaved session operations. Another tab’s additions are preserved and its deletions are not resurrected by a stale React snapshot. Favorites, added-station changes, history and backup commits share an origin-wide Web Lock where available. Older browsers merge sequential edits without that lock; simultaneous writes there remain best-effort.
 The import checks the schemas of all keys it will write before any writes.
 Future schemas stay untouched; a future appearance/language/player schema blocks
 only an import that explicitly includes settings.
@@ -56,12 +55,10 @@ undone in reverse order, including removal of originally absent keys. Contexts
 and playback are not updated after a failed persistence step. If storage becomes
 unavailable during rollback too, a distinct message explains that some saved
 data could not be restored and recommends downloading the live library before
-reloading. localStorage has no multi-key transaction or cross-tab lock; this is
-best-effort rollback, not an atomic database transaction. Unrelated storage keys
+reloading. localStorage has no multi-key transaction; the shared Web Lock orders cooperating app windows, while rollback remains best-effort rather than a database transaction. Unrelated storage keys
 and unmatched legacy favorites are not removed by the import.
 
-The stations provider extends its existing catalog array rather than replacing
-it, preserving the shared audio controller and timer. Favorites/recent providers
+The stations provider keeps its catalog array identity while refreshing its contents, preserving the shared audio controller and timer. Favorites/recent providers
 adopt the saved merged values. Optional player settings update the current audio
 instance. Backup UI, validation and feature translations load outside the initial
 JS bundle; its chunk is included in the offline shell. A local error boundary

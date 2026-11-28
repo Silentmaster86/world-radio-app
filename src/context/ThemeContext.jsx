@@ -1,4 +1,5 @@
-import { createContext, useState, useContext, useEffect } from 'react';
+import { createContext, useState, useContext, useEffect, useMemo } from 'react';
+import { useDesign } from './DesignContext';
 import { darkTheme } from '../darkTheme';
 import { lightTheme } from '../lightTheme';
 import { readStorage, writeStorage } from '../lib/storage';
@@ -56,7 +57,15 @@ export function ThemeProviderToggle({ children }) {
     };
   }, [mode]);
   const isDarkMode = mode === 'dark' || (mode === 'system' && systemDark);
-  const theme = isDarkMode ? darkTheme : lightTheme;
+  const { module } = useDesign();
+  const base = isDarkMode ? darkTheme : lightTheme;
+  const theme = useMemo(
+    () =>
+      module
+        ? { ...base, colors: { ...base.colors, ...module.palette[isDarkMode ? 'dark' : 'light'] } }
+        : base,
+    [base, module, isDarkMode],
+  );
   useEffect(() => {
     const root = document.documentElement;
     const previousScheme = root.style.colorScheme;
@@ -97,6 +106,10 @@ export function ThemeProviderToggle({ children }) {
       value={{
         mode,
         setThemeMode,
+        restoreTheme: (settings) => {
+          setMode(settings.theme);
+          if (settings.backgroundMotion !== undefined) setMotion(settings.backgroundMotion);
+        },
         backgroundMotion,
         setBackgroundMotion,
         isDarkMode,

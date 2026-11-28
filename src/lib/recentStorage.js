@@ -29,7 +29,8 @@ export function loadRecent() {
     null,
     (value) => value !== null && typeof value === 'object' && !Array.isArray(value),
   );
-  if (saved.status === 'unavailable') return { ...defaults, message: RECENT_SESSION_MESSAGE };
+  if (saved.status === 'unavailable')
+    return { ...defaults, canPersist: false, message: RECENT_SESSION_MESSAGE };
   if (!saved.exists) return defaults;
   if (saved.value?.version > 1)
     return {

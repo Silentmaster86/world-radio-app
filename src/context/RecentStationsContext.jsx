@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { libraryTransaction } from '../lib/libraryTransaction';
 import { useAudio } from './AudioContext';
 import { useStations } from './StationsContext';
 import {
@@ -18,32 +19,33 @@ export function RecentStationsProvider({ children }) {
   const [history, setHistory] = useState(loadRecent);
   const latest = useRef(history);
   const recorded = useRef(null);
-  const persist = useCallback((recentIds) => {
-    const previous = latest.current;
-    const next = {
-      ...previous,
-      recentIds,
-      message: !previous.canPersist
-        ? previous.message
-        : saveRecent(recentIds)
-          ? ''
-          : RECENT_SESSION_MESSAGE,
-    };
-    latest.current = next;
-    setHistory(next);
-  }, []);
+  const pending = useRef([]);
+  const readRecent = () =>
+    pending.current.reduce((ids, change) => change(ids), loadRecent().recentIds);
+  const persist = useCallback(
+    (change) =>
+      libraryTransaction(() => {
+        pending.current.push(change);
+        const previous = loadRecent();
+        const recentIds = pending.current.reduce(
+          (ids, operation) => operation(ids),
+          previous.recentIds,
+        );
+        const saved = previous.canPersist && saveRecent(recentIds);
+        if (saved) pending.current = [];
+        const next = {
+          ...previous,
+          recentIds,
+          message: saved ? '' : previous.message || RECENT_SESSION_MESSAGE,
+        };
+        latest.current = next;
+        setHistory(next);
+      }),
+    [],
+  );
   const remember = useCallback(
     (id) => {
-      if (!stations.some((station) => station.id === id)) return;
-      const previous = latest.current;
-      const ids = prependRecent(previous.recentIds, id);
-      if (
-        !previous.message &&
-        ids.length === previous.recentIds.length &&
-        ids.every((item, index) => item === previous.recentIds[index])
-      )
-        return;
-      persist(ids);
+      if (stations.some((station) => station.id === id)) persist((ids) => prependRecent(ids, id));
     },
     [persist, stations],
   );
@@ -61,7 +63,11 @@ export function RecentStationsProvider({ children }) {
   useEffect(() => {
     const sync = (event) => {
       if (event.key !== RECENT_KEY && event.key !== null) return;
-      const next = loadRecent();
+      const loaded = loadRecent();
+      const next = {
+        ...loaded,
+        recentIds: pending.current.reduce((ids, change) => change(ids), loaded.recentIds),
+      };
       latest.current = next;
       setHistory(next);
     };
@@ -73,13 +79,15 @@ export function RecentStationsProvider({ children }) {
     <RecentStationsContext.Provider
       value={{
         recentIds: history.recentIds,
+        readRecent,
         restoreRecent: (recentIds) => {
+          pending.current = [];
           const next = { ...latest.current, recentIds, message: '' };
           latest.current = next;
           setHistory(next);
         },
         historyMessage: history.message,
-        clearHistory: () => persist([]),
+        clearHistory: () => persist(() => []),
       }}
     >
       {children}

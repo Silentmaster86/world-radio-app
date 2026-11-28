@@ -148,6 +148,7 @@ async function main() {
           await page.locator('[data-sleep-minutes="15"]').click();
           await manage(page);
           await page.locator('[data-move-down="heart-uk"]').click();
+          await page.locator('[data-move-up="capital-dance"]:disabled').waitFor();
           assert.equal(
             await page.evaluate(() => document.activeElement.dataset.favoriteHeading),
             'heart-uk',
@@ -175,6 +176,7 @@ async function main() {
           assert.equal(await page.locator('[data-added-row]').count(), 2);
           await page.locator(`[data-remove-station="${records[1].id}"]`).click();
           await page.locator('[data-confirm-remove]').click();
+          await page.locator('[data-confirm-remove]').waitFor({ state: 'hidden' });
           assert.equal(await page.evaluate(() => window.__libraryAudio[0].src), source);
           assert.equal(await page.evaluate(() => window.__libraryAudio[0].paused), false);
           assert.equal(
@@ -202,6 +204,7 @@ async function main() {
           await manage(page);
           await page.locator(`[data-remove-station="${records[0].id}"]`).click();
           await page.locator('[data-confirm-remove]').click();
+          await page.locator('[data-confirm-remove]').waitFor({ state: 'hidden' });
           assert.equal(await page.evaluate(() => window.__libraryAudio.length), 1);
           assert.equal(
             await page.evaluate(() => window.__libraryAudio[0].getAttribute('src')),
@@ -307,6 +310,7 @@ async function main() {
             null,
           );
           await recipient.locator('article button[aria-pressed]').click();
+          await recipient.locator('article button[aria-pressed=true]').waitFor();
           await recipient.reload({ waitUntil: 'networkidle' });
           assert.equal(await recipient.locator('article button[aria-pressed="true"]').count(), 1);
           assert.equal(receiver.lookups(), 1);

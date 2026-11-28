@@ -1,3 +1,4 @@
+import { afterLibraryAction } from '../lib/libraryTransaction';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import HomeHeader from '../components/Home/HomeHeader';
@@ -87,9 +88,10 @@ export default function SharedStation() {
             type="button"
             data-add-shared
             onClick={() => {
-              const added = addStation(lookup.row);
-              if (!added) setError('addFailed');
-              else if (added.id !== id) navigate('/station/' + added.id, { replace: true });
+              afterLibraryAction(addStation(lookup.row), (added) => {
+                if (!added) setError('addFailed');
+                else if (added.id !== id) navigate('/station/' + added.id, { replace: true });
+              });
             }}
           >
             {t('add')}

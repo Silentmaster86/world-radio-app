@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { useStations } from './StationsContext';
 import { createAudioPlayer, createInitialPlayerState } from '../lib/audioPlayer';
 import { bindMediaSession } from '../lib/mediaSession';
+import { afterLibraryAction } from '../lib/libraryTransaction';
 import { createSleepTimer } from '../lib/sleepTimer';
 import {
   loadPlayerPreferences,
@@ -13,7 +14,11 @@ const AudioContext = createContext();
 export const useAudio = () => useContext(AudioContext);
 
 export function AudioProvider({ children }) {
-  const { catalog: stations, removeStation: removeSavedStation } = useStations();
+  const {
+    catalog: stations,
+    stations: visibleStations,
+    removeStation: removeSavedStation,
+  } = useStations();
   const playerRef = useRef(null);
   const timerRef = useRef(null);
   const [sleepTimerDeadline, setSleepTimerDeadline] = useState(null);
@@ -98,8 +103,18 @@ export function AudioProvider({ children }) {
     }
   }, [settings, snapshot.selectedStationId, snapshot.volume, snapshot.muted]);
 
+  useEffect(() => {
+    const player = playerRef.current;
+    const selected = player?.getSnapshot().selectedStationId;
+    if (selected && !visibleStations.some((station) => station.id === selected)) {
+      timerRef.current?.cancel();
+      player.forgetStation(selected);
+    }
+  }, [visibleStations]);
+
   const invoke = (name, ...args) => playerRef.current?.[name](...args);
-  const currentStation = stations.find((station) => station.id === snapshot.selectedStationId);
+  const currentStation =
+    stations.find((station) => station.id === snapshot.selectedStationId) || stations[0];
   return (
     <AudioContext.Provider
       value={{
@@ -112,12 +127,14 @@ export function AudioProvider({ children }) {
         sleepTimerDeadline,
         setSleepTimer: (minutes) => timerRef.current?.start(minutes),
         cancelSleepTimer: () => timerRef.current?.cancel(),
-        removeStation: (id) => {
-          if (!removeSavedStation(id)) return false;
-          if (playerRef.current?.getSnapshot().selectedStationId === id) timerRef.current?.cancel();
-          invoke('forgetStation', id);
-          return true;
-        },
+        removeStation: (id) =>
+          afterLibraryAction(removeSavedStation(id), (removed) => {
+            if (!removed) return false;
+            if (playerRef.current?.getSnapshot().selectedStationId === id)
+              timerRef.current?.cancel();
+            invoke('forgetStation', id);
+            return true;
+          }),
         selectStation: (id) => invoke('selectStation', id),
         setStation: (station) => invoke('selectStation', station?.id),
         play: () => invoke('play'),

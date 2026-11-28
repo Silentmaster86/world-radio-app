@@ -15,7 +15,7 @@ export default {
     'Controlla l’anteprima. Per copiare anche lingua, aspetto e volume, seleziona prima le impostazioni. Poi scegli Aggiungi da backup. Stazioni e preferiti esistenti restano.',
   'backup.contentsQ': 'Cosa contiene un backup?',
   'backup.contentsA':
-    'Stazioni aggiunte, preferiti e ordine, cronologia, lingua, aspetto e volume. Contiene dati delle stazioni, non registrazioni. L’animazione dello sfondo resta separata su ogni dispositivo.',
+    'Stazioni aggiunte, preferiti e ordine, cronologia, lingua, aspetto e volume. Contiene dati delle stazioni, non registrazioni. Include anche lo stile e la preferenza di animazione dello sfondo.',
   'backup.recoveryQ': 'Posso recuperare la libreria senza backup?',
   'backup.recoveryA':
     'La libreria è salvata in questo browser. Non ci sono account né sincronizzazione automatica. Cancellare i dati del sito o cambiare browser può impedirne l’accesso. Salva un backup prima di cambiare dispositivo.',
@@ -24,7 +24,7 @@ export default {
     'L’audio richiede internet. Dopo la preparazione dei file offline, libreria e interfaccia possono aprirsi senza rete.',
 
   'backup.language':
-    'Impossibile caricare la lingua importata. Non è stato importato nulla. Riconnettiti o importa senza le impostazioni.',
+    'Impossibile caricare la lingua o lo stile importato. Non è stato importato nulla. Riconnettiti o importa senza le impostazioni.',
   'language.loading': 'Caricamento della lingua…',
   'language.failed':
     'Impossibile caricare questa lingua. La lingua attuale e la radio restano invariate. Riconnettiti o riapri l’app e riprova.',

@@ -1,56 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
 import { FaDownload } from 'react-icons/fa';
 import { usePwa } from '../../context/PwaContext';
 import { useLanguage } from '../../context/LanguageContext';
-const Button = styled.button`
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  width: 44px;
-  height: 44px;
-  border: 1px solid currentColor;
-  border-radius: 50%;
-  background: transparent;
-`;
-const Dialog = styled.dialog`
-  position: fixed;
-  inset: 0;
-  margin: auto;
-  padding: 1.25rem;
-  width: min(92vw, 440px);
-  max-height: 85dvh;
-  overflow-y: auto;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: 1rem;
-  background: ${({ theme }) => theme.colors.surface};
-  color: ${({ theme }) => theme.colors.text};
-  &::backdrop {
-    background: #0008;
-  }
-  &:not([open]) {
-    display: none;
-  }
-  h2 {
-    font-size: 1.25rem;
-    margin: 0 0 1rem;
-  }
-  p {
-    line-height: 1.6;
-  }
-  button {
-    min-height: 44px;
-    padding: 0.5rem 0.85rem;
-    border: 1px solid currentColor;
-    border-radius: 0.6rem;
-  }
-  footer {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: end;
-    gap: 0.75rem;
-  }
-`;
 export default function InstallApp() {
   const pwa = usePwa();
   const { t } = useLanguage();
@@ -79,7 +30,8 @@ export default function InstallApp() {
   };
   return (
     <>
-      <Button
+      <button
+        className="install-button"
         ref={opener}
         type="button"
         aria-label={t('install.aria')}
@@ -87,8 +39,9 @@ export default function InstallApp() {
         onClick={install}
       >
         <FaDownload aria-hidden="true" />
-      </Button>
-      <Dialog
+      </button>
+      <dialog
+        className="install-dialog"
         ref={dialog}
         aria-labelledby="install-heading"
         aria-describedby="install-steps"
@@ -117,7 +70,7 @@ export default function InstallApp() {
             {t('install.close')}
           </button>
         </footer>
-      </Dialog>
+      </dialog>
     </>
   );
 }

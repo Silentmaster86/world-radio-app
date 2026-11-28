@@ -1,3 +1,5 @@
+import { prepareDesign, useDesign } from '../../context/DesignContext';
+import { libraryTransaction, afterLibraryAction } from '../../lib/libraryTransaction';
 import { useEffect, useId, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useStations } from '../../context/StationsContext';
@@ -11,7 +13,6 @@ import {
   createBackup,
   parseBackup,
   planImport,
-  withSavedLibrary,
   persistImport,
   downloadBackup,
 } from '../../lib/libraryBackup';
@@ -70,7 +71,8 @@ export default function BackupPanel() {
     recent = useRecentStations(),
     audio = useAudio();
   const { language, setLanguage, t: ui } = useLanguage();
-  const { mode, setThemeMode } = useTheme();
+  const { mode, setThemeMode, backgroundMotion, restoreTheme } = useTheme();
+  const { design, setDesign } = useDesign();
   const [incoming, setIncoming] = useState(null),
     [includeSettings, setIncludeSettings] = useState(false),
     [reading, setReading] = useState(false),
@@ -89,16 +91,23 @@ export default function BackupPanel() {
   );
   const t = (key, params) => backupMessage(language, key, params);
   const current = () => ({
-    catalog: stations.catalog,
-    favoriteIds: favorites.favoriteIds,
-    recentIds: recent.recentIds,
-    settings: { language, theme: mode, volume: audio.volume, muted: audio.muted },
+    catalog: stations.readCatalog?.() || stations.catalog,
+    favoriteIds: favorites.readFavorites?.() || favorites.favoriteIds,
+    recentIds: recent.readRecent?.() || recent.recentIds,
+    settings: {
+      language,
+      theme: mode,
+      volume: audio.volume,
+      muted: audio.muted,
+      design,
+      backgroundMotion,
+    },
   });
   let preview = null,
     previewError = '';
   if (incoming) {
     try {
-      preview = planImport(incoming, withSavedLibrary(current()));
+      preview = planImport(incoming, current());
     } catch (e) {
       previewError = e.message;
     }
@@ -141,38 +150,59 @@ export default function BackupPanel() {
       setApplying(false);
       commitRef.current();
     };
-    if (includeSettings && !hasLanguage(incoming.settings.language)) {
+    if (includeSettings && (!hasLanguage(incoming.settings.language) || incoming.settings.design)) {
       setApplying(true);
       setError('');
-      loadLanguage(incoming.settings.language).then(finish, () => {
+      Promise.all([
+        loadLanguage(incoming.settings.language),
+        incoming.settings.design ? prepareDesign(incoming.settings.design) : Promise.resolve(),
+      ]).then(finish, () => {
         if (request !== generation.current) return;
         setApplying(false);
         setError('language');
       });
     } else finish();
   }
+
   function commit() {
-    try {
-      // Build again on confirmation: playback may have changed history since preview.
-      const plan = planImport(incoming, withSavedLibrary(current()));
-      persistImport(plan, { includeSettings, stationId: audio.selectedStationId });
-      stations.restoreStations(plan.stations);
-      favorites.restoreFavorites(plan.favoriteIds);
-      recent.restoreRecent(plan.recentIds);
-      if (includeSettings) {
-        setLanguage(plan.settings.language);
-        setThemeMode(plan.settings.theme);
-        audio.changeVolume(plan.settings.volume);
-        if (audio.muted !== plan.settings.muted) audio.toggleMute();
-      }
-      setIncoming(null);
-      setMessage('success');
-      setError('');
-      fileRef.current.value = '';
-      fileRef.current.focus();
-    } catch (e) {
-      setError(e.message);
-    }
+    const request = generation.current;
+    setApplying(true);
+    return afterLibraryAction(
+      libraryTransaction(() => {
+        if (request !== generation.current) return null;
+        try {
+          // Build again on confirmation: playback may have changed history since preview.
+          const plan = planImport(incoming, current());
+          persistImport(plan, { includeSettings, stationId: audio.selectedStationId });
+          stations.restoreStations(plan.stations);
+          favorites.restoreFavorites(plan.favoriteIds);
+          recent.restoreRecent(plan.recentIds);
+          if (includeSettings) {
+            setLanguage(plan.settings.language);
+            if (restoreTheme) restoreTheme(plan.settings);
+            else setThemeMode(plan.settings.theme);
+            if (plan.settings.design !== undefined) setDesign?.(plan.settings.design, false);
+            audio.changeVolume(plan.settings.volume);
+            if (audio.muted !== plan.settings.muted) audio.toggleMute();
+          }
+          setIncoming(null);
+          setMessage('success');
+          setError('');
+          fileRef.current.value = '';
+          fileRef.current.focus();
+          return true;
+        } catch (e) {
+          setError(e.message);
+          return null;
+        }
+      }),
+      (result) => {
+        if (request === generation.current) {
+          setApplying(false);
+          if (result === false) setError('storage');
+        }
+      },
+    );
   }
   return (
     <Panel aria-labelledby={title} data-backup-panel>
@@ -203,7 +233,7 @@ export default function BackupPanel() {
           data-backup-file
         />
       </label>
-      {applying && <p role="status">{ui('language.loading')}</p>}
+      {applying && <p role="status">{ui('settings.loading')}</p>}
       {reading && <p role="status">{t('reading')}</p>}
       {incoming && (
         <div data-backup-preview>

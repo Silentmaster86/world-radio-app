@@ -1,0 +1,382 @@
+:root[data-design='analog'] .ambient-background {
+  opacity: 0.2;
+}
+:root[data-design='analog'] body {
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    var(--wra-shadow) 4px
+  );
+}
+:root[data-design='analog'] .design-navigation {
+  border: 3px ridge var(--wra-border);
+  background: var(--wra-raised);
+  border-radius: 4px;
+}
+:root[data-design='analog'] .design-navigation a {
+  border: 2px outset var(--wra-border);
+  border-radius: 3px;
+  font-family: ui-monospace, monospace;
+  font-size: 0.75rem;
+}
+:root[data-design='analog'] .design-navigation a[aria-current='page'] {
+  border-style: inset;
+}
+.analog-cabinet {
+  padding: 12px;
+  background: repeating-linear-gradient(1deg, #65492f, #65492f 3px, #705136 4px, #705136 7px);
+  border: 4px ridge #ab8960;
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 12px;
+}
+.receiver-face {
+  background: var(--wra-raised);
+  padding: 1rem;
+  border: 3px ridge var(--wra-border);
+  border-radius: 5px;
+}
+.receiver-face .design-kicker {
+  margin: 0 0 0.75rem;
+}
+.receiver-display {
+  background: #d3dda9;
+  color: #28351c;
+  border: 5px inset #9fa975;
+  padding: 0.7rem;
+  font-family: ui-monospace, monospace;
+  box-shadow: inset 0 3px 10px #28351c33;
+}
+.receiver-display h2 {
+  margin: 0.2rem 0;
+  font-size: clamp(1.1rem, 3vw, 2rem);
+  letter-spacing: -0.04em;
+}
+.receiver-display p {
+  margin: 0;
+  font-size: 0.7rem;
+}
+.receiver-tuner {
+  position: relative;
+  height: 18px;
+  margin: 10px 0;
+  border-top: 1px solid var(--wra-border);
+  background: repeating-linear-gradient(90deg, var(--wra-border) 0 1px, transparent 1px 9px);
+}
+.receiver-tuner i {
+  position: absolute;
+  top: -3px;
+  bottom: 0;
+  left: 43%;
+  width: 3px;
+  background: var(--wra-danger);
+}
+.receiver-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.reel {
+  width: 32px;
+  height: 32px;
+  border: 5px dashed var(--wra-muted);
+  border-radius: 50%;
+}
+.receiver-power {
+  margin-left: auto;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 5px ridge #9b998e;
+  background: #292a25;
+  color: #f5ecd4;
+  box-shadow: 2px 3px 5px #0005;
+}
+.speaker-grille {
+  border: 4px inset #746448;
+  border-radius: 4px;
+  background:
+    radial-gradient(#15150f 2px, transparent 3px) 0 0/7px 7px,
+    #776a51;
+}
+.analog-cabinet[data-playing='true'] .reel {
+  animation: reel-spin 3s linear infinite;
+}
+@keyframes reel-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+:root[data-design='analog'] .station-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+:root[data-design='analog'] .station-card {
+  border: 3px outset var(--wra-border);
+  background: var(--wra-raised);
+  border-radius: 4px;
+  box-shadow: 2px 3px 0 var(--wra-shadow);
+}
+:root[data-design='analog'] .station-card[data-selected='true'] {
+  border-style: inset;
+  background: var(--wra-surface);
+}
+:root[data-design='analog'] .station-card::before {
+  content: 'P' counter(station, decimal-leading-zero);
+  position: absolute;
+  left: 0.5rem;
+  top: 0.3rem;
+  font:
+    0.65rem ui-monospace,
+    monospace;
+  color: var(--wra-muted);
+}
+:root[data-design='analog'] .station-card .station-button {
+  display: grid;
+  padding: 1.5rem 0.6rem 0.6rem;
+  gap: 0.5rem;
+}
+:root[data-design='analog'] .station-artwork {
+  border-radius: 3px;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto;
+  background: var(--wra-surface);
+}
+:root[data-design='analog'] .station-artwork > [data-station-logo] {
+  width: 48px;
+  height: 48px;
+  border-radius: 0;
+}
+:root[data-design='analog'] .station-info h2 {
+  font:
+    700 0.9rem ui-monospace,
+    monospace;
+}
+:root[data-design='analog'] .soundbar {
+  border: 3px ridge var(--wra-border);
+  background: var(--wra-raised);
+  border-radius: 4px;
+  box-shadow: 0 -4px 15px var(--wra-shadow);
+}
+:root[data-design='analog'] .soundbar .main-play-control,
+:root[data-design='analog'] .now-playing-card .main-play-control {
+  border: 5px ridge #9b998e;
+  background: #292a25;
+  color: #f5ecd4;
+  border-radius: 50%;
+}
+:root[data-design='analog'] .now-playing-card {
+  border: 10px ridge #8a6947;
+  background: var(--wra-raised);
+  border-radius: 8px;
+}
+:root[data-design='analog'] .now-playing-artwork {
+  padding: 1rem;
+  border: 5px inset var(--wra-border);
+  background: repeating-linear-gradient(0deg, transparent 0 3px, #0001 3px 4px), #d3dda9;
+  border-radius: 4px;
+}
+:root[data-design='analog'] .now-playing-artwork::before,
+:root[data-design='analog'] .now-playing-artwork::after {
+  display: none;
+}
+:root[data-design='analog'] .settings-dialog,
+:root[data-design='analog'] select,
+:root[data-design='analog'] input,
+:root[data-design='analog'] .collection-tabs button {
+  border-radius: 4px;
+}
+@media (max-width: 640px) {
+  .analog-cabinet {
+    grid-template-columns: minmax(0, 1fr) 45px;
+    padding: 6px;
+    gap: 6px;
+  }
+  .receiver-face {
+    padding: 0.6rem;
+  }
+  .receiver-display {
+    padding: 0.4rem;
+  }
+  .receiver-controls {
+    gap: 0.5rem;
+  }
+  .receiver-display h2 {
+    font-size: 1rem;
+  }
+  :root[data-design='analog'] .station-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  :root[data-design='analog'] .station-artwork {
+    width: 44px;
+    height: 44px;
+  }
+  :root[data-design='analog'] .station-artwork > [data-station-logo] {
+    width: 36px;
+    height: 36px;
+  }
+}
+@media (max-height: 650px) {
+  .receiver-face {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    padding: 0.4rem;
+    min-width: 0;
+  }
+  .receiver-display {
+    flex: 1;
+    min-width: 0;
+  }
+  .receiver-display small,
+  .receiver-display p,
+  .receiver-tuner,
+  .receiver-face .design-kicker,
+  .receiver-controls .reel {
+    display: none;
+  }
+  .receiver-controls {
+    flex-shrink: 0;
+  }
+  .receiver-power {
+    width: 44px;
+    height: 44px;
+  }
+  .receiver-display h2 {
+    margin: 0;
+    font-size: 1rem;
+  }
+  :root[data-design='analog'] .station-card .station-button {
+    padding-top: 1.2rem;
+  }
+  :root[data-design='analog'] .station-card .station-meta {
+    display: none;
+  }
+}
+.receiver-face {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.4rem 0.75rem;
+  padding: 0.6rem;
+  min-width: 0;
+}
+.receiver-face .design-kicker {
+  grid-column: 1/-1;
+  margin: 0;
+}
+.receiver-display {
+  min-width: 0;
+  padding: 0.45rem;
+}
+.receiver-display h2 {
+  font-size: 1.4rem;
+  margin: 0.1rem 0;
+}
+.receiver-display small {
+  font-size: 0.65rem;
+}
+.receiver-tuner {
+  grid-column: 1;
+  height: 12px;
+  margin: 2px 0;
+}
+.receiver-controls {
+  grid-column: 2;
+  grid-row: 2/4;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.receiver-power {
+  margin: 0;
+}
+:root[data-design='analog'] .station-card .station-button {
+  padding: 1.2rem 0.5rem 0.5rem;
+}
+@media (max-width: 640px) {
+  .receiver-display h2 {
+    font-size: 0.95rem;
+  }
+  .receiver-controls .reel {
+    display: none;
+  }
+  .receiver-display small {
+    display: none;
+  }
+  .analog-cabinet {
+    grid-template-columns: minmax(0, 1fr) 32px;
+  }
+  :root[data-design='analog'] .station-card .station-button {
+    gap: 0.25rem;
+  }
+  .receiver-power {
+    width: 44px;
+    height: 44px;
+  }
+}
+@media (max-height: 650px) {
+  :root[data-design='analog'] .station-card .station-artwork {
+    display: none;
+  }
+}
+.receiver-controls {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  align-content: center;
+  justify-items: center;
+}
+.receiver-controls .reel {
+  width: 24px;
+  height: 24px;
+  border-width: 4px;
+}
+.receiver-power {
+  grid-column: 1/-1;
+}
+:root[data-design='analog'] .station-card .station-button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  text-align: left;
+  gap: 0.65rem;
+  padding: 1.25rem 2.75rem 0.4rem 0.5rem;
+}
+:root[data-design='analog'] .station-card .station-artwork {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+}
+:root[data-design='analog'] .station-card .station-artwork > [data-station-logo] {
+  width: 36px;
+  height: 36px;
+}
+@media (max-width: 640px) {
+  :root[data-design='analog'] .station-card .station-button {
+    display: grid;
+    gap: 0.25rem;
+    text-align: center;
+    padding: 1.2rem 0.5rem 0.5rem;
+  }
+}
+:root[data-design='analog'] .station-play-indicator {
+  width: 18px;
+  height: 18px;
+  right: -2px;
+  bottom: -2px;
+}
+:root[data-design='analog'] .station-play-indicator > svg {
+  width: 7px;
+  height: 7px;
+}
+.analog-cabinet[data-playing='true'] .receiver-tuner i {
+  animation: analog-glow 2s ease-in-out infinite alternate;
+}
+@keyframes analog-glow {
+  to {
+    opacity: 0.55;
+    box-shadow: 0 0 6px var(--wra-live);
+  }
+}

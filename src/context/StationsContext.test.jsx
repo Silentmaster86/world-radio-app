@@ -30,6 +30,7 @@ function Probe() {
         Timer
       </button>
       <p
+        data-current={audio.currentStation.id}
         data-state={audio.status}
         data-deadline={audio.sleepTimerDeadline}
         data-issue={storageIssue}
@@ -90,4 +91,78 @@ test('curated stations and future-schema storage cannot be deleted', () => {
   page.click('[data-remove-curated]');
   expect(Number(page.container.querySelector('p').textContent)).toBe(count + 1);
   expect(localStorage.getItem(ADDED_KEY)).toBe(raw);
+});
+
+test('two tabs add without overwriting one another and external deletion does not resurrect', () => {
+  const first = mount();
+  const otherRow = {
+    ...row,
+    stationuuid: '23456789-1234-1234-1234-123456789abc',
+    name: 'Second station',
+    url: 'https://radio.example/second',
+  };
+  function Second() {
+    const api = useStations();
+    return (
+      <button data-second onClick={() => api.addStation(otherRow)}>
+        Add second
+      </button>
+    );
+  }
+  const second = render(
+    <StationsProvider>
+      <Second />
+    </StationsProvider>,
+  );
+  first.click('[data-add]');
+  second.click('[data-second]');
+  expect(JSON.parse(localStorage.getItem(ADDED_KEY)).stations.map((s) => s.name)).toEqual([
+    'World Jazz',
+    'Second station',
+  ]);
+  first.click('[data-remove]');
+  second.click('[data-second]');
+  expect(JSON.parse(localStorage.getItem(ADDED_KEY)).stations.map((s) => s.name)).toEqual([
+    'Second station',
+  ]);
+  act(() => window.dispatchEvent(new StorageEvent('storage', { key: ADDED_KEY })));
+  expect(first.container.querySelector('p').textContent).toBe('13');
+});
+
+test('unavailable storage is reported before adding and external deletion stops selected playback', async () => {
+  localStorage.setItem(
+    ADDED_KEY,
+    JSON.stringify({
+      version: 1,
+      stations: [{ directoryId: row.stationuuid, name: row.name, url: row.url }],
+    }),
+  );
+  const page = mount();
+  function Selection() {
+    const a = useAudio();
+    return (
+      <button data-selected-play onClick={() => a.selectStation('rb-' + row.stationuuid)}>
+        Play
+      </button>
+    );
+  }
+  page.unmount();
+  const playing = render(
+    <StationsProvider>
+      <AudioProvider>
+        <Probe />
+        <Selection />
+      </AudioProvider>
+    </StationsProvider>,
+  );
+  await act(async () => playing.container.querySelector('[data-selected-play]').click());
+  localStorage.setItem(ADDED_KEY, JSON.stringify({ version: 1, stations: [] }));
+  act(() => window.dispatchEvent(new StorageEvent('storage', { key: ADDED_KEY })));
+  expect(playing.container.querySelector('[data-state]').dataset.state).toBe('idle');
+  expect(window.Audio.mock.results.at(-1).value.src).toBe('');
+  playing.unmount();
+  jest.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+    throw new Error('blocked');
+  });
+  expect(mount().container.querySelector('[data-issue]').dataset.issue).toBe('true');
 });

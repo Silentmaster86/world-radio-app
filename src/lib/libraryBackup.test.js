@@ -198,3 +198,51 @@ test('a future settings schema is preserved unless settings import is explicitly
   );
   expect({ ...localStorage }).toEqual(before);
 });
+
+test.each(['classic', 'orbit', 'pulse', 'analog', 'signal'])(
+  'round trips %s and motion without requiring them in old backups',
+  (design) => {
+    const data = current();
+    data.settings = { ...data.settings, design, backgroundMotion: false };
+    const backup = createBackup(data);
+    const plan = planImport(parseBackup(JSON.stringify(backup)), current());
+    persistImport(plan, { includeSettings: true });
+    expect(JSON.parse(localStorage.getItem('wra:design:v1'))).toEqual({ version: 1, design });
+    expect(JSON.parse(localStorage.getItem('wra:theme:v1'))).toEqual({
+      version: 1,
+      mode: 'dark',
+      backgroundMotion: false,
+    });
+    expect(createBackup(current()).settings).not.toHaveProperty('design');
+  },
+);
+test('an old backup preserves the current design and a future design schema blocks all writes', () => {
+  localStorage.setItem('wra:design:v1', '{"version":1,"design":"orbit"}');
+  localStorage.setItem(
+    'wra:theme:v1',
+    JSON.stringify({ version: 1, mode: 'dark', backgroundMotion: false }),
+  );
+  persistImport(planImport(incoming(), current()), { includeSettings: true });
+  expect(JSON.parse(localStorage.getItem('wra:design:v1')).design).toBe('orbit');
+  expect(JSON.parse(localStorage.getItem('wra:theme:v1'))).toEqual({
+    version: 1,
+    mode: 'light',
+    backgroundMotion: false,
+  });
+  const backup = incoming();
+  backup.settings.design = 'pulse';
+  localStorage.setItem('wra:design:v1', '{"version":8,"design":"future"}');
+  const before = { ...localStorage };
+  expect(() => persistImport(planImport(backup, current()), { includeSettings: true })).toThrow(
+    'newer',
+  );
+  expect({ ...localStorage }).toEqual(before);
+});
+test.each([{ design: 'unknown' }, { backgroundMotion: 'yes' }])(
+  'rejects invalid design preferences %j',
+  (settings) => {
+    const backup = incoming();
+    Object.assign(backup.settings, settings);
+    expect(() => parseBackup(JSON.stringify(backup))).toThrow('invalid');
+  },
+);

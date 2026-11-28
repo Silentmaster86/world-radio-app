@@ -1,3 +1,4 @@
+import { DesignProvider } from './context/DesignContext';
 import { StationsProvider } from './context/StationsContext';
 import ReactDOM from 'react-dom/client';
 import App from './App';
@@ -26,9 +27,11 @@ root.render(
       <StationsProvider>
         <FavoritesProvider>
           <AudioProvider>
-            <ThemeProviderToggle>
-              <AppWithTheme />
-            </ThemeProviderToggle>
+            <DesignProvider>
+              <ThemeProviderToggle>
+                <AppWithTheme />
+              </ThemeProviderToggle>
+            </DesignProvider>
           </AudioProvider>
         </FavoritesProvider>
       </StationsProvider>
